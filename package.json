@@ -4,7 +4,7 @@
   "description": "",
   "author": "",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT License",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -24,7 +24,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "dotenv -e .env.test.local -- jest --config ./test/jest-e2e.json",
+    "test:e2e": "dotenv -e .env.test.local -- jest --watch --no-cache --config ./test/jest-e2e.json",
     "migrate:test:up": " dotenv -e .env.test.local -- npx sequelize-cli db:migrate",
     "migrate:undo:test:all": "dotenv -e .env.test.local -- npx sequelize-cli db:migrate:undo:all",
     "sequelize:seed:test:all": "dotenv -e .env.test.local -- npx sequelize-cli db:seed:all",
