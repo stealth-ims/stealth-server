@@ -7,30 +7,37 @@ const baseModelColumns = require('../migration-base.js');
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('reports', {
-      report_name: {
+      reportName: {
+        field: 'report_name',
         type: Sequelize.STRING,
       },
-      name_in_export: {
+      nameInExport: {
+        field: 'name_in_export',
         type: Sequelize.STRING,
       },
-      start_date: {
+      startDate: {
+        field: 'start_date',
         type: Sequelize.DATE,
       },
-      end_date: {
+      endDate: {
+        field: 'end_date',
         type: Sequelize.DATE,
       },
-      report_layout: {
+      reportLayout: {
+        field: 'report_layout',
         type: Sequelize.ENUM('PORTRAIT', 'LANDSCAPE'),
         defaultValue: 'PORTRAIT',
       },
 
       deletedAt: {
+        field: 'deleted_at',
         type: Sequelize.DATE,
         allowNull: true,
         field: 'deleted_at',
       },
 
       deletedBy: {
+        field: 'deleted_by',
         type: Sequelize.STRING,
         allowNull: true,
         field: 'deleted_by',
