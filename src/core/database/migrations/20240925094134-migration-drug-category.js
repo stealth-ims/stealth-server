@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.ENUM('ACTIVE', 'DEACTIVATED'),
         defaultValue: 'ACTIVE',
       },
-      drug_count: {
+      drugCount: {
         type: Sequelize.INTEGER,
         get: async () => {
           return await Sequelize.Model.count(
@@ -30,6 +30,7 @@ module.exports = {
             where({ category_id: this.id }),
           );
         },
+        field: 'drug_count',
       },
     });
   },

@@ -10,11 +10,13 @@ module.exports = {
       ...baseModelColumns,
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
         unique: true,
       },
-      contact_person: {
+      contactPerson: {
         type: Sequelize.STRING,
         allowNull: false,
+        field: 'contact_person',
       },
       contact: {
         type: Sequelize.STRING,
@@ -24,7 +26,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      info: Sequelize.TEXT,
+      info: {
+        type: Sequelize.TEXT,
+        field: 'info',
+      },
     });
   },
 

@@ -14,15 +14,20 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      cost_price: {
+      costPrice: {
         type: Sequelize.DOUBLE,
         allowNull: false,
+        field: 'cost_price',
       },
-      selling_price: {
+      sellingPrice: {
         type: Sequelize.DOUBLE,
         allowNull: false,
+        field: 'selling_price',
       },
-      dosage_form: Sequelize.ENUM('SOLIDS', 'LIQUIDS'),
+      dosageForm: {
+        type: Sequelize.ENUM('SOLIDS', 'LIQUIDS'),
+        field: 'dosage_form',
+      },
       code: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -31,8 +36,13 @@ module.exports = {
         type: Sequelize.DATEONLY,
         allowNull: false,
       },
-      fda_approval: Sequelize.STRING,
-      ISO: Sequelize.STRING,
+      fdaApproval: {
+        type: Sequelize.STRING,
+        field: 'fda_approval',
+      },
+      ISO: {
+        type: Sequelize.STRING,
+      },
       batch: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -41,28 +51,33 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      reorder_point: {
+      reorderPoint: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        field: 'reorder_point',
       },
       manufacturer: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      supplier_id: {
+      supplierId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
           model: 'suppliers',
           key: 'id',
         },
+        field: 'supplier_id',
       },
       status: {
         type: Sequelize.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'),
         allowNull: false,
       },
-      storage_req: Sequelize.TEXT,
-      category_id: {
+      storageReq: {
+        type: Sequelize.TEXT,
+        field: 'storage_req',
+      },
+      categoryId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
@@ -71,6 +86,7 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+        field: 'category_id',
       },
     });
   },
