@@ -15,6 +15,9 @@ export class Supplier extends BaseModel {
   @Column({ type: DataType.STRING, allowNull: false })
   contact: string;
 
+  @Column({ type: DataType.STRING })
+  position: string
+
   @Column({ type: DataType.STRING, allowNull: false })
   type: string;
 

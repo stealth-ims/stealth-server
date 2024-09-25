@@ -14,10 +14,6 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      date: {
-        type: Sequelize.DATEONLY,
-        allowNull: false,
-      },
       status: {
         type: Sequelize.ENUM('ACTIVE', 'DEACTIVATED'),
         defaultValue: 'ACTIVE',
