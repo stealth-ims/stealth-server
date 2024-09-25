@@ -1,4 +1,4 @@
-import { Column, Table } from 'sequelize-typescript';
+import { Column, DataType, DeletedAt, Table } from 'sequelize-typescript';
 import { BaseModel } from '../../shared/models/base.model';
 
 @Table({
@@ -35,4 +35,11 @@ export class User extends BaseModel {
 
   @Column({ allowNull: true })
   deactivatedBy: string;
+
+  @DeletedAt
+  @Column({ type: DataType.DATE, field: 'deleted_at' })
+  deletedAt: Date;
+
+  @Column({ type: DataType.STRING, field: 'deleted_by' })
+  deletedBy: string;
 }

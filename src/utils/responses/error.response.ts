@@ -1,8 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class ApiErrorResponse {
-  constructor(statusCode: number, message: string) {
-    this.statusCode = statusCode;
-    this.message = message;
-  }
-  statusCode: number;
+  @ApiProperty()
   message: string;
+  @ApiProperty()
+  error: string;
+  @ApiProperty()
+  statusCode: number;
 }
