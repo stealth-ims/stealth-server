@@ -1,6 +1,13 @@
 import { Column, Table, DataType } from 'sequelize-typescript';
 import { BaseModel } from '../../shared/models/base.model';
 
+export enum ReportLayout {
+  PORTRAIT = 'PORTRAIT',
+  LANDSCAPE = 'LANDSCAPE',
+}
+
+export type ReportLayoutType = keyof typeof ReportLayout;
+
 @Table({
   tableName: 'reports',
   underscored: true,
@@ -19,9 +26,9 @@ export class Report extends BaseModel {
   endDate: Date;
 
   @Column({
-    type: DataType.ENUM('PORTRAIT', 'LANDSCAPE'),
+    type: DataType.ENUM(...Object.values(ReportLayout)),
     defaultValue: 'PORTRAIT',
     field: 'report_layout',
   })
-  reportLayout: 'PORTRAIT' | 'LANDSCAPE';
+  reportLayout: ReportLayoutType;
 }

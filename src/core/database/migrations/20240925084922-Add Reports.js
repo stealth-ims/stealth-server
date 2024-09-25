@@ -1,15 +1,12 @@
 'use strict';
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+const baseModelColumns = require('../migration-base.js');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('reports', {
-      id: {
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-      },
       report_name: {
         type: Sequelize.STRING,
       },
@@ -26,30 +23,11 @@ module.exports = {
         type: Sequelize.ENUM('PORTRAIT', 'LANDSCAPE'),
         defaultValue: 'PORTRAIT',
       },
-      created_at: {
-        type: Sequelize.DATE,
-        defaultValue: new Date(),
-      },
-      created_by: {
-        type: Sequelize.STRING,
-      },
-      updated_at: {
-        type: Sequelize.DATE,
-        defaultValue: new Date(),
-      },
-      updated_by: {
-        type: Sequelize.STRING,
-      },
-      deleted_at: {
-        type: Sequelize.DATE,
-      },
-      deleted_by: {
-        type: Sequelize.STRING,
-      },
+      ...baseModelColumns,
     });
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     await queryInterface.dropTable('reports');
   },
 };
