@@ -4,11 +4,11 @@ import { UpdateDrugsCategoryDto } from './dto/update-drugs.category.dto';
 
 @Injectable()
 export class DrugsCategoryService {
-  create(createDrugsCategoryDto: CreateDrugsCategoryDto) {
+  async create(createDrugsCategoryDto: CreateDrugsCategoryDto) {
     return 'This action adds a new drugsCategory';
   }
 
-  findAll() {
+  async findAll(/* filters*/) {
     return `This action returns all drugsCategory`;
   }
 

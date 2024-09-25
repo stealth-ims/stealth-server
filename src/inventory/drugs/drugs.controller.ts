@@ -10,13 +10,15 @@ import {
 import { DrugsService } from './drugs.service';
 import { CreateDrugDto } from './dto/create-drug.dto';
 import { UpdateDrugDto } from './dto/update-drug.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Drugs")
 @Controller('drugs')
 export class DrugsController {
   constructor(private readonly drugsService: DrugsService) {}
 
   @Post()
-  create(@Body() createDrugDto: CreateDrugDto) {
+  async create(@Body() createDrugDto: CreateDrugDto) {
     return this.drugsService.create(createDrugDto);
   }
 

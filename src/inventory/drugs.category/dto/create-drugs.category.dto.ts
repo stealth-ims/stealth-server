@@ -11,9 +11,4 @@ export class CreateDrugsCategoryDto extends IntersectionType(GenericResponseDto)
   @IsNotEmpty()
   @IsString()
   name: string;
-
-  @ApiProperty({ enum: DrugsCategoryStatus, description: "drug category status" })
-  @IsNotEmpty()
-  @IsEnum(DrugsCategoryStatus)
-  status: DrugsCategoryStatus;
 }

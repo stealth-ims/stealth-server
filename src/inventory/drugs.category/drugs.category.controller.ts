@@ -8,21 +8,36 @@ import {
   Delete,
 } from '@nestjs/common';
 import { DrugsCategoryService } from './drugs.category.service';
-import { CreateDrugsCategoryDto } from './dto/create-drugs.category.dto';
-import { UpdateDrugsCategoryDto } from './dto/update-drugs.category.dto';
+import { CreateDrugsCategoryDto, UpdateDrugsCategoryDto } from './dto';
+import { ApiCreatedSuccessResponse } from 'src/shared/docs/decorators/response.decorators';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiTags } from '@nestjs/swagger';
+import { ApiErrorResponse } from 'src/utils/responses/error.response';
 
+@ApiTags("Drug Category")
 @Controller('drugs/category')
 export class DrugsCategoryController {
   constructor(private readonly drugsCategoryService: DrugsCategoryService) { }
 
+  @ApiCreatedSuccessResponse({
+    type: CreateDrugsCategoryDto,
+    description: "Drug category added successfully"
+  })
+  @ApiBadRequestResponse({
+    type: ApiErrorResponse,
+    description: "validation error occured"
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
   @Post()
-  create(@Body() createDrugsCategoryDto: CreateDrugsCategoryDto) {
-    return this.drugsCategoryService.create(createDrugsCategoryDto);
+  async create(@Body() createDrugsCategoryDto: CreateDrugsCategoryDto) {
+    return  await this.drugsCategoryService.create(createDrugsCategoryDto);
   }
 
   @Get()
-  findAll() {
-    return this.drugsCategoryService.findAll();
+  async findAll() {
+    return await this.drugsCategoryService.findAll();
   }
 
   @Get(':id')
