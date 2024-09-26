@@ -1,4 +1,6 @@
-import { Column, DataType, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, ForeignKey, Index, Table } from 'sequelize-typescript';
+import { DrugsCategory } from 'src/inventory/drugs-category/models/drugs-category.model';
+import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/shared/models/base.model';
 
 @Table({
@@ -6,6 +8,7 @@ import { BaseModel } from 'src/shared/models/base.model';
   underscored: true,
 })
 export class Drug extends BaseModel {
+  @Index
   @Column
   name: string;
 
@@ -48,6 +51,17 @@ export class Drug extends BaseModel {
   @Column({ type: DataType.TEXT, field: 'storage_req' })
   storageReq: string;
 
-  @Column({ type: DataType.UUID, allowNull: false, references: { model: 'drug_categories', key: 'id' }, onUpdate: 'CASCADE', onDelete: 'CASCADE', field: 'category_id' })
+  @ForeignKey(() => DrugsCategory)
+  @Column({ type: DataType.UUID, onUpdate: 'CASCADE', onDelete: 'CASCADE', field: 'category_id' })
   categoryId: string;
+
+  @BelongsTo(() => DrugsCategory, 'category_id')
+  category: DrugsCategory
+
+  @ForeignKey(() => Supplier)
+  @Column
+  supplierId: string
+
+  @BelongsTo(()=> Supplier, 'category_id')
+  supplier: Supplier
 }

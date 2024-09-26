@@ -1,4 +1,5 @@
-import { Column, DataType, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Table } from 'sequelize-typescript';
+import { Drug } from 'src/inventory/drugs/models/drug.model';
 import { BaseModel } from 'src/shared/models/base.model';
 
 @Table({
@@ -23,4 +24,7 @@ export class Supplier extends BaseModel {
 
   @Column({ type: DataType.TEXT, field: 'info' })
   info: string;
+
+  @HasMany(() => Drug)
+  drugs: Drug[];
 }

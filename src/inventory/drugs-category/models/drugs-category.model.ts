@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Column, DataType, Table } from 'sequelize-typescript';
+import { Column, DataType, Default, HasMany, Table } from 'sequelize-typescript';
+import { Drug } from 'src/inventory/drugs/models/drug.model';
 import { BaseModel } from 'src/shared/models/base.model';
 
 @Table({
@@ -7,26 +7,19 @@ import { BaseModel } from 'src/shared/models/base.model';
   underscored: true,
 })
 export class DrugsCategory extends BaseModel {
-  @ApiProperty({
-    example: "laxatives",
-    description: "drug category name"
-  })
   @Column
   name: string;
 
-  @ApiProperty({
-    example: "ACTIVE",
-    description: "drug category status"
-  })
   @Column({ type: DataType.ENUM('ACTIVE', 'DEACTIVATED'), defaultValue: 'ACTIVE' })
   status: DrugsCategoryStatus;
 
-  @ApiProperty({
-    example: "100",
-    description: "Number of drugs in category"
-  })
   @Column({ type: DataType.INTEGER, field: 'drug_count' })
-  drugCount: number;
+  get drugCount(): number {
+    return this.drugs.length
+  };
+
+  @HasMany(() => Drug)
+  drugs: Drug[]
 }
 
 export enum DrugsCategoryStatus {
