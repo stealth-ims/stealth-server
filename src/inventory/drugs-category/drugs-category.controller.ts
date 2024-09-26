@@ -53,7 +53,7 @@ export class DrugsCategoryController {
 
   @CustomApiResponse(["accepted", "forbidden", 'unauthorized'], {type: String, message: "Drug category deleted successfully"})
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.drugsCategoryService.remove(+id);
   }
 }

@@ -7,6 +7,7 @@ import { Drug } from './models/drug.model';
 import { UniqueConstraintError } from 'sequelize';
 import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
+import { throwError } from 'src/utils/responses/error.response';
 
 @Injectable()
 export class DrugsService {
@@ -33,32 +34,40 @@ export class DrugsService {
       this.logger.log(`Drug added successfully. id: ${createdDrug.id}`)
       return createdDrug;
     } catch (error) {
-      this.logger.error(error);
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      if (error instanceof UniqueConstraintError) {
-        let err = error.errors[0];
-        this.logger.warn(`${err.value} already exists`)
-        throw new BadRequestException(`${err.path}: ${err.message}, ${err.value} already exists`, JSON.stringify(err))
-      }
+      throw throwError(this.logger, error);
+    }
+  }
+
+  async findAll(query: GetDrugDto): Promise<DrugResponse[]> {
+    try {
+      const drugs = await this.drugRepo.findAll();
+      return drugs
+    } catch (error) {
+      this.logger.error(error.message, error);
       throw new InternalServerErrorException(error.message, error);
     }
   }
 
-  findAll(query: GetDrugDto) {
-    return `This action returns all drugs`;
+  async findOne(id: string) : Promise<DrugResponse>{
+    try {
+      this.logger.log(`finding drug with id: ${id}`)
+      const drug = await this.drugRepo.findByPk(id)
+      if (!drug) {
+        throw new NotFoundException(`drug with id: ${id} not found`)
+      }
+      return drug
+    } catch (error) {
+      this.logger.error(error.message, error)
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(error.message, error);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} drug`;
-  }
-
-  update(id: number, updateDrugDto: UpdateDrugDto) {
+  async update(id: string, updateDrugDto: UpdateDrugDto) {
     return `This action updates a #${id} drug`;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} drug`;
   }
 

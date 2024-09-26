@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
 import { ApiTags, PickType } from '@nestjs/swagger';
@@ -26,8 +27,8 @@ export class DrugsController {
 
   @CustomApiResponse(["accepted", "forbidden", "unauthorized"], { type: DrugResponse, isArray: true, message: "Drugs retrieved successfully" })
   @Get()
-  findAll(@Query() query: GetDrugDto) {
-    return this.drugsService.findAll(query);
+  async findAll(@Query() query: GetDrugDto) {
+    return await this.drugsService.findAll(query);
   }
 
   @CustomApiResponse(["accepted", "forbidden", "unauthorized"], { type: DrugAnalytics, message: "Drug analytics retrieved successfully" })
@@ -38,19 +39,19 @@ export class DrugsController {
 
   @CustomApiResponse(["accepted", "forbidden", "unauthorized"], { type: DrugResponse, message: "Drug retrieved successfully" })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.drugsService.findOne(+id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.drugsService.findOne(id);
   }
 
   @CustomApiResponse(["patch", "forbidden", "unauthorized"], { type: String, message: "Drug updated successfully" })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDrugDto: UpdateDrugDto) {
-    return this.drugsService.update(+id, updateDrugDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Body() updateDrugDto: UpdateDrugDto) {
+    return await this.drugsService.update(id, updateDrugDto);
   }
 
   @CustomApiResponse(["accepted", "forbidden", "unauthorized"], { type: PickType<DrugResponse, 'id'>, message: "Drug deleted successfully" })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.drugsService.remove(+id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.drugsService.remove(+id);
   }
 }
