@@ -1,12 +1,10 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CreateDrugDto } from './dto/create-drug.dto';
-import { UpdateDrugDto } from './dto/update-drug.dto';
-import { DrugResponse, GetDrugDto } from './dto';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { CreateDrugDto, DrugResponse, GetDrugDto, UpdateDrugDto } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Drug } from './models/drug.model';
-import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import { throwError } from 'src/utils/responses/error.response';
+import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
 
 @Injectable()
 export class DrugsService {

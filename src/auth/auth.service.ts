@@ -6,8 +6,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from '../models/user.model';
-import { CreateUserDto } from '../dto';
+import { User } from './models/user.model';
+import { CreateUserDto } from '../user/dto';
 import { LoginDto, LoginTokenDto, RefreshTokenDto, TokenDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -61,9 +61,33 @@ export class AuthService {
     return new LoginTokenDto(user, token);
   }
 
+  async retrieveUser(userId: string) {
+    const user = await this.userRepository.findByPk(userId, {
+      attributes: {
+        exclude: ['password', 'deactivatedBy', 'deletedAt', 'deletedBy'],
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   async delete(userId: string) {
     console.log(userId);
     return { message: 'user deleted' };
+  }
+
+  async refreshToken(dto: RefreshTokenDto) {
+    const { sub } = await this.jwtService.verifyAsync<
+      Pick<IUserPayload, 'sub'>
+    >(dto.refreshToken, {
+      secret: this.jwtConfiguration.secret,
+      audience: this.jwtConfiguration.audience,
+      issuer: this.jwtConfiguration.issuer,
+    });
+    const user = await this.userRepository.findByPk(sub);
+    return this.generateTokens(user);
   }
 
   private async signToken<T>(userId: string, expiresIn: number, payload?: T) {
@@ -96,17 +120,5 @@ export class AuthService {
       this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl),
     ]);
     return new TokenDto(accessToken, refreshToken);
-  }
-
-  async refreshToken(dto: RefreshTokenDto) {
-    const { sub } = await this.jwtService.verifyAsync<
-      Pick<IUserPayload, 'sub'>
-    >(dto.refreshToken, {
-      secret: this.jwtConfiguration.secret,
-      audience: this.jwtConfiguration.audience,
-      issuer: this.jwtConfiguration.issuer,
-    });
-    const user = await this.userRepository.findByPk(sub);
-    return this.generateTokens(user);
   }
 }

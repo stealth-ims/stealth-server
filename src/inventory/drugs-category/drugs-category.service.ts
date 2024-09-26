@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CreateDrugsCategoryDto, DrugsCategoryResponse } from './dto/create-drugs-category.dto';
-import { UpdateDrugsCategoryDto } from './dto/update-drugs-category.dto';
 import { DrugsCategory, DrugsCategoryStatus } from './models/drugs-category.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { SequelizeScopeError, UniqueConstraintError, UnknownConstraintError } from 'sequelize';
 import { error } from 'console';
 import { throwError } from 'src/utils/responses/error.response';
+import { CreateDrugsCategoryDto, DrugsCategoryResponse, UpdateDrugsCategoryDto } from './dto';
 
 @Injectable()
 export class DrugsCategoryService {

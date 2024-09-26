@@ -1,4 +1,9 @@
 import { OmitType } from '@nestjs/swagger';
 import { CreateUserDto } from './create.dto';
 
-export class GetUserDto extends OmitType(CreateUserDto, ['password']) {}
+export class GetUserDto extends OmitType(CreateUserDto, [
+  'password',
+  'deactivatedBy',
+  'deletedAt',
+  'deletedBy',
+]) {}

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { User } from '../../models/user.model';
+import { User } from '../models/user.model';
 
 export class TokenDto {
   constructor(accessToken: string, refreshToken: string) {
