@@ -7,21 +7,21 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { DrugsCategoryService } from './drugs.category.service';
+import { DrugsCategoryService } from './drugs-category.service';
 import { CreateDrugsCategoryDto, UpdateDrugsCategoryDto } from './dto';
 import { ApiCreatedSuccessResponse, ApiSuccessResponse } from 'src/shared/docs/decorators/response.decorators';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiTags } from '@nestjs/swagger';
 import { ApiErrorResponse } from 'src/utils/responses/error.response';
 import { ApiSuccessResponseDto } from 'src/utils/responses/success.response';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import { DrugsCategory } from './models/drugs.category.model';
+import { DrugsCategory } from './models/drugs-category.model';
 
 @ApiTags("Drug Category")
 @Controller('drugs/category')
 export class DrugsCategoryController {
   constructor(private readonly drugsCategoryService: DrugsCategoryService) { }
 
-  @CustomApiResponse(["created", "forbidden", "unauthorized"], {type: DrugsCategory, message: "Drug category created successfully"})
+  @CustomApiResponse(["created", "forbidden", "unauthorized"], { type: DrugsCategory, message: "Drug category created successfully" })
   @Post()
   async create(@Body() createDrugsCategoryDto: CreateDrugsCategoryDto) {
     return await this.drugsCategoryService.create(createDrugsCategoryDto);
