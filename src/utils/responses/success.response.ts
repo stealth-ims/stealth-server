@@ -24,3 +24,36 @@ export class ApiSuccessResponseNoData {
   @ApiProperty()
   message: string;
 }
+
+export class PaginatedDataResponseDto<T> {
+  constructor(rows: T, page: number, pageSize: number, total: number) {
+    const totalNumberOfPages = Math.ceil(total / pageSize);
+    this.rows = rows;
+    this.total = total;
+    this.pageSize = pageSize;
+    this.page = page;
+    this.nextPage = page < totalNumberOfPages ? page + 1 : null;
+    this.prevPage = page > 1 ? page - 1 : null;
+    this.totalPages = totalNumberOfPages;
+  }
+  @ApiProperty()
+  rows: T;
+
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  pageSize: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  nextPage: number | null;
+
+  @ApiProperty()
+  prevPage: number | null;
+
+  @ApiProperty()
+  totalPages: number;
+}

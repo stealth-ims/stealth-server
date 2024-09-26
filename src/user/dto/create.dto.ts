@@ -3,8 +3,9 @@ import {
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, Matches } from 'class-validator';
 import { GenericResponseDto } from '../../shared/docs/dto/base.dto';
+import { Role } from '../../auth/interface/roles.enum';
 
 export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   @ApiProperty({
@@ -44,10 +45,12 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   department: string;
 
   @ApiProperty({
-    example: 'pharmacist',
+    example: 'healthcare_worker',
+    enum: Role,
     description: 'The role the user is being registered as',
   })
   @IsNotEmpty()
+  @IsEnum(Role)
   role: string;
 
   @ApiProperty({

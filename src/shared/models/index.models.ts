@@ -1,5 +1,5 @@
 import { ReportModels } from 'src/reports/models';
-import { UserModels } from '../../user/models';
 import { DrugOrderModels } from '../../orders/models';
+import { UserModels } from '../../auth/models';
 
 export const IndexModels = [...UserModels, ...ReportModels, ...DrugOrderModels];
