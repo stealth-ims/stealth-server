@@ -30,11 +30,11 @@ export class SuppliersService {
     }
   }
 
-  update(id: number, updateSupplierDto: UpdateSupplierDto) {
+  update(id: string, updateSupplierDto: UpdateSupplierDto) {
     return `This action updates a #${id} supplier`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} supplier`;
   }
 }

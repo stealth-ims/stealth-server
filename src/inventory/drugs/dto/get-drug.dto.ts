@@ -2,31 +2,15 @@ import { ApiProperty, ApiQuery, IntersectionType, } from "@nestjs/swagger";
 import { CreateDrugDto } from "./create-drug.dto";
 import { GenericResponseDto } from "src/shared/docs/dto/base.dto";
 import { IsNumber, IsString } from "class-validator";
+import { GetManyDto } from "src/shared/docs/dto/get-may.dto";
 
-@ApiQuery({ name: 'find', required: false })
-export class GetDrugDto {
+export class GetDrugDto extends IntersectionType(GetManyDto) {
   @ApiProperty({ example: "44220956-0962-4dd0-9e65-1564c585563c", description: 'Search drugs by supplier id' })
   supplierId: string;
-
-  @ApiProperty({ example: 10, description: 'The number of items to return', required: false })
-  @IsNumber()
-  limit: number;
-
-  @ApiProperty({ example: 1, description: 'The page number to return', required: false })
-  @IsNumber()
-  page: number;
-
-  @ApiProperty({ example: 'name', description: 'The field to search by', isArray: true, required: false })
-  @IsString({ each: true })
-  search: string;
 
   @ApiProperty({ example: 'laxatives', description: 'The dosage form of the drug', isArray: true, required: false })
   @IsString({ each: true })
   categories: string[];
-
-  @ApiProperty({ example: 'name=order', description: 'The field to sort by', required: false })
-  @IsString()
-  orderBy: string;
 }
 
 export class DrugAnalytics {
