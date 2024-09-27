@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto, GetUserDto } from '../user/dto';
 import { AuthService } from './auth.service';
-import { ApiSuccessResponseDto } from '../utils/responses/success.response';
 import { User } from './models/user.model';
 import {
   ApiCreatedSuccessResponse,
@@ -25,11 +24,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ApiErrorResponse } from '../utils/responses/error.response';
 import { Authorize, GetUser } from './decorator';
+import { ApiErrorResponse } from '../utils/responses/error.response';
+import { ApiSuccessResponseDto } from '../utils/responses/success.response';
 
 @ApiTags('User Authentication')
-@Controller('/users/auth')
+@Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
   constructor(private readonly authService: AuthService) {}
@@ -46,7 +46,7 @@ export class AuthController {
     type: ApiErrorResponse,
     description: 'An unexpected error occured',
   })
-  @Post()
+  @Post('signup')
   async signUp(@Body() dto: CreateUserDto) {
     try {
       const response = await this.authService.register(dto);
@@ -59,7 +59,10 @@ export class AuthController {
       if (error instanceof HttpException) {
         throw error;
       } else {
-        this.logger.error(`An error occured: ${error.message}`, error);
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
         throw new InternalServerErrorException(error.message, error);
       }
     }
@@ -87,7 +90,10 @@ export class AuthController {
       if (error instanceof HttpException) {
         throw error;
       } else {
-        this.logger.error(`An error occured: ${error.message}`, error);
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
         throw new InternalServerErrorException(error.message, error);
       }
     }
@@ -106,8 +112,8 @@ export class AuthController {
     description: 'An unexpected error occured',
   })
   @ApiBearerAuth('access-token')
-  @Get('user')
   @Authorize()
+  @Get('user')
   async getUser(@GetUser('sub') id: string) {
     try {
       const response = await this.authService.retrieveUser(id);
@@ -120,11 +126,11 @@ export class AuthController {
       if (error instanceof HttpException) {
         throw error;
       } else {
-        this.logger.error(`An error occured: ${error.message}`, error);
-        throw new InternalServerErrorException(
-          error.message ?? 'An unknown error occured',
-          error,
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
         );
+        throw new InternalServerErrorException(error.message, error);
       }
     }
   }
