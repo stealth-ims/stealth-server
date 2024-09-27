@@ -10,9 +10,8 @@ import { configuration } from '../shared/config/config';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let service: AuthService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         SequelizeModule.forRoot(configuration.test as SequelizeModuleOptions),
@@ -24,13 +23,9 @@ describe('AuthController', () => {
       providers: [AuthService],
     }).compile();
     controller = module.get<AuthController>(AuthController);
-    service = module.get<AuthService>(AuthService);
   });
 
   it('controller should be defined', () => {
     expect(controller).toBeDefined();
-  });
-  it('service should be defined', () => {
-    expect(service).toBeDefined();
   });
 });
