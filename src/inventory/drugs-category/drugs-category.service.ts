@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDrugsCategoryDto, UpdateDrugsCategoryDto } from './dto';
 
-
 @Injectable()
 export class DrugsCategoryService {
-  async create(createDrugsCategoryDto: CreateDrugsCategoryDto) {
+  async create(_createDrugsCategoryDto: CreateDrugsCategoryDto) {
     return 'This action adds a new drugsCategory';
   }
 
@@ -16,7 +15,8 @@ export class DrugsCategoryService {
     return `This action returns a #${id} drugsCategory`;
   }
 
-  update(id: number, updateDrugsCategoryDto: UpdateDrugsCategoryDto) {
+  //@Kratosgado:: when ready to use the the dto omit the underscore
+  update(id: number, _updateDrugsCategoryDto: UpdateDrugsCategoryDto) {
     return `This action updates a #${id} drugsCategory`;
   }
 

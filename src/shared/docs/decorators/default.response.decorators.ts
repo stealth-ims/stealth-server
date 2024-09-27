@@ -1,18 +1,20 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiAcceptedResponse,
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiResponse,
-  ApiUnauthorizedResponse
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiErrorResponse } from 'src/utils/responses/error.response';
 import { ApiSuccessResponse } from './response.decorators';
 
-export function CustomApiResponse(responseTypes: CustomResponses[], options: { type: any, message?: string, isArray?: boolean }) {
+export function CustomApiResponse(
+  responseTypes: CustomResponses[],
+  options: { type: any; message?: string; isArray?: boolean },
+) {
   return applyDecorators(
     ...responseTypes.map((response) => {
       switch (response) {
@@ -20,7 +22,7 @@ export function CustomApiResponse(responseTypes: CustomResponses[], options: { t
           return ApiSuccessResponse({
             type: options.type,
             description: options.message || 'Request accepted',
-            isArray: options.isArray
+            isArray: options.isArray,
           });
         case 'created':
           return ApiCreatedResponse({

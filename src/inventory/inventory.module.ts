@@ -10,4 +10,4 @@ import { DrugsCategoryModule } from './drugs-category/drugs.-category.module';
   controllers: [InventoryController],
   providers: [InventoryService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

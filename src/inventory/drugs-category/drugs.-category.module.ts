@@ -6,4 +6,4 @@ import { DrugsCategoryController } from './drugs-category.controller';
   controllers: [DrugsCategoryController],
   providers: [DrugsCategoryService],
 })
-export class DrugsCategoryModule { }
+export class DrugsCategoryModule {}

@@ -17,7 +17,7 @@ export class Supplier extends BaseModel {
   contact: string;
 
   @Column({ type: DataType.STRING })
-  position: string
+  position: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
   type: string;
