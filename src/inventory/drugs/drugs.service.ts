@@ -1,15 +1,26 @@
 import {
-  BadRequestException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateDrugDto, DrugResponse, GetDrugDto, UpdateDrugDto } from './dto';
+import {
+  CreateDrugDto,
+  DrugPaginationDto,
+  DrugResponse,
+  UpdateDrugDto,
+} from './dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Drug } from './models/drug.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import { throwError } from 'src/utils/responses/error.response';
 import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
+import { FindAndCountOptions, Op } from 'sequelize';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+  PaginatedDataResponseDto,
+} from 'src/utils/responses/success.response';
 
 @Injectable()
 export class DrugsService {
@@ -22,7 +33,9 @@ export class DrugsService {
     this.logger = new Logger(DrugsService.name);
   }
 
-  async create(createDrugDto: CreateDrugDto): Promise<DrugResponse> {
+  async create(
+    createDrugDto: CreateDrugDto,
+  ): Promise<ApiSuccessResponseDto<DrugResponse>> {
     try {
       // check if category exists
       this.logger.log(
@@ -38,41 +51,81 @@ export class DrugsService {
 
       const createdDrug = await this.drugRepo.create({ ...createDrugDto });
       this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-      return createdDrug;
+      return new ApiSuccessResponseDto(
+        createdDrug,
+        HttpStatus.CREATED,
+        'Drug category created successfully',
+      );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  async findAll(_query: GetDrugDto): Promise<DrugResponse[]> {
+  async findAll(
+    query: DrugPaginationDto,
+  ): Promise<ApiSuccessResponseDto<PaginatedDataResponseDto<DrugResponse[]>>> {
     try {
-      const drugs = await this.drugRepo.findAll();
-      return drugs;
+      const filter: FindAndCountOptions<Drug> = {
+        where:
+          (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
+        limit: query.pageSize || 10,
+        offset: query.pageSize * (query.page - 1) || 0,
+        order: [[query.orderBy ?? 'name', 'ASC']],
+      };
+      const drugs = await this.drugRepo.findAndCountAll(filter);
+      this.logger.log(`Retrieved ${drugs.count} drugs`);
+      return new ApiSuccessResponseDto(
+        new PaginatedDataResponseDto(
+          drugs.rows,
+          query.page || 1,
+          query.pageSize,
+          drugs.count,
+        ),
+        HttpStatus.FOUND,
+        'Drugs retrieved successfully',
+      );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  async findOne(id: string): Promise<DrugResponse> {
+  async findOne(id: string): Promise<ApiSuccessResponseDto<DrugResponse>> {
     try {
       this.logger.log(`finding drug with id: ${id}`);
       const drug = await this.drugRepo.findByPk(id);
       if (!drug) {
         throw new NotFoundException(`drug with id: ${id} not found`);
       }
-      return drug;
+
+      this.logger.log(`Found drugs category with ID: ${id}`);
+      return new ApiSuccessResponseDto(
+        drug,
+        HttpStatus.FOUND,
+        'Drug retrieved successfully',
+      );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  async update(id: string, updateDrugDto: UpdateDrugDto) {
+  async update(
+    id: string,
+    updateDrugDto: UpdateDrugDto,
+  ): Promise<ApiSuccessResponseNoData> {
     try {
-      const result = await this.drugRepo.upsert({ id: id, ...updateDrugDto });
-      if (!result[1]) {
-        throw new BadRequestException('No update was done');
+      const result = await this.drugRepo.update(
+        { ...updateDrugDto },
+        { where: { id } },
+      );
+      if (result[0] == 0) {
+        this.logger.warn(`drug with id ${id} not found`);
+        throw new NotFoundException(`drug with id ${id} not found`);
       }
-      return result[0];
+      this.logger.log(`Updated drug with ID: ${id}`);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug updated successfully',
+      );
     } catch (error) {
       throw throwError(this.logger, error);
     }
@@ -82,7 +135,10 @@ export class DrugsService {
     try {
       await this.drugRepo.destroy({ where: { id } });
       this.logger.log(`Deleted Drug with id: ${id}`);
-      return `Deleted Drug with id: ${id}`;
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug deleted successfully',
+      );
     } catch (error) {
       throw throwError(this.logger, error);
     }

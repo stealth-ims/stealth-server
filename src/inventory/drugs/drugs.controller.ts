@@ -6,19 +6,19 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
-import { ApiTags, PickType } from '@nestjs/swagger';
+import { ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
   CreateDrugDto,
   DrugAnalytics,
+  DrugPaginationDto,
   DrugResponse,
-  GetDrugDto,
   UpdateDrugDto,
 } from './dto';
+import { GetQueries } from 'src/shared/docs/decorators/get-queries.decorator';
 
 @ApiTags('Drugs')
 @Controller('drugs')
@@ -34,13 +34,26 @@ export class DrugsController {
     return await this.drugsService.create(createDrugDto);
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['filter', 'authorize'], {
     type: DrugResponse,
     isArray: true,
     message: 'Drugs retrieved successfully',
   })
+  @ApiQuery({
+    name: 'categories',
+    example: 'laxatives',
+    isArray: true,
+    description: 'The category of the drug',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'supplierId',
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'Id supplier of the drug',
+    required: false,
+  })
   @Get()
-  async findAll(@Query() query: GetDrugDto) {
+  async findAll(@GetQueries() query: DrugPaginationDto) {
     return await this.drugsService.findAll(query);
   }
 

@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
-  Query,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { CreateSupplierDto, SupplierResponse, UpdateSupplierDto } from './dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import { GetQueries } from 'src/shared/docs/decorators/get-queries.decorator';
 
 @ApiTags('Suppliers')
 @Controller('suppliers')
@@ -29,13 +29,13 @@ export class SuppliersController {
     return await this.suppliersService.create(createSupplierDto);
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['filter', 'authorize'], {
     type: SupplierResponse,
     isArray: true,
     message: 'Suppliers retrieved successfully',
   })
   @Get()
-  async findAll(@Query() query: PaginationRequestDto) {
+  async findAll(@GetQueries() query: PaginationRequestDto) {
     return await this.suppliersService.findAll(query);
   }
 
