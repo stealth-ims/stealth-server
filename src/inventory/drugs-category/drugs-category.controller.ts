@@ -28,7 +28,7 @@ export class DrugsCategoryController {
     this.logger = new Logger(DrugsCategoryController.name);
   }
 
-  @CustomApiResponse(['success', 'unauthorized'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: DrugsCategoryResponse,
     message: 'Drug category created successfully',
   })
@@ -37,7 +37,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.create(createDrugsCategoryDto);
   }
 
-  @CustomApiResponse(['filter', 'unauthorized'], {
+  @CustomApiResponse(['filter', 'authorize'], {
     type: DrugsCategoryResponse,
     message: 'Drug categories retrieved successfully',
   })
@@ -46,7 +46,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.findAll(query);
   }
 
-  @CustomApiResponse(['success', 'unauthorized', 'notfound'], {
+  @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: DrugsCategoryResponse,
     message: 'Drug category retrieved successfully',
   })
@@ -55,7 +55,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.findOne(id);
   }
 
-  @CustomApiResponse(['success', 'unauthorized'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: String,
     message: 'Drug category updated successfully',
   })
@@ -67,7 +67,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.update(id, updateDrugsCategoryDto);
   }
 
-  @CustomApiResponse(['success', 'unauthorized'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: String,
     message: 'Drug category deleted successfully',
   })

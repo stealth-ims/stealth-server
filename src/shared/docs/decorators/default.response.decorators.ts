@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -10,6 +11,7 @@ import { ApiErrorResponse } from 'src/utils/responses/error.response';
 import { ApiSuccessResponse } from './response.decorators';
 import { ApiOkResponsePaginated } from './paginated-success.response.decorators';
 import { PaginationDocs } from './get-queries.decorator';
+import { Authorize } from 'src/auth/decorator';
 
 export function CustomApiResponse(
   responseTypes: CustomResponses[],
@@ -48,7 +50,7 @@ export function CustomApiResponse(
           ],
         );
         break;
-      case 'unauthorized':
+      case 'authorize':
         docs.push(
           ...[
             ApiForbiddenResponse({
@@ -59,6 +61,8 @@ export function CustomApiResponse(
               type: ApiErrorResponse,
               description: 'Unauthorized access',
             }),
+            ApiBearerAuth('access-token'),
+            Authorize(),
           ],
         );
         break;
@@ -76,4 +80,4 @@ export function CustomApiResponse(
   return applyDecorators(...docs);
 }
 
-type CustomResponses = 'success' | 'unauthorized' | 'filter' | 'notfound';
+type CustomResponses = 'success' | 'authorize' | 'filter' | 'notfound';
