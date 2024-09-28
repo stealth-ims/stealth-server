@@ -27,44 +27,32 @@ export const GetQueries = createParamDecorator(
   },
 );
 
-export type QueryParams = 'search' | 'limit' | 'page';
-
-export const QueryDocs = (params: QueryParams[]) => {
+export const PaginationDocs = () => {
   // apply ApiQuery decorator according to fields in DTO
-  const docs = [];
-  params.forEach((param) => {
-    switch (param) {
-      case 'search':
-        docs.push(
-          ApiQuery({
-            name: 'search',
-            type: String,
-            required: false,
-            description: 'what to search for',
-          }),
-        );
-        break;
-      case 'limit':
-        docs.push(
-          ApiQuery({
-            name: 'limit',
-            type: Number,
-            required: false,
-            description: 'The maximum number of rows to retrieve',
-          }),
-        );
-        break;
-      case 'page':
-        docs.push(
-          ApiQuery({
-            name: 'page',
-            type: Number,
-            required: false,
-            description: 'The page number',
-          }),
-        );
-        break;
-    }
-  });
-  return applyDecorators(...docs);
+  return applyDecorators(
+    ApiQuery({
+      name: 'search',
+      type: String,
+      required: false,
+      description: 'what to search for',
+    }),
+    ApiQuery({
+      name: 'pageSize',
+      type: Number,
+      required: false,
+      description: 'The maximum number of rows to retrieve',
+    }),
+    ApiQuery({
+      name: 'page',
+      type: Number,
+      required: false,
+      description: 'The page number to retrieve',
+    }),
+    ApiQuery({
+      name: 'orderBy',
+      type: String,
+      required: false,
+      description: 'The field to order by',
+    }),
+  );
 };

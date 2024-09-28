@@ -9,6 +9,7 @@ import {
 import { ApiErrorResponse } from 'src/utils/responses/error.response';
 import { ApiSuccessResponse } from './response.decorators';
 import { ApiOkResponsePaginated } from './paginated-success.response.decorators';
+import { PaginationDocs } from './get-queries.decorator';
 
 export function CustomApiResponse(
   responseTypes: CustomResponses[],
@@ -37,10 +38,14 @@ export function CustomApiResponse(
         break;
       case 'filter':
         docs.push(
-          ApiOkResponsePaginated({
-            type: options.type,
-            description: options.message || 'Resources retrieved successfully',
-          }),
+          ...[
+            ApiOkResponsePaginated({
+              type: options.type,
+              description:
+                options.message || 'Resources retrieved successfully',
+            }),
+            PaginationDocs(),
+          ],
         );
         break;
       case 'unauthorized':

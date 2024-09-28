@@ -9,14 +9,16 @@ import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateDrugsCategoryDto,
   DrugsCategoryResponse,
-  GetDrugsCategoryDto,
   UpdateDrugsCategoryDto,
 } from './dto';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
+  PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
+import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import { FindAndCountOptions, Op } from 'sequelize';
 
 @Injectable()
 export class DrugsCategoryService {
@@ -62,16 +64,31 @@ export class DrugsCategoryService {
    * @throws {InternalServerErrorException} if an error occurs while retrieving the categories.
    */
   async findAll(
-    query: GetDrugsCategoryDto,
-  ): Promise<ApiSuccessResponseDto<DrugsCategoryResponse[]>> {
+    query: PaginationRequestDto,
+  ): Promise<
+    ApiSuccessResponseDto<PaginatedDataResponseDto<DrugsCategoryResponse[]>>
+  > {
     try {
-      this.logger.log(`Retrieving drugs categories with limit: ${query.limit}`);
-      const categories = await this.drugCategoryRepo.findAll({
-        limit: query.limit,
-      });
-      this.logger.log(`Retrieved ${categories.length} drugs categories`);
+      this.logger.log(
+        `Retrieving drugs categories with limit: ${query.pageSize}`,
+      );
+
+      const filter: FindAndCountOptions<DrugsCategory> = {
+        where:
+          (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
+        limit: query.pageSize || 10,
+        offset: query.pageSize * (query.page - 1) || 0,
+        order: [[query.orderBy ?? 'name', 'ASC']],
+      };
+      const categories = await this.drugCategoryRepo.findAndCountAll(filter);
+      this.logger.log(`Retrieved ${categories.count} drugs categories`);
       return new ApiSuccessResponseDto(
-        categories,
+        new PaginatedDataResponseDto(
+          categories.rows,
+          query.page || 1,
+          query.pageSize,
+          categories.count,
+        ),
         HttpStatus.FOUND,
         'Drug categories retrieved successfully',
       );

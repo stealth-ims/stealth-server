@@ -13,12 +13,12 @@ import { DrugsCategoryService } from './drugs-category.service';
 import {
   CreateDrugsCategoryDto,
   DrugsCategoryResponse,
-  GetDrugsCategoryDto,
   UpdateDrugsCategoryDto,
 } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { GetQueries } from 'src/shared/docs/decorators/get-queries.decorator';
+import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 
 @ApiTags('Drug Category')
 @Controller('drugsCategories')
@@ -41,9 +41,8 @@ export class DrugsCategoryController {
     type: DrugsCategoryResponse,
     message: 'Drug categories retrieved successfully',
   })
-  // @QueryDocs(['limit', 'page', 'search'])
   @Get()
-  async findAll(@GetQueries() query: GetDrugsCategoryDto) {
+  async findAll(@GetQueries() query: PaginationRequestDto) {
     return await this.drugsCategoryService.findAll(query);
   }
 

@@ -14,6 +14,7 @@ describe('DrugsCategoryController', () => {
   let controller: DrugsCategoryController;
   let service: DrugsCategoryService;
 
+  // test
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
