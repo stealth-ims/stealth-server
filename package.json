@@ -83,13 +83,16 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && yarn test"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "*.{js,ts}": [
       "yarn format",
       "yarn lint"
+    ],
+    "*.{spec.js,spec.ts}": [
+      "yarn test"
     ]
   },
   "jest": {
