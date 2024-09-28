@@ -10,7 +10,7 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 import { CreateUserDto } from '../user/dto';
-import { LoginDto, LoginTokenDto, RefreshTokenDto, TokenDto } from './dto';
+import { LoginDto, LoginTokenDto, TokenDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import jwtConfig from './interface/jwt.config';
@@ -86,15 +86,11 @@ export class AuthService {
     return { message: 'user deleted' };
   }
 
-  async refreshToken(dto: RefreshTokenDto) {
-    const { sub } = await this.jwtService.verifyAsync<
-      Pick<IUserPayload, 'sub'>
-    >(dto.refreshToken, {
-      secret: this.jwtConfiguration.secret,
-      audience: this.jwtConfiguration.audience,
-      issuer: this.jwtConfiguration.issuer,
-    });
-    const user = await this.userRepository.findByPk(sub);
+  async refreshToken(userId: string) {
+    const user = await this.userRepository.findByPk(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return this.generateTokens(user);
   }
 

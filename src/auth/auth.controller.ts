@@ -23,6 +23,7 @@ import {
   LoginTokenDto,
   ResetPasswordDto,
   SendForgotPasswordEmailDto,
+  TokenDto,
 } from './dto';
 import {
   ApiBadRequestResponse,
@@ -142,10 +143,50 @@ export class AuthController {
     }
   }
 
+  @ApiSuccessResponse({
+    type: TokenDto,
+    description: 'Tokens refreshed successfully',
+  })
+  @ApiUnauthorizedResponse({
+    type: ApiErrorResponse,
+    description: 'invalid user',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @Get('refresh')
+  async refreshTokens(@GetUser('sub') id: string) {
+    try {
+      const response = await this.authService.refreshToken(id);
+      return new ApiSuccessResponseDto<TokenDto>(
+        response,
+        HttpStatus.OK,
+        'user retrieved successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
   @Post('forgot-password/send-mail')
   @ApiSuccessResponse({
     type: String,
     description: 'email sent successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
   })
   @HttpCode(HttpStatus.OK)
   async sendMail(@Body() dto: SendForgotPasswordEmailDto) {
@@ -174,6 +215,10 @@ export class AuthController {
     type: String,
     description: 'code has been validated successfully',
   })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
   @HttpCode(HttpStatus.OK)
   async validateCode(@Body() dto: CheckCodeDto) {
     try {
@@ -200,6 +245,10 @@ export class AuthController {
   @ApiSuccessResponse({
     type: String,
     description: 'password has been reset successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
   })
   @HttpCode(HttpStatus.OK)
   async changePassword(@Body() dto: ResetPasswordDto) {

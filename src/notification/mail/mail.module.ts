@@ -1,7 +1,5 @@
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from '../../auth/models/user.model';
 import { MailService } from './mail.service';
 import { MailController } from './mail.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -9,7 +7,6 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([User]),
     MailerModule.forRootAsync({
       useFactory: async () => ({
         transport: {
