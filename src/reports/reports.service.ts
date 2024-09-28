@@ -8,9 +8,8 @@ export class ReportsService {
   constructor(@InjectModel(Report) private reportRepository: typeof Report) {}
 
   async createReport(dto: CreateReportDto) {
-    const report = await this.reportRepository.create(dto);
+    const report = await this.reportRepository.create({ ...dto });
 
-
-    return report
+    return report;
   }
 }

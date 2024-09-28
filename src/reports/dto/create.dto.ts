@@ -1,5 +1,9 @@
 import { IsDate, IsNotEmpty } from 'class-validator';
-import { Report } from '../models/reports.models';
+import {
+  Report,
+  ReportLayout,
+  ReportLayoutType,
+} from '../models/reports.models';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 
 const reportPickType = PickType(Report, [
@@ -39,4 +43,12 @@ export class CreateReportDto extends reportPickType {
   @IsNotEmpty()
   @IsDate()
   endDate: Date;
+
+  @ApiProperty({
+    example: 'PORTRAIT',
+    description: 'The layout of the report',
+    enum: ReportLayout,
+  })
+  @IsNotEmpty()
+  reportLayout: ReportLayoutType;
 }
