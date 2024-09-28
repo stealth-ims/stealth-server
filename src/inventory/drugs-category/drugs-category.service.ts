@@ -69,10 +69,6 @@ export class DrugsCategoryService {
     ApiSuccessResponseDto<PaginatedDataResponseDto<DrugsCategoryResponse[]>>
   > {
     try {
-      this.logger.log(
-        `Retrieving drugs categories with limit: ${query.pageSize}`,
-      );
-
       const filter: FindAndCountOptions<DrugsCategory> = {
         where:
           (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},

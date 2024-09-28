@@ -42,7 +42,7 @@ export class DrugsCategoryController {
     message: 'Drug categories retrieved successfully',
   })
   @Get()
-  async findAll(@GetQueries() query: PaginationRequestDto) {
+  async findAll(@GetQueries() query?: PaginationRequestDto) {
     return await this.drugsCategoryService.findAll(query);
   }
 
