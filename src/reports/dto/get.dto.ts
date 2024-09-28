@@ -5,6 +5,7 @@ import {
   ReportLayoutType,
 } from '../models/reports.models';
 import { ApiResponseProperty, IntersectionType } from '@nestjs/swagger';
+import { ApiSuccessResponseDto } from 'src/utils/responses/success.response';
 
 export class GetReportDto extends IntersectionType(Report, GenericResponseDto) {
   @ApiResponseProperty({
@@ -48,4 +49,11 @@ export class GetReportDto extends IntersectionType(Report, GenericResponseDto) {
     enum: ReportLayout,
   })
   reportLayout: ReportLayoutType;
+}
+
+export class GetReportSuccessDto extends ApiSuccessResponseDto<GetReportDto> {
+  @ApiResponseProperty({
+    type: GetReportDto,
+  })
+  data: GetReportDto;
 }
