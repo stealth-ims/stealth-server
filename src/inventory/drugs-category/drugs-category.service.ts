@@ -1,24 +1,22 @@
 import {
-  BadRequestException,
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { UpdateDrugsCategoryDto } from './dto/update-drugs-category.dto';
 import { DrugsCategory } from './models/drugs-category.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { UniqueConstraintError } from 'sequelize';
 import {
   CreateDrugsCategoryDto,
   DrugsCategoryResponse,
   GetDrugsCategoryDto,
+  UpdateDrugsCategoryDto,
 } from './dto';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
 } from 'src/utils/responses/success.response';
+import { throwError } from 'src/utils/responses/error.response';
 
 @Injectable()
 export class DrugsCategoryService {
@@ -52,12 +50,7 @@ export class DrugsCategoryService {
         'Drug category created successfully',
       );
     } catch (error) {
-      this.logger.error(error);
-      if (error instanceof UniqueConstraintError) {
-        const eMessage = `${error.errors[0].path}: ${error.errors[0].message}`;
-        throw new BadRequestException(eMessage, error.name);
-      }
-      throw new InternalServerErrorException(error.message, error);
+      throw throwError(this.logger, error);
     }
   }
 
@@ -66,7 +59,7 @@ export class DrugsCategoryService {
    *
    * @param limit - The maximum number of categories to retrieve.
    * @returns A promise that resolves to an array of DrugsCategoryResponse objects.
-   * @throws InternalServerErrorException if an error occurs while retrieving the categories.
+   * @throws {InternalServerErrorException} if an error occurs while retrieving the categories.
    */
   async findAll(
     query: GetDrugsCategoryDto,
@@ -83,8 +76,7 @@ export class DrugsCategoryService {
         'Drug categories retrieved successfully',
       );
     } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException(error.message, error);
+      throw throwError(this.logger, error);
     }
   }
 
@@ -114,9 +106,7 @@ export class DrugsCategoryService {
         'Drug retrieved successfully',
       );
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
-      this.logger.error(error);
-      throw new InternalServerErrorException(error.message, error);
+      throw throwError(this.logger, error);
     }
   }
 
@@ -148,8 +138,7 @@ export class DrugsCategoryService {
         'Drug updated successfully',
       );
     } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException(error.message, error);
+      throw throwError(this.logger, error);
     }
   }
 
@@ -170,8 +159,7 @@ export class DrugsCategoryService {
         'Drug deleted successfully',
       );
     } catch (error) {
-      this.logger.error(error);
-      throw new InternalServerErrorException(error.message, error);
+      throw throwError(this.logger, error);
     }
   }
 }

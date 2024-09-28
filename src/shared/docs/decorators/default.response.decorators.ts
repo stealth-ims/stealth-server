@@ -1,59 +1,74 @@
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
-  ApiResponse,
-  ApiSeeOtherResponse,
-  ApiUnauthorizedResponse
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiErrorResponse } from 'src/utils/responses/error.response';
 import { ApiSuccessResponse } from './response.decorators';
+import { ApiOkResponsePaginated } from './paginated-success.response.decorators';
 
-export function CustomApiResponse(responseTypes: CustomResponses[], options: { type: any, message?: string, isArray?: boolean }) {
-  const docs = [ApiBadRequestResponse({
-    type: ApiErrorResponse,
-    description: 'Validation error occurred',
-  }),
-  ApiInternalServerErrorResponse({
-    type: ApiErrorResponse,
-    description: 'An unexpected error occurred',
-  })];
+export function CustomApiResponse(
+  responseTypes: CustomResponses[],
+  options: { type: any; message?: string; isArray?: boolean },
+) {
+  const docs = [
+    ApiBadRequestResponse({
+      type: ApiErrorResponse,
+      description: 'Validation error occurred',
+    }),
+    ApiInternalServerErrorResponse({
+      type: ApiErrorResponse,
+      description: 'An unexpected error occurred',
+    }),
+  ];
   responseTypes.forEach((response) => {
     switch (response) {
       case 'success':
-        docs.push(ApiSuccessResponse({
-          type: options.type,
-          description: options.message || 'Request successful',
-          isArray: options.isArray
-        }));
+        docs.push(
+          ApiSuccessResponse({
+            type: options.type,
+            description: options.message || 'Request successful',
+            isArray: options.isArray,
+          }),
+        );
+        break;
+      case 'filter':
+        docs.push(
+          ApiOkResponsePaginated({
+            type: options.type,
+            description: options.message || 'Resources retrieved successfully',
+          }),
+        );
         break;
       case 'unauthorized':
-        docs.push(...[ApiForbiddenResponse({
-          type: ApiErrorResponse,
-          description: 'Forbidden access',
-        }), ApiUnauthorizedResponse({
-          type: ApiErrorResponse,
-          description: 'Unauthorized access',
-        })]);
+        docs.push(
+          ...[
+            ApiForbiddenResponse({
+              type: ApiErrorResponse,
+              description: 'Forbidden access',
+            }),
+            ApiUnauthorizedResponse({
+              type: ApiErrorResponse,
+              description: 'Unauthorized access',
+            }),
+          ],
+        );
         break;
       case 'notfound':
-        docs.push(ApiNotFoundResponse({
-          type: ApiErrorResponse,
-          description: 'Resource not found',
-        }));
+        docs.push(
+          ApiNotFoundResponse({
+            type: ApiErrorResponse,
+            description: 'Resource not found',
+          }),
+        );
         break;
     }
   });
 
-  return applyDecorators(
-    ...docs
-  );
+  return applyDecorators(...docs);
 }
 
-type CustomResponses =
-  | 'success'
-  | 'unauthorized'
-  | 'notfound';
+type CustomResponses = 'success' | 'unauthorized' | 'filter' | 'notfound';

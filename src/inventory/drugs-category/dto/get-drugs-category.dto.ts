@@ -1,7 +1,7 @@
-import { IntersectionType } from "@nestjs/swagger";
-import { IsOptional, IsString, Matches } from "class-validator";
-import { GenericResponseDto } from "src/shared/docs/dto/base.dto";
-import { DrugsCategory } from "../models/drugs-category.model";
+import { IntersectionType } from '@nestjs/swagger';
+import { IsOptional, IsString, Matches } from 'class-validator';
+import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import { DrugsCategory } from '../models/drugs-category.model';
 
 export class GetDrugsCategoryDto {
   @IsOptional()
@@ -16,4 +16,7 @@ export class GetDrugsCategoryDto {
   search?: string;
 }
 
-export class DrugsCategoryResponse extends IntersectionType(DrugsCategory, GenericResponseDto) { }
+export class DrugsCategoryResponse extends IntersectionType(
+  DrugsCategory,
+  GenericResponseDto,
+) {}

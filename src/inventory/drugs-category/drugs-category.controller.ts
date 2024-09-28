@@ -18,10 +18,7 @@ import {
 } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import {
-  GetQueries,
-  QueryDocs,
-} from 'src/shared/docs/decorators/get-queries.decorator';
+import { GetQueries } from 'src/shared/docs/decorators/get-queries.decorator';
 
 @ApiTags('Drug Category')
 @Controller('drugsCategories')
@@ -40,12 +37,11 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.create(createDrugsCategoryDto);
   }
 
-  @CustomApiResponse(['success', 'unauthorized'], {
+  @CustomApiResponse(['filter', 'unauthorized'], {
     type: DrugsCategoryResponse,
-    isArray: true,
     message: 'Drug categories retrieved successfully',
   })
-  @QueryDocs(['limit', 'page', 'search'])
+  // @QueryDocs(['limit', 'page', 'search'])
   @Get()
   async findAll(@GetQueries() query: GetDrugsCategoryDto) {
     return await this.drugsCategoryService.findAll(query);
