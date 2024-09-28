@@ -28,4 +28,5 @@ describe('AuthController', () => {
   it('controller should be defined', () => {
     expect(controller).toBeDefined();
   });
+  it.todo('should run');
 });
