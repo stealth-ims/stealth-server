@@ -8,17 +8,22 @@ import {
   Logger,
   ParseUUIDPipe,
   Patch,
-  Query,
 } from '@nestjs/common';
 import { DrugsCategoryService } from './drugs-category.service';
-import { CreateDrugsCategoryDto, DrugsCategoryResponse, GetDrugsCategoryDto, UpdateDrugsCategoryDto } from './dto';
-import { ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
+import {
+  CreateDrugsCategoryDto,
+  DrugsCategoryResponse,
+  GetDrugsCategoryDto,
+  UpdateDrugsCategoryDto,
+} from './dto';
+import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import { DrugsCategory } from './models/drugs-category.model';
-import { GetQueries, QueryDocs } from 'src/shared/docs/decorators/get-queries.decorator';
-import { ApiSuccessResponseNoData } from 'src/utils/responses/success.response';
+import {
+  GetQueries,
+  QueryDocs,
+} from 'src/shared/docs/decorators/get-queries.decorator';
 
-@ApiTags("Drug Category")
+@ApiTags('Drug Category')
 @Controller('drugsCategories')
 export class DrugsCategoryController {
   private readonly logger: Logger;
@@ -26,37 +31,53 @@ export class DrugsCategoryController {
     this.logger = new Logger(DrugsCategoryController.name);
   }
 
-  @CustomApiResponse(["success", "unauthorized"], { type: DrugsCategoryResponse, message: "Drug category created successfully" })
+  @CustomApiResponse(['success', 'unauthorized'], {
+    type: DrugsCategoryResponse,
+    message: 'Drug category created successfully',
+  })
   @Post()
   async create(@Body() createDrugsCategoryDto: CreateDrugsCategoryDto) {
     return await this.drugsCategoryService.create(createDrugsCategoryDto);
   }
 
-  @CustomApiResponse(["success", "unauthorized"], { type: DrugsCategoryResponse, isArray: true, message: "Drug categories retrieved successfully" })
+  @CustomApiResponse(['success', 'unauthorized'], {
+    type: DrugsCategoryResponse,
+    isArray: true,
+    message: 'Drug categories retrieved successfully',
+  })
   @QueryDocs(['limit', 'page', 'search'])
   @Get()
   async findAll(@GetQueries() query: GetDrugsCategoryDto) {
     return await this.drugsCategoryService.findAll(query);
   }
 
-  @CustomApiResponse(["success", "unauthorized", "notfound"], { type: DrugsCategoryResponse, message: "Drug category retrieved successfully" })
+  @CustomApiResponse(['success', 'unauthorized', 'notfound'], {
+    type: DrugsCategoryResponse,
+    message: 'Drug category retrieved successfully',
+  })
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return await this.drugsCategoryService.findOne(id);
   }
 
-  @CustomApiResponse(["success", "unauthorized"], { type: String, message: "Drug category updated successfully" })
+  @CustomApiResponse(['success', 'unauthorized'], {
+    type: String,
+    message: 'Drug category updated successfully',
+  })
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDrugsCategoryDto: UpdateDrugsCategoryDto,
   ) {
-    return  await this.drugsCategoryService.update(id, updateDrugsCategoryDto);
+    return await this.drugsCategoryService.update(id, updateDrugsCategoryDto);
   }
 
-  @CustomApiResponse(["success", 'unauthorized'], { type: String, message: "Drug category deleted successfully" })
+  @CustomApiResponse(['success', 'unauthorized'], {
+    type: String,
+    message: 'Drug category deleted successfully',
+  })
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    return  await this.drugsCategoryService.remove(id);
+    return await this.drugsCategoryService.remove(id);
   }
 }

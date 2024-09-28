@@ -3,7 +3,7 @@ import { CreateDrugDto, UpdateDrugDto } from './dto';
 
 @Injectable()
 export class DrugsService {
-  create(createDrugDto: CreateDrugDto) {
+  create(_createDrugDto: CreateDrugDto) {
     return 'This action adds a new drug';
   }
 
@@ -15,7 +15,7 @@ export class DrugsService {
     return `This action returns a #${id} drug`;
   }
 
-  update(id: number, updateDrugDto: UpdateDrugDto) {
+  update(id: number, _updateDrugDto: UpdateDrugDto) {
     return `This action updates a #${id} drug`;
   }
 

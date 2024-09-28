@@ -42,5 +42,5 @@ export class DrugsCategory extends BaseModel {
   };
 
   @HasMany(() => Drug)
-  drugs: Drug[]
+  drugs: Drug[];
 }

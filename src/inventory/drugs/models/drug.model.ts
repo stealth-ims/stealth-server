@@ -1,4 +1,11 @@
-import { BelongsTo, Column, DataType, ForeignKey, Index, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Index,
+  Table,
+} from 'sequelize-typescript';
 import { DrugsCategory } from 'src/inventory/drugs-category/models/drugs-category.model';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/shared/models/base.model';
@@ -45,23 +52,31 @@ export class Drug extends BaseModel {
   @Column
   manufacturer: string;
 
-  @Column({ type: DataType.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'), allowNull: false })
+  @Column({
+    type: DataType.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'),
+    allowNull: false,
+  })
   status: string;
 
   @Column({ type: DataType.TEXT, field: 'storage_req' })
   storageReq: string;
 
   @ForeignKey(() => DrugsCategory)
-  @Column({ type: DataType.UUID, onUpdate: 'CASCADE', onDelete: 'CASCADE', field: 'category_id' })
+  @Column({
+    type: DataType.UUID,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    field: 'category_id',
+  })
   categoryId: string;
 
   @BelongsTo(() => DrugsCategory, 'category_id')
-  category: DrugsCategory
+  category: DrugsCategory;
 
   @ForeignKey(() => Supplier)
   @Column
-  supplierId: string
+  supplierId: string;
 
-  @BelongsTo(()=> Supplier, 'category_id')
-  supplier: Supplier
+  @BelongsTo(() => Supplier, 'category_id')
+  supplier: Supplier;
 }

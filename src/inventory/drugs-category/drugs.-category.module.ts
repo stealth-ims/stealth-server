@@ -11,4 +11,4 @@ import { DrugsCategory } from './models/drugs-category.model';
   controllers: [DrugsCategoryController],
   providers: [DrugsCategoryService],
 })
-export class DrugsCategoryModule { }
+export class DrugsCategoryModule {}

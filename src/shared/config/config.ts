@@ -1,9 +1,4 @@
-// import dotenv from 'dotenv';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const dotenv = require('dotenv');
-dotenv.config(); // Load environment variables
-
-const configuration = {
+export const configuration = {
   development: {
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -34,5 +29,3 @@ const configuration = {
     },
   },
 };
-
-module.exports = configuration;
