@@ -57,3 +57,11 @@ export class GetReportSuccessDto extends ApiSuccessResponseDto<GetReportDto> {
   })
   data: GetReportDto;
 }
+
+export class GetAllReportsSuccessDto extends ApiSuccessResponseDto<GetReportDto[]> {
+  @ApiResponseProperty({
+    type: GetReportDto,
+  })
+  data: GetReportDto[];
+}
+

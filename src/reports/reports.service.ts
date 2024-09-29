@@ -11,6 +11,10 @@ export class ReportsService {
   ) {}
 
   async createReport(dto: CreateReportDto) {
-    return null
+    return null;
+  }
+
+  async fetchAll() {
+    return []
   }
 }

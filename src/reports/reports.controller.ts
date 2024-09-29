@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
   Post,
   UsePipes,
@@ -10,7 +11,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create.dto';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import { GetReportSuccessDto } from './dto/get.dto';
+import { GetAllReportsSuccessDto, GetReportSuccessDto } from './dto/get.dto';
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -30,6 +31,21 @@ export class ReportsController {
       response,
       HttpStatus.OK,
       'Report created successfully',
+    );
+  }
+
+  @CustomApiResponse(["accepted"], {
+    type: GetAllReportsSuccessDto,
+    message: 'Report created successfully',
+  })
+  @Get()
+  async getReports() {
+    const response = await this.reportsService.fetchAll();
+
+    return new GetAllReportsSuccessDto(
+      response,
+      HttpStatus.OK,
+      'Reports retrieved successfully',
     );
   }
 }

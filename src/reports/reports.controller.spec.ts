@@ -44,32 +44,44 @@ describe('ReportsController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create successfully', async () => {
-    const payload: CreateReportDto = {
-      endDate: new Date(),
-      startDate: new Date(),
-      nameInExport: '2024-report',
-      reportName: 'Sales report',
-      reportLayout: 'PORTRAIT',
-    };
+  describe('Creating reports', () => {
+    it('should create successfully', async () => {
+      const payload: CreateReportDto = {
+        endDate: new Date(),
+        startDate: new Date(),
+        nameInExport: '2024-report',
+        reportName: 'Sales report',
+        reportLayout: 'PORTRAIT',
+      };
 
-    const response = await request(server).post('/reports').send(payload);
+      const response = await request(server).post('/reports').send(payload);
 
-    expect(response.statusCode).toBe(201);
+      expect(response.statusCode).toBe(201);
 
-    expect(response.body.data).toBeDefined();
+      expect(response.body.data).toBeDefined();
+    });
+
+    it('should spit out 400', async () => {
+      const payload: Omit<CreateReportDto, 'nameInExport'> = {
+        endDate: new Date(),
+        startDate: new Date(),
+        reportName: 'Sales report',
+        reportLayout: 'PORTRAIT',
+      };
+
+      const response = await request(server).post('/reports').send(payload);
+
+      expect(response.statusCode).toBe(400);
+    });
   });
 
-  it('should spit out 400', async () => {
-    const payload: Omit<CreateReportDto, 'nameInExport'> = {
-      endDate: new Date(),
-      startDate: new Date(),
-      reportName: 'Sales report',
-      reportLayout: 'PORTRAIT',
-    };
+  describe('getting reports', () => {
+    it('should fetch successfully', async () => {
+      const response = await request(server).get('/reports');
 
-    const response = await request(server).post('/reports').send(payload);
+      expect(response.statusCode).toBe(200);
 
-    expect(response.statusCode).toBe(400);
+      expect(response.body.data).toBeDefined();
+    });
   });
 });
