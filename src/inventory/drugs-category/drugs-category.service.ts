@@ -74,7 +74,7 @@ export class DrugsCategoryService {
           (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
         limit: query.pageSize || 10,
         offset: query.pageSize * (query.page - 1) || 0,
-        order: [[query.orderBy ?? 'name', 'ASC']],
+        order: query.orderBy && [[query.orderBy, 'ASC']],
       };
       const categories = await this.drugCategoryRepo.findAndCountAll(filter);
       this.logger.log(`Retrieved ${categories.count} drugs categories`);

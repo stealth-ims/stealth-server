@@ -40,7 +40,7 @@ export class Drug extends BaseModel {
   @Column
   fdaApproval: string;
 
-  @Column
+  @Column({ field: 'ISO' })
   ISO: string;
 
   @Column
