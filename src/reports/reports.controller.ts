@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -12,7 +13,11 @@ import { ApiTags } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create.dto';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import { GetAllReportsSuccessDto, GetReportSuccessDto } from './dto/get.dto';
+import {
+  GetAllReportsSuccessDto,
+  GetReportDto,
+  GetReportSuccessDto,
+} from './dto/get.dto';
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -52,7 +57,7 @@ export class ReportsController {
 
   @CustomApiResponse(['accepted'], {
     type: GetAllReportsSuccessDto,
-    message: 'Report created successfully',
+    message: 'Report fetched successfully',
   })
   @Get('/:id')
   async getReport(@Param('id') id: string) {
@@ -62,6 +67,21 @@ export class ReportsController {
       response,
       HttpStatus.OK,
       'Report fetched successfully',
+    );
+  }
+
+  @CustomApiResponse(['accepted'], {
+    type: GetReportDto,
+    message: 'Report deleted successfully',
+  })
+  @Delete('/:id')
+  async delete(@Param('id') id: string) {
+    const response = await this.reportsService.removeOne(id);
+
+    return new GetReportDto(
+      response,
+      HttpStatus.OK,
+      'Report deleted successfully',
     );
   }
 }

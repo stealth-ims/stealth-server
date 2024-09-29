@@ -113,4 +113,22 @@ describe('ReportsController', () => {
       expect(response.body.data).toBeNull();
     });
   });
+
+  describe('deleting single report', () => {
+    it('should delete successfully', async () => {
+      const response = await request(server).delete('/reports/the-akshual-id');
+
+      expect(response.statusCode).toBe(200);
+
+      expect(response.body.data).toBeNull();
+    });
+
+    it('should return four oh four', async () => {
+      const response = await request(server).delete('/reports/404');
+
+      expect(response.statusCode).toBe(404);
+
+      expect(response.body.data).toBeNull();
+    });
+  });
 });

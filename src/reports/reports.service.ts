@@ -21,4 +21,8 @@ export class ReportsService {
   async fetchOne(id: Report['id']) {
     return null;
   }
+
+  async removeOne(id: Report['id']) {
+    return null;
+  }
 }
