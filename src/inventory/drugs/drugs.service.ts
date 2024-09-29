@@ -113,7 +113,7 @@ export class DrugsService {
     try {
       const result = await this.drugRepo.update(
         { ...updateDrugDto },
-        { where: { id } },
+        { where: { id: id } },
       );
       if (result[0] == 0) {
         this.logger.warn(`drug with id ${id} not found`);
@@ -131,7 +131,7 @@ export class DrugsService {
 
   async remove(id: string) {
     try {
-      const res = await this.drugRepo.destroy({ where: { id } });
+      const res = await this.drugRepo.destroy({ where: { id: id } });
       if (res == 0) {
         this.logger.warn(`Category with id ${id} not found`);
         throw new NotFoundException(`Category with id ${id} not found`);

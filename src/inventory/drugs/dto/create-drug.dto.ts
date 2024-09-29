@@ -1,9 +1,8 @@
 import { IsString, IsNumber, IsEnum, IsUUID, Matches } from 'class-validator';
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
-import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { DosageForm } from '../models/drug.model';
 
-export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
+export class CreateDrugDto {
   @ApiProperty({
     example: 'Drug Name',
     description: 'The name of the drug',

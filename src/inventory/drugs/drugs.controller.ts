@@ -9,7 +9,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
-import { ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
   CreateDrugDto,
@@ -87,7 +87,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: PickType<DrugResponse, 'id'>,
+    type: String,
     message: 'Drug deleted successfully',
   })
   @Delete(':id')
