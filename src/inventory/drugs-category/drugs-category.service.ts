@@ -19,6 +19,7 @@ import {
 import { throwError } from 'src/utils/responses/error.response';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
+import { Drug } from '../drugs/models/drug.model';
 
 @Injectable()
 export class DrugsCategoryService {
@@ -75,8 +76,10 @@ export class DrugsCategoryService {
         limit: query.pageSize || 10,
         offset: query.pageSize * (query.page - 1) || 0,
         order: query.orderBy && [[query.orderBy, 'ASC']],
+        include: [Drug],
       };
       const categories = await this.drugCategoryRepo.findAndCountAll(filter);
+
       this.logger.log(`Retrieved ${categories.count} drugs categories`);
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto(
@@ -106,7 +109,9 @@ export class DrugsCategoryService {
   ): Promise<ApiSuccessResponseDto<DrugsCategoryResponse>> {
     try {
       this.logger.log(`Finding drugs category with ID: ${id}`);
-      const category = await this.drugCategoryRepo.findByPk(id);
+      const category = await this.drugCategoryRepo.findByPk(id, {
+        include: [{ all: true }],
+      });
 
       if (!category) {
         this.logger.warn('Category not found');
@@ -165,8 +170,12 @@ export class DrugsCategoryService {
   async remove(id: string): Promise<ApiSuccessResponseNoData> {
     try {
       this.logger.log(`Removing drugs category with ID: ${id}`);
-      await this.drugCategoryRepo.destroy({ where: { id: id } });
+      const res = await this.drugCategoryRepo.destroy({ where: { id: id } });
 
+      if (res == 0) {
+        this.logger.warn(`Category with id ${id} not found`);
+        throw new NotFoundException(`Category with id ${id} not found`);
+      }
       return new ApiSuccessResponseNoData(
         HttpStatus.ACCEPTED,
         'Drug deleted successfully',

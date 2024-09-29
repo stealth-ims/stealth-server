@@ -15,6 +15,7 @@ import {
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { FindAndCountOptions, Op } from 'sequelize';
+import { Drug } from '../drugs/models/drug.model';
 
 @Injectable()
 export class SuppliersService {
@@ -54,7 +55,7 @@ export class SuppliersService {
           (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
         limit: query.pageSize || 10,
         offset: query.pageSize * (query.page - 1) || 0,
-        order: [[query.orderBy ?? 'name', 'ASC']],
+        order: query.orderBy && [[query.orderBy, 'ASC']],
       };
       const suppliers = await this.supplierRepo.findAndCountAll(filter);
       this.logger.log(`Retrieved ${suppliers.count} supplier(s)`);
@@ -66,7 +67,7 @@ export class SuppliersService {
           suppliers.count,
         ),
         HttpStatus.FOUND,
-        'Drug categories retrieved successfully',
+        'Suppliers retrieved successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -76,7 +77,9 @@ export class SuppliersService {
   async findOne(id: string): Promise<ApiSuccessResponseDto<SupplierResponse>> {
     try {
       this.logger.log(`Finding supplier with ID: ${id}`);
-      const supplier = await this.supplierRepo.findByPk(id);
+      const supplier = await this.supplierRepo.findByPk(id, {
+        include: [Drug],
+      });
 
       if (!supplier) {
         this.logger.warn('supplier not found');

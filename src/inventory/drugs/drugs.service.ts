@@ -12,7 +12,7 @@ import {
   UpdateDrugDto,
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Drug } from './models/drug.model';
+import { Drug, DrugStatus } from './models/drug.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import { throwError } from 'src/utils/responses/error.response';
 import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
@@ -50,7 +50,10 @@ export class DrugsService {
       );
       await this.supplierService.findOne(createDrugDto.supplierId);
 
-      const createdDrug = await this.drugRepo.create({ ...createDrugDto });
+      const createdDrug = await this.drugRepo.create({
+        ...createDrugDto,
+        status: DrugStatus.STOCKED,
+      });
       this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
       return new ApiSuccessResponseDto(
         createdDrug,
@@ -128,7 +131,11 @@ export class DrugsService {
 
   async remove(id: string) {
     try {
-      await this.drugRepo.destroy({ where: { id } });
+      const res = await this.drugRepo.destroy({ where: { id } });
+      if (res == 0) {
+        this.logger.warn(`Category with id ${id} not found`);
+        throw new NotFoundException(`Category with id ${id} not found`);
+      }
       this.logger.log(`Deleted Drug with id: ${id}`);
       return new ApiSuccessResponseNoData(
         HttpStatus.ACCEPTED,
@@ -164,7 +171,7 @@ export class DrugsService {
       where: whereOptions,
       limit: query.pageSize || 10,
       offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy && [[query.orderBy, 'DESC']],
+      order: query.orderBy && [[query.orderBy, 'ASC']],
     };
   }
 }

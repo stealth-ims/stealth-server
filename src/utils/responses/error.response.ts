@@ -30,8 +30,8 @@ export const throwError = (logger: Logger, error: any): Error => {
     const err = error.errors[0];
     logger.warn(`${err.value} already exists`);
     return new ConflictException(
-      `${err.path}: ${err.message}, ${err.value} already exists`,
-      JSON.stringify(err),
+      `field ${err.path}: ${err.message}, ${err.value} already exists`,
+      err.type,
     );
   }
   return new InternalServerErrorException(error.message, error);

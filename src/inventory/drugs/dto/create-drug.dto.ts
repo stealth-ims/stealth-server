@@ -1,6 +1,7 @@
 import { IsString, IsNumber, IsEnum, IsUUID, Matches } from 'class-validator';
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import { DosageForm } from '../models/drug.model';
 
 export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   @ApiProperty({
@@ -9,6 +10,13 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   })
   @IsString()
   name: string;
+
+  @ApiProperty({
+    example: 'Brand Name',
+    description: 'The brand name of the drug',
+  })
+  @IsString()
+  brandName: string;
 
   @ApiProperty({
     example: 10.99,
@@ -29,8 +37,8 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
     enum: ['SOLIDS', 'LIQUIDS'],
     description: 'The dosage form of the drug',
   })
-  @IsEnum(['SOLIDS', 'LIQUIDS'])
-  dosageForm: string;
+  @IsEnum(DosageForm)
+  dosageForm: DosageForm;
 
   @ApiProperty({
     example: 'ABC-DGU-123',
@@ -43,7 +51,7 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
     example: '2022-12-31',
     description: 'The validity of the drug',
   })
-  @Matches(/\d{4}-\d{2}-\d{2}/)
+  @Matches(/\d{4}-\d{2}-\d{2}/, { message: 'Invalid date format: YYYY-MM-DD' })
   validity: Date;
 
   @ApiProperty({
@@ -101,14 +109,6 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   })
   @IsString()
   manufacturer: string;
-
-  @ApiProperty({
-    example: 'STOCKED',
-    enum: ['LOW', 'STOCKED', 'OUT_OF_STOCK'],
-    description: 'The status of the drug',
-  })
-  @IsEnum(['LOW', 'STOCKED', 'OUT_OF_STOCK'])
-  status: string;
 
   @ApiProperty({
     example: 'Store in a cool, dry place',
