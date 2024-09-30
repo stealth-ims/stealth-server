@@ -48,9 +48,9 @@ export class ReportsController {
 
     return new PaginatedDataResponseDto<GetReportDto[]>(
       response,
-      100,
-      200,
-      300,
+      1,
+      10,
+      response.length,
     );
   }
 

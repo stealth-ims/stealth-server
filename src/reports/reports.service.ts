@@ -8,7 +8,9 @@ export class ReportsService {
   constructor(@InjectModel(Report) private reportRepository: typeof Report) {}
 
   async fetchAll() {
-    return [];
+    const reports = await this.reportRepository.findAll();
+
+    return reports;
   }
 
   async create(dto: CreateReportDto) {
