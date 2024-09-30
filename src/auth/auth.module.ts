@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './interface/jwt.config';
 import { MailService } from '../notification/mail/mail.service';
 
+@Global()
 @Module({
   imports: [
     SequelizeModule.forFeature([User]),
