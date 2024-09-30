@@ -36,6 +36,15 @@ export class User extends BaseModel {
   @Column({ allowNull: true })
   deactivatedBy: string;
 
+  @Column({ allowNull: true })
+  deactivatedAt: Date;
+
+  @Column({ type: DataType.STRING(400), allowNull: true })
+  passwordResetCode: string;
+
+  @Column({ allowNull: true })
+  passwordResetExpires: Date;
+
   @DeletedAt
   @Column({ type: DataType.DATE, field: 'deleted_at' })
   deletedAt: Date;
