@@ -15,13 +15,15 @@ import {
   DrugsCategoryResponse,
   UpdateDrugsCategoryDto,
 } from './dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { GetQueries } from 'src/shared/docs/decorators/get-queries.decorator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
-import { Roles } from 'src/auth/decorator';
+import { Authorize, Roles } from 'src/auth/decorator';
 import { Role } from 'src/auth/interface/roles.enum';
 
+@Authorize()
+@ApiBearerAuth('access-token')
 @ApiTags('Drug Category')
 @Controller('drugsCategories')
 export class DrugsCategoryController {
@@ -30,7 +32,7 @@ export class DrugsCategoryController {
     this.logger = new Logger(DrugsCategoryController.name);
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['created', 'unauthorized', 'forbidden'], {
     type: DrugsCategoryResponse,
     message: 'Drug category created successfully',
   })
@@ -47,7 +49,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.create(createDrugsCategoryDto);
   }
 
-  @CustomApiResponse(['filter', 'authorize'], {
+  @CustomApiResponse(['paginated', 'unauthorized', 'forbidden'], {
     type: DrugsCategoryResponse,
     message: 'Drug categories retrieved successfully',
   })
@@ -56,7 +58,7 @@ export class DrugsCategoryController {
     return await this.drugsCategoryService.findAll(query);
   }
 
-  @CustomApiResponse(['success', 'authorize', 'notfound'], {
+  @CustomApiResponse(['accepted', 'unauthorized', 'forbidden', 'notfound'], {
     type: DrugsCategoryResponse,
     message: 'Drug category retrieved successfully',
   })
@@ -73,7 +75,7 @@ export class DrugsCategoryController {
     Role.NationalSCM,
     Role.RegionalSCM,
   )
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['patch', 'unauthorized', 'forbidden'], {
     type: String,
     message: 'Drug category updated successfully',
   })
@@ -93,7 +95,7 @@ export class DrugsCategoryController {
     Role.NationalSCM,
     Role.RegionalSCM,
   )
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['accepted', 'unauthorized', 'forbidden'], {
     type: String,
     message: 'Drug category deleted successfully',
   })
