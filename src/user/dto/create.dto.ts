@@ -62,7 +62,7 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
     {
       message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and capital character each',
+        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
     },
   )
   password: string;
