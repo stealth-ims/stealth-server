@@ -5,7 +5,10 @@ import {
   ApiOkResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ApiSuccessResponseDto } from '../../../utils/responses/success.response';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+} from '../../../utils/responses/success.response';
 
 export const ApiSuccessResponse = ({
   type,
@@ -47,6 +50,21 @@ export const ApiSuccessResponse = ({
                 },
               ],
             }),
+      },
+    }),
+  );
+
+export const ApiSuccessResponseNullData = ({
+  description,
+}: {
+  description: string;
+}) =>
+  applyDecorators(
+    ApiExtraModels(ApiSuccessResponseNoData),
+    ApiCreatedResponse({
+      description,
+      schema: {
+        allOf: [{ $ref: getSchemaPath(ApiSuccessResponseNoData) }],
       },
     }),
   );

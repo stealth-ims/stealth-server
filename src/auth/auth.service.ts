@@ -72,7 +72,15 @@ export class AuthService {
   async retrieveUser(userId: string) {
     const user = await this.userRepository.findByPk(userId, {
       attributes: {
-        exclude: ['password', 'deactivatedBy', 'deletedAt', 'deletedBy'],
+        exclude: [
+          'password',
+          'passwordResetCode',
+          'passwordResetExpires',
+          'deactivatedAt',
+          'deactivatedBy',
+          'deletedAt',
+          'deletedBy',
+        ],
       },
     });
     if (!user) {
@@ -187,8 +195,8 @@ export class AuthService {
         this.jwtConfiguration.accessTokenTtl,
         {
           email: user.email,
-          facility: user.facility,
-          department: user.department,
+          facility: user.facilityId,
+          department: user.departmentId,
           role: user.role,
         },
       ),

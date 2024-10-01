@@ -1,6 +1,7 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { User } from '../models/user.model';
+import { Role } from '../interface/roles.enum';
 
 export class TokenDto {
   constructor(accessToken: string, refreshToken: string) {
@@ -28,9 +29,9 @@ export class LoginTokenDto {
     this.fullName = user.fullName;
     this.email = user.email;
     this.phoneNumber = user.phoneNumber;
-    this.facility = user.facility;
-    this.department = user.department;
-    this.role = user.role;
+    this.facilityId = user.facilityId;
+    this.departmentId = user.departmentId;
+    this.role = user.role as Role;
     this.tokens = tokens;
   }
   @ApiResponseProperty({
@@ -54,19 +55,20 @@ export class LoginTokenDto {
   phoneNumber: string;
 
   @ApiResponseProperty({
-    example: 'Greater Accra Regional Hospital',
+    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
   })
-  facility: string;
+  facilityId: string;
 
   @ApiResponseProperty({
-    example: 'pharmacy',
+    example: 'b683e942-d167-48c3-8a67-b6ebde4676a2',
   })
-  department: string;
+  departmentId: string;
 
   @ApiResponseProperty({
-    example: 'pharmacist',
+    example: 'healthcare_worker',
+    enum: Role,
   })
-  role: string;
+  role: Role;
 
   @ApiResponseProperty({
     type: TokenDto,

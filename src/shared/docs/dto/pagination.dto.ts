@@ -1,37 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 
 export class PaginationRequestDto {
-  @ApiProperty({
-    example: 10,
-    description: 'The number of items to return',
-    required: false,
-  })
-  @IsNumber()
-  pageSize: number;
-
-  @ApiProperty({
-    example: 1,
-    description: 'The page number to return',
-    required: false,
-  })
-  @IsNumber()
-  page: number;
-
-  @ApiProperty({
-    example: 'name',
-    description: 'The field to search by',
-    isArray: true,
-    required: false,
-  })
-  @IsString({ each: true })
+  @ApiPropertyOptional()
+  @IsOptional()
   search: string;
 
-  @ApiProperty({
-    example: 'name',
-    description: 'The field to sort by',
-    required: false,
-  })
-  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  page: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  pageSize: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   orderBy: string;
 }

@@ -1,6 +1,4 @@
-import { applyDecorators, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../guards/auth.guard';
-import { RolesGuard } from '../guards/roles.guard';
+import { SetMetadata } from '@nestjs/common';
 
-export const Authorize = () =>
-  applyDecorators(UseGuards(AuthGuard, RolesGuard));
+export const AUTHORIZE_KEY = 'authorize';
+export const Authorize = () => SetMetadata(AUTHORIZE_KEY, true);

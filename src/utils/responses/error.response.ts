@@ -1,12 +1,5 @@
-import {
-  Logger,
-  NotFoundException,
-  BadRequestException,
-  ConflictException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, InternalServerErrorException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { UniqueConstraintError } from 'sequelize';
 
 export class ApiErrorResponse {
   @ApiProperty()
@@ -17,22 +10,14 @@ export class ApiErrorResponse {
   statusCode: number;
 }
 
-export const throwError = (logger: Logger, error: any): Error => {
-  // add more instances
-  logger.error(error);
-  if (
-    error instanceof NotFoundException ||
-    error instanceof BadRequestException
-  ) {
-    return error;
-  }
-  if (error instanceof UniqueConstraintError) {
-    const err = error.errors[0];
-    logger.warn(`${err.value} already exists`);
-    return new ConflictException(
-      `${err.path}: ${err.message}, ${err.value} already exists`,
-      JSON.stringify(err),
+export function throwError(logger, error) {
+  if (error instanceof HttpException) {
+    throw error;
+  } else {
+    logger.error(
+      `An error occured: ${error.name} :: ${error.message}`,
+      error.stack,
     );
+    throw new InternalServerErrorException(error.message, error);
   }
-  return new InternalServerErrorException(error.message, error);
-};
+}

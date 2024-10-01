@@ -31,18 +31,18 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   phoneNumber: string;
 
   @ApiProperty({
-    example: 'Greater Accra Regional Hospital',
-    description: 'The facility using the Inventory System',
+    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
+    description: 'The facility id using the Inventory System',
   })
   @IsNotEmpty()
-  facility: string;
+  facilityId: string;
 
   @ApiProperty({
-    example: 'pharmacy',
-    description: 'The department the user is registering to',
+    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
+    description: 'The department id the user is registering to',
   })
   @IsNotEmpty()
-  department: string;
+  departmentId: string;
 
   @ApiProperty({
     example: 'healthcare_worker',

@@ -31,3 +31,9 @@ export abstract class BaseModel extends Model {
 
 // @Column({ type: DataType.STRING, field: 'deleted_by' })
 // deletedBy: string;
+
+// @Column({ type: DataType.STRING, field: 'created_by' , allowNull: true})
+// createdBy: string;
+
+// @Column({ type: DataType.STRING, field: 'updated_by', allowNull: true })
+// updatedBy: string;
