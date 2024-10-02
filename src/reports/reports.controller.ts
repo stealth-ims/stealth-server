@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
@@ -23,10 +24,13 @@ import {
 } from 'src/utils/responses/success.response';
 import { Response } from 'express';
 import { UpdateReportDto } from './dto/edit.dto';
+import { throwError } from 'src/utils/responses/error.response';
 
 @ApiTags('Reports')
 @Controller('reports')
 export class ReportsController {
+  private logger = new Logger(ReportsController.name);
+
   constructor(private readonly reportsService: ReportsService) {}
 
   @CustomApiResponse(['created', 'forbidden', 'unauthorized'], {
@@ -35,13 +39,17 @@ export class ReportsController {
   })
   @Post()
   async postReport(@Body() dto: CreateReportDto) {
-    const response = await this.reportsService.create(dto);
+    try {
+      const response = await this.reportsService.create(dto);
 
-    return new ApiSuccessResponseDto(
-      response,
-      HttpStatus.OK,
-      'Report created successfully',
-    );
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Report created successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['paginated', 'forbidden', 'unauthorized'], {
@@ -51,14 +59,18 @@ export class ReportsController {
   })
   @Get()
   async getReports(@Query() query: GetReportPaginationDto) {
-    const { rows, count } = await this.reportsService.fetchAll(query);
+    try {
+      const { rows, count } = await this.reportsService.fetchAll(query);
 
-    return new PaginatedDataResponseDto<GetReportDto[]>(
-      rows,
-      query.page || 1,
-      query.pageSize,
-      count,
-    );
+      return new PaginatedDataResponseDto<GetReportDto[]>(
+        rows,
+        query.page || 1,
+        query.pageSize,
+        count,
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @Get('/export')
@@ -71,19 +83,23 @@ export class ReportsController {
     @Query() query: GetReportPaginationDto,
     @Res() res: Response,
   ) {
-    const csv = await this.reportsService.export(query);
+    try {
+      const csv = await this.reportsService.export(query);
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=report-${Date.now()}.csv`,
-    );
-    res.send(csv);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=report-${Date.now()}.csv`,
+      );
+      res.send(csv);
 
-    return new ApiSuccessResponseNoData(
-      HttpStatus.OK,
-      'Report exported successfully',
-    );
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Report exported successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
@@ -92,13 +108,17 @@ export class ReportsController {
   })
   @Get(':id')
   async getReport(@Param('id') id: string) {
-    const response = await this.reportsService.fetchOne(id);
+    try {
+      const response = await this.reportsService.fetchOne(id);
 
-    return new ApiSuccessResponseDto(
-      response,
-      HttpStatus.OK,
-      'Report fetched successfully',
-    );
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Report fetched successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
@@ -107,12 +127,16 @@ export class ReportsController {
   })
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    await this.reportsService.removeOne(id);
+    try {
+      await this.reportsService.removeOne(id);
 
-    return new ApiSuccessResponseNoData(
-      HttpStatus.OK,
-      'Report deleted successfully',
-    );
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Report deleted successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @Patch(':id')
@@ -122,10 +146,15 @@ export class ReportsController {
   })
   @HttpCode(HttpStatus.OK)
   async editDepartment(@Body() dto: UpdateReportDto, @Param('id') id: string) {
-    await this.reportsService.update(id, dto);
-    return new ApiSuccessResponseNoData(
-      HttpStatus.OK,
-      'Report updated successfully',
-    );
+    try {
+      await this.reportsService.update(id, dto);
+
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Report updated successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 }
