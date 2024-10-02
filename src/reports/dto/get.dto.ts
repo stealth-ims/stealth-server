@@ -1,4 +1,10 @@
-import { IsOptional, IsNotEmpty, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsNotEmpty,
+  IsDateString,
+  IsEnum,
+  IsString,
+} from 'class-validator';
 import {
   Report,
   ReportLayout,
@@ -40,6 +46,7 @@ export class GetReportDto extends GenericResponseDto {
     description: 'The name to be used when exporting',
   })
   @IsOptional()
+  @IsString()
   nameInExport?: string;
 
   @ApiProperty({
