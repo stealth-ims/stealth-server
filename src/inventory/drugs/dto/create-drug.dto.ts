@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsEnum, IsUUID, Matches } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsUUID,
+  Matches,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { DosageForm } from '../models/drug.model';
 
@@ -129,4 +136,19 @@ export class CreateDrugDto {
   })
   @IsUUID()
   supplierId: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: "Add facility ID if it's a facility drug",
+  })
+  @IsUUID()
+  facilityId: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'Add department ID if it is a department drug',
+  })
+  @IsUUID()
+  @IsOptional()
+  departmentId: string;
 }

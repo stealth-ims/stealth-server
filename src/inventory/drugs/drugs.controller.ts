@@ -19,6 +19,8 @@ import {
   DrugResponse,
   UpdateDrugDto,
 } from './dto';
+import { Roles } from 'src/auth/decorator';
+import { Role } from 'src/auth/interface/roles.enum';
 
 @ApiTags('Drugs')
 @Controller('drugs')
@@ -29,6 +31,14 @@ export class DrugsController {
     type: DrugResponse,
     message: 'Drug created successfully',
   })
+  @Roles(
+    Role.NationalAdmin,
+    Role.NationalSCM,
+    Role.RegionalAdmin,
+    Role.RegionalSCM,
+    Role.HospitalAdmin,
+    Role.HospitalSCM,
+  )
   @Post()
   async create(@Body() createDrugDto: CreateDrugDto) {
     return await this.drugsService.create(createDrugDto);
@@ -66,6 +76,14 @@ export class DrugsController {
     type: String,
     message: 'Drug updated successfully',
   })
+  @Roles(
+    Role.NationalAdmin,
+    Role.NationalSCM,
+    Role.RegionalAdmin,
+    Role.RegionalSCM,
+    Role.HospitalAdmin,
+    Role.HospitalSCM,
+  )
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -78,6 +96,14 @@ export class DrugsController {
     type: String,
     message: 'Drug deleted successfully',
   })
+  @Roles(
+    Role.NationalAdmin,
+    Role.NationalSCM,
+    Role.RegionalAdmin,
+    Role.RegionalSCM,
+    Role.HospitalAdmin,
+    Role.HospitalSCM,
+  )
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return await this.drugsService.remove(id);

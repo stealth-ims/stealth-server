@@ -3,9 +3,10 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Index,
   Table,
 } from 'sequelize-typescript';
+import { Department } from 'src/admin/department/models/department.model';
+import { Facility } from 'src/admin/facility/models/facility.model';
 import { DrugsCategory } from 'src/inventory/drugs-category/models/drugs-category.model';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/shared/models/base.model';
@@ -15,7 +16,6 @@ import { BaseModel } from 'src/shared/models/base.model';
   underscored: true,
 })
 export class Drug extends BaseModel {
-  @Index
   @Column
   name: string;
 
@@ -88,6 +88,24 @@ export class Drug extends BaseModel {
 
   @BelongsTo(() => Supplier, 'category_id')
   supplier: Supplier;
+
+  @ForeignKey(() => Facility)
+  @Column({
+    type: DataType.UUID,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  facilityId: string;
+
+  @BelongsTo(() => Facility, 'facility_id')
+  facility: Facility;
+
+  @ForeignKey(() => Department)
+  @Column({ allowNull: true })
+  departmentId: string;
+
+  @BelongsTo(() => Supplier, 'department_id')
+  department: Supplier;
 }
 
 export enum DosageForm {

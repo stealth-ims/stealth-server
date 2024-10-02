@@ -8,6 +8,7 @@ import jwtConfig from 'src/auth/interface/jwt.config';
 import { DrugsCategory } from '../drugs-category/models/drugs-category.model';
 import { Drug } from '../drugs/models/drug.model';
 import { Supplier } from './models/supplier.model';
+import { IndexModels } from 'src/shared/models/index.models';
 
 const DB_USER = 'postgres';
 const DB_PASSWORD = 'postgres';
@@ -33,7 +34,7 @@ describe('SuppliersController', () => {
             ssl: false,
           },
           logging: false,
-          models: [DrugsCategory, Drug, Supplier],
+          models: [...IndexModels],
         }),
         SequelizeModule.forFeature([DrugsCategory, Drug, Supplier]),
         ConfigModule.forFeature(jwtConfig),

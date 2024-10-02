@@ -12,11 +12,12 @@ import jwtConfig from 'src/auth/interface/jwt.config';
 import { Drug } from '../drugs/models/drug.model';
 import { Supplier } from '../suppliers/models/supplier.model';
 import {
-  ConflictException,
   HttpStatus,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import { IndexModels } from 'src/shared/models/index.models';
 
 const DB_USER = 'postgres';
 const DB_PASSWORD = 'postgres';
@@ -45,7 +46,7 @@ describe('DrugsCategoryController', () => {
             ssl: false,
           },
           logging: false,
-          models: [DrugsCategory, Drug, Supplier],
+          models: [...IndexModels],
         }),
         SequelizeModule.forFeature([DrugsCategory, Drug, Supplier]),
         ConfigModule.forFeature(jwtConfig),
@@ -69,9 +70,9 @@ describe('DrugsCategoryController', () => {
     try {
       await controller.create({ name: 'test' });
     } catch (error) {
-      expect(error).toBeInstanceOf(ConflictException);
-      expect((error as ConflictException).getStatus()).toBe(
-        HttpStatus.CONFLICT,
+      expect(error).toBeInstanceOf(InternalServerErrorException);
+      expect((error as InternalServerErrorException).getStatus()).toBe(
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   });

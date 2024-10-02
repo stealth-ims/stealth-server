@@ -10,14 +10,30 @@ import { Supplier } from '../suppliers/models/supplier.model';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from 'src/auth/interface/jwt.config';
+import { FacilityService } from 'src/admin/facility/facility.service';
+import { DepartmentService } from 'src/admin/department/department.service';
+import { Facility } from 'src/admin/facility/models/facility.model';
+import { Department } from 'src/admin/department/models/department.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Drug, DrugsCategory, Supplier]),
+    SequelizeModule.forFeature([
+      Drug,
+      DrugsCategory,
+      Supplier,
+      Facility,
+      Department,
+    ]),
     ConfigModule.forFeature(jwtConfig),
     JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [DrugsController],
-  providers: [DrugsService, SuppliersService, DrugsCategoryService],
+  providers: [
+    DrugsService,
+    SuppliersService,
+    DrugsCategoryService,
+    FacilityService,
+    DepartmentService,
+  ],
 })
 export class DrugsModule {}

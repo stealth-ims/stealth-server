@@ -22,6 +22,8 @@ import {
   ApiSuccessResponseNoData,
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
+import { FacilityService } from 'src/admin/facility/facility.service';
+import { DepartmentService } from 'src/admin/department/department.service';
 
 @Injectable()
 export class DrugsService {
@@ -30,6 +32,8 @@ export class DrugsService {
     @InjectModel(Drug) private readonly drugRepo: typeof Drug,
     private readonly drugCategoryService: DrugsCategoryService,
     private readonly supplierService: SuppliersService,
+    private readonly facilityService: FacilityService,
+    private readonly departmentService: DepartmentService,
   ) {
     this.logger = new Logger(DrugsService.name);
   }
@@ -38,6 +42,16 @@ export class DrugsService {
     createDrugDto: CreateDrugDto,
   ): Promise<ApiSuccessResponseDto<DrugResponse>> {
     try {
+      // check if facility exists
+      this.logger.log(`checking facility with id: ${createDrugDto.facilityId}`);
+      await this.facilityService.findOne(createDrugDto.facilityId);
+
+      // check if department exists
+      this.logger.log(
+        `checking department with id: ${createDrugDto.departmentId}`,
+      );
+      await this.departmentService.findOne(createDrugDto.departmentId);
+
       // check if category exists
       this.logger.log(
         `checking drug category with id: ${createDrugDto.categoryId}`,

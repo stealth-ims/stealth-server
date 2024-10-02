@@ -16,6 +16,14 @@ export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
   @ApiPropertyOptional()
   @IsString({ each: true })
   categories: string[];
+
+  @IsUUID()
+  @ApiPropertyOptional()
+  facilityId: string;
+
+  @IsUUID()
+  @ApiPropertyOptional()
+  departmentId: string;
 }
 
 export class DrugAnalytics {

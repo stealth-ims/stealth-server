@@ -16,6 +16,11 @@ import {
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
+import { Facility } from 'src/admin/facility/models/facility.model';
+import { Department } from 'src/admin/department/models/department.model';
+import { FacilityService } from 'src/admin/facility/facility.service';
+import { DepartmentService } from 'src/admin/department/department.service';
+import { IndexModels } from 'src/shared/models/index.models';
 
 const DB_USER = 'postgres';
 const DB_PASSWORD = 'postgres';
@@ -42,14 +47,26 @@ describe('DrugsController', () => {
             ssl: false,
           },
           logging: false,
-          models: [DrugsCategory, Drug, Supplier],
+          models: [...IndexModels],
         }),
-        SequelizeModule.forFeature([DrugsCategory, Drug, Supplier]),
+        SequelizeModule.forFeature([
+          DrugsCategory,
+          Drug,
+          Supplier,
+          Facility,
+          Department,
+        ]),
         ConfigModule.forFeature(jwtConfig),
         JwtModule.registerAsync(jwtConfig.asProvider()),
       ],
       controllers: [DrugsController],
-      providers: [DrugsService, DrugsCategoryService, SuppliersService],
+      providers: [
+        DrugsService,
+        DrugsCategoryService,
+        SuppliersService,
+        FacilityService,
+        DepartmentService,
+      ],
     }).compile();
 
     controller = module.get<DrugsController>(DrugsController);
@@ -73,8 +90,10 @@ describe('DrugsController', () => {
       unitOfMeasurement: 'g',
       manufacturer: 'King a farmer',
       storageReq: 'Storage requiremtn',
-      categoryId: 'a8398b52-c89d-447a-b103-654225e53a4e',
-      supplierId: 'edb91c5a-9594-4301-898f-e6e55ede5f84',
+      categoryId: 'bd8e7e44-e142-4b26-a1e1-cd9af9d072ff',
+      supplierId: 'e76ccef6-72a8-4c7e-b8f1-49868526a83e',
+      facilityId: '6e242fa9-dbbf-4599-9c04-97285c710144',
+      departmentId: 'f8db9c0e-0df7-4c78-886d-665f8482a20e',
     };
     it('should create a new drug', async () => {
       const result = await controller.create(createDrugDto);
