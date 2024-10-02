@@ -24,7 +24,7 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @CustomApiResponse(['created', 'forbidden', 'unauthorized'], {
-    type: CreateReportDto,
+    type: GetReportDto,
     message: 'Report created successfully',
   })
   @Post()

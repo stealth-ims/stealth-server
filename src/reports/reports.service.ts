@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Report } from './models/reports.models';
 import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
+import { GetReportDto } from './dto/get.dto';
 
 @Injectable()
 export class ReportsService {
@@ -10,7 +11,7 @@ export class ReportsService {
   async fetchAll() {
     const reports = await this.reportRepository.findAll();
 
-    return reports;
+    return reports.map((report) => new GetReportDto(report));
   }
 
   async create(dto: CreateReportDto) {
@@ -18,7 +19,7 @@ export class ReportsService {
       ...dto,
     });
 
-    return report;
+    return new GetReportDto(report);
   }
 
   async fetchOne(id: string) {
@@ -27,7 +28,7 @@ export class ReportsService {
       throw new NotFoundException(`No report found`);
     }
 
-    return report;
+    return new GetReportDto(report);
   }
 
   async removeOne(id: string) {
