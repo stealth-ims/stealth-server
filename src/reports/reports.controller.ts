@@ -86,11 +86,11 @@ export class ReportsController {
     );
   }
 
-  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized'], {
+  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
   })
-  @Get('/:id')
+  @Get(':id')
   async getReport(@Param('id') id: string) {
     const response = await this.reportsService.fetchOne(id);
 
@@ -101,11 +101,11 @@ export class ReportsController {
     );
   }
 
-  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized'], {
+  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
     type: String,
     message: 'Report deleted successfully',
   })
-  @Delete('/:id')
+  @Delete(':id')
   async delete(@Param('id') id: string) {
     await this.reportsService.removeOne(id);
 
