@@ -75,8 +75,8 @@ export class DrugsCategoryController {
     Role.NationalSCM,
     Role.RegionalSCM,
   )
-  @CustomApiResponse(['patch', 'unauthorized', 'forbidden'], {
-    type: String,
+  @CustomApiResponse(['null', 'unauthorized', 'forbidden'], {
+    type: null,
     message: 'Drug category updated successfully',
   })
   @Patch(':id')
@@ -95,8 +95,8 @@ export class DrugsCategoryController {
     Role.NationalSCM,
     Role.RegionalSCM,
   )
-  @CustomApiResponse(['accepted', 'unauthorized', 'forbidden'], {
-    type: String,
+  @CustomApiResponse(['null', 'unauthorized', 'forbidden'], {
+    type: null,
     message: 'Drug category deleted successfully',
   })
   @Delete(':id')
