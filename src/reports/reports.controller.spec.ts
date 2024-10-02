@@ -143,4 +143,34 @@ describe('ReportsController', () => {
       expect(response.body.data).toBeUndefined();
     });
   });
+
+  describe('editing report', () => {
+    it('should edit successfully', async () => {
+      const reports = await controller.getReports(new GetReportPaginationDto());
+
+      const response = await request(server)
+        .patch(`/reports/${reports.rows[0].id}`)
+        .send({
+          reportName: 'edited',
+        });
+
+      expect(response.statusCode).toBe(200);
+
+      expect(response.body.data).toBeUndefined();
+
+      const editedReport = await controller.getReport(reports.rows[0].id);
+
+      expect(editedReport.data.reportName).toBe('edited');
+    });
+
+    it('should return four oh four', async () => {
+      const response = await request(server).delete(
+        '/reports/44220956-0962-4dd0-9e65-1564c585563c',
+      );
+
+      expect(response.statusCode).toBe(404);
+
+      expect(response.body.data).toBeUndefined();
+    });
+  });
 });
