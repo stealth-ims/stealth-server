@@ -8,6 +8,8 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -21,11 +23,20 @@ import {
 } from './dto';
 import { Roles } from 'src/auth/decorator';
 import { Role } from 'src/auth/interface/roles.enum';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+  PaginatedDataResponseDto,
+} from 'src/utils/responses/success.response';
+import { throwError } from 'src/utils/responses/error.response';
 
 @ApiTags('Drugs')
 @Controller('drugs')
 export class DrugsController {
-  constructor(private readonly drugsService: DrugsService) {}
+  private readonly logger: Logger;
+  constructor(private readonly drugsService: DrugsService) {
+    this.logger = new Logger(DrugsController.name);
+  }
 
   @CustomApiResponse(['success', 'authorize'], {
     type: DrugResponse,
@@ -41,7 +52,16 @@ export class DrugsController {
   )
   @Post()
   async create(@Body() createDrugDto: CreateDrugDto) {
-    return await this.drugsService.create(createDrugDto);
+    try {
+      const createdDrug = await this.drugsService.create(createDrugDto);
+      return new ApiSuccessResponseDto(
+        createdDrug,
+        HttpStatus.CREATED,
+        'Drug category created successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
@@ -51,7 +71,21 @@ export class DrugsController {
   })
   @Get()
   async findAll(@Query() query: DrugPaginationDto) {
-    return await this.drugsService.findAll(query);
+    try {
+      const drugs = await this.drugsService.findAll(query);
+      return new ApiSuccessResponseDto(
+        new PaginatedDataResponseDto(
+          drugs[0],
+          query.page || 1,
+          query.pageSize,
+          drugs[1],
+        ),
+        HttpStatus.FOUND,
+        'Drugs retrieved successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['success', 'authorize'], {
@@ -69,7 +103,16 @@ export class DrugsController {
   })
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.drugsService.findOne(id);
+    try {
+      const drug = await this.drugsService.findOne(id);
+      return new ApiSuccessResponseDto(
+        drug,
+        HttpStatus.FOUND,
+        'Drug retrieved successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['success', 'authorize'], {
@@ -89,7 +132,15 @@ export class DrugsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDrugDto: UpdateDrugDto,
   ) {
-    return await this.drugsService.update(id, updateDrugDto);
+    try {
+      await this.drugsService.update(id, updateDrugDto);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug updated successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['success', 'authorize'], {
@@ -106,6 +157,14 @@ export class DrugsController {
   )
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.drugsService.remove(id);
+    try {
+      await this.drugsService.remove(id);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug deleted successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 }

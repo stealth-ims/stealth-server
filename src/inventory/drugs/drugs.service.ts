@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -14,14 +13,8 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Drug, DrugStatus } from './models/drug.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
-import { throwError } from 'src/utils/responses/error.response';
 import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
-import {
-  ApiSuccessResponseDto,
-  ApiSuccessResponseNoData,
-  PaginatedDataResponseDto,
-} from 'src/utils/responses/success.response';
 import { FacilityService } from 'src/admin/facility/facility.service';
 import { DepartmentService } from 'src/admin/department/department.service';
 
@@ -38,9 +31,14 @@ export class DrugsService {
     this.logger = new Logger(DrugsService.name);
   }
 
-  async create(
-    createDrugDto: CreateDrugDto,
-  ): Promise<ApiSuccessResponseDto<DrugResponse>> {
+  /**
+   * Creates a new drug.
+   *
+   * @param createDrugDto - The DTO containing the drug information.
+   * @returns A promise that resolves to the created drug.
+   * @throws If any error occurs during the creation process.
+   */
+  async create(createDrugDto: CreateDrugDto): Promise<DrugResponse> {
     try {
       // check if facility exists
       this.logger.log(`checking facility with id: ${createDrugDto.facilityId}`);
@@ -69,39 +67,38 @@ export class DrugsService {
         status: DrugStatus.STOCKED,
       });
       this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-      return new ApiSuccessResponseDto(
-        createdDrug,
-        HttpStatus.CREATED,
-        'Drug category created successfully',
-      );
+      return createdDrug;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
-  async findAll(
-    query: DrugPaginationDto,
-  ): Promise<ApiSuccessResponseDto<PaginatedDataResponseDto<DrugResponse[]>>> {
+  /**
+   * Retrieves all drugs based on the provided query parameters.
+   *
+   * @param query - The query parameters for filtering drugs.
+   * @returns A promise that resolves to an array of DrugResponse and the total count of drugs.
+   * @throws Throws an error if there was an issue retrieving the drugs.
+   */
+  async findAll(query: DrugPaginationDto): Promise<[DrugResponse[], number]> {
     try {
       const filter = this.applyFilter(query);
       const drugs = await this.drugRepo.findAndCountAll(filter);
       this.logger.log(`Retrieved ${drugs.count} drugs`);
-      return new ApiSuccessResponseDto(
-        new PaginatedDataResponseDto(
-          drugs.rows,
-          query.page || 1,
-          query.pageSize,
-          drugs.count,
-        ),
-        HttpStatus.FOUND,
-        'Drugs retrieved successfully',
-      );
+      return [drugs.rows, drugs.count];
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
-  async findOne(id: string): Promise<ApiSuccessResponseDto<DrugResponse>> {
+  /**
+   * Finds a drug by its ID.
+   *
+   * @param id - The ID of the drug to find.
+   * @returns A promise that resolves to the found drug.
+   * @throws {NotFoundException} If the drug with the given ID is not found.
+   */
+  async findOne(id: string): Promise<DrugResponse> {
     try {
       this.logger.log(`finding drug with id: ${id}`);
       const drug = await this.drugRepo.findByPk(id);
@@ -110,20 +107,21 @@ export class DrugsService {
       }
 
       this.logger.log(`Found drugs category with ID: ${id}`);
-      return new ApiSuccessResponseDto(
-        drug,
-        HttpStatus.FOUND,
-        'Drug retrieved successfully',
-      );
+      return drug;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
-  async update(
-    id: string,
-    updateDrugDto: UpdateDrugDto,
-  ): Promise<ApiSuccessResponseNoData> {
+  /**
+   * Updates a drug with the specified ID.
+   *
+   * @param id - The ID of the drug to update.
+   * @param updateDrugDto - The data to update the drug with.
+   * @throws {NotFoundException} If the drug with the specified ID is not found.
+   * @returns A Promise that resolves to void.
+   */
+  async update(id: string, updateDrugDto: UpdateDrugDto): Promise<void> {
     try {
       const result = await this.drugRepo.update(
         { ...updateDrugDto },
@@ -134,29 +132,29 @@ export class DrugsService {
         throw new NotFoundException(`drug with id ${id} not found`);
       }
       this.logger.log(`Updated drug with ID: ${id}`);
-      return new ApiSuccessResponseNoData(
-        HttpStatus.ACCEPTED,
-        'Drug updated successfully',
-      );
+      return;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
-  async remove(id: string) {
+  /**
+   * Removes a drug from the inventory.
+   *
+   * @param id - The ID of the drug to be removed.
+   * @throws {NotFoundException} If the drug with the given ID is not found.
+   */
+  async remove(id: string): Promise<void> {
     try {
       const res = await this.drugRepo.destroy({ where: { id: id } });
       if (res == 0) {
-        this.logger.warn(`Category with id ${id} not found`);
-        throw new NotFoundException(`Category with id ${id} not found`);
+        this.logger.warn(`drug with id ${id} not found`);
+        throw new NotFoundException(`drug with id ${id} not found`);
       }
       this.logger.log(`Deleted Drug with id: ${id}`);
-      return new ApiSuccessResponseNoData(
-        HttpStatus.ACCEPTED,
-        'Drug deleted successfully',
-      );
+      return;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
@@ -164,6 +162,12 @@ export class DrugsService {
     return new NotImplementedException(`Retrieving analytics not implemented`);
   }
 
+  /**
+   * Applies the filter options to construct the FindAndCountOptions object for querying drugs.
+   *
+   * @param query - The DrugPaginationDto object containing the filter options.
+   * @returns The FindAndCountOptions object with the applied filter options.
+   */
   private applyFilter(query: DrugPaginationDto): FindAndCountOptions<Drug> {
     const whereOptions: WhereOptions<Drug> = {
       [Op.and]: [
