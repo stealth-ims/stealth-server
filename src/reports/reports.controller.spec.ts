@@ -8,6 +8,7 @@ import { configuration } from 'src/shared/config/config';
 import * as request from 'supertest';
 import { CreateReportDto } from './dto/create.dto';
 import 'dotenv/config';
+import { GetReportPaginationDto } from './dto/get.dto';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -87,7 +88,7 @@ describe('ReportsController', () => {
 
   describe('getting single report', () => {
     it('should fetch successfully', async () => {
-      const reports = await controller.getReports();
+      const reports = await controller.getReports(new GetReportPaginationDto());
       const response = await request(server).get(
         `/reports/${reports.rows[0].id}`,
       );
@@ -121,7 +122,7 @@ describe('ReportsController', () => {
 
   describe('deleting single report', () => {
     it('should delete successfully', async () => {
-      const reports = await controller.getReports();
+      const reports = await controller.getReports(new GetReportPaginationDto());
 
       const response = await request(server).delete(
         `/reports/${reports.rows[0].id}`,
