@@ -8,17 +8,27 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { CreateSupplierDto, SupplierResponse, UpdateSupplierDto } from './dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import {
+  ApiSuccessResponseDto,
+  PaginatedDataResponseDto,
+} from 'src/utils/responses/success.response';
+import { throwError } from 'src/utils/responses/error.response';
 
 @ApiTags('Suppliers')
 @Controller('suppliers')
 export class SuppliersController {
-  constructor(private readonly suppliersService: SuppliersService) {}
+  private readonly logger: Logger;
+  constructor(private readonly suppliersService: SuppliersService) {
+    this.logger = new Logger(SuppliersController.name);
+  }
 
   @CustomApiResponse(['success', 'authorize'], {
     type: SupplierResponse,
@@ -26,7 +36,16 @@ export class SuppliersController {
   })
   @Post()
   async create(@Body() createSupplierDto: CreateSupplierDto) {
-    return await this.suppliersService.create(createSupplierDto);
+    try {
+      const supplier = await this.suppliersService.create(createSupplierDto);
+      return new ApiSuccessResponseDto(
+        supplier,
+        HttpStatus.CREATED,
+        `Supplier created successfully`,
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
@@ -36,7 +55,21 @@ export class SuppliersController {
   })
   @Get()
   async findAll(@Query() query: PaginationRequestDto) {
-    return await this.suppliersService.findAll(query);
+    try {
+      const suppliers = await this.suppliersService.findAll(query);
+      return new ApiSuccessResponseDto(
+        new PaginatedDataResponseDto(
+          suppliers[0],
+          query.page || 1,
+          query.pageSize,
+          suppliers[1],
+        ),
+        HttpStatus.FOUND,
+        'Suppliers retrieved successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
@@ -45,7 +78,16 @@ export class SuppliersController {
   })
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.suppliersService.findOne(id);
+    try {
+      const supplier = await this.suppliersService.findOne(id);
+      return new ApiSuccessResponseDto(
+        supplier,
+        HttpStatus.FOUND,
+        'supplier retrieved successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['success', 'authorize'], {

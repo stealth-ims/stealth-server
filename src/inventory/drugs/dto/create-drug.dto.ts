@@ -39,8 +39,8 @@ export class CreateDrugDto {
   sellingPrice: number;
 
   @ApiProperty({
-    example: 'SOLIDS',
-    enum: ['SOLIDS', 'LIQUIDS'],
+    example: DosageForm.LIQUIDS,
+    enum: DosageForm,
     description: 'The dosage form of the drug',
   })
   @IsEnum(DosageForm)

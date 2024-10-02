@@ -12,22 +12,12 @@ import {
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Drug, DrugStatus } from './models/drug.model';
-import { SuppliersService } from '../suppliers/suppliers.service';
-import { DrugsCategoryService } from '../drugs-category/drugs-category.service';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
-import { FacilityService } from 'src/admin/facility/facility.service';
-import { DepartmentService } from 'src/admin/department/department.service';
 
 @Injectable()
 export class DrugsService {
   private readonly logger: Logger;
-  constructor(
-    @InjectModel(Drug) private readonly drugRepo: typeof Drug,
-    private readonly drugCategoryService: DrugsCategoryService,
-    private readonly supplierService: SuppliersService,
-    private readonly facilityService: FacilityService,
-    private readonly departmentService: DepartmentService,
-  ) {
+  constructor(@InjectModel(Drug) private readonly drugRepo: typeof Drug) {
     this.logger = new Logger(DrugsService.name);
   }
 
@@ -40,28 +30,6 @@ export class DrugsService {
    */
   async create(createDrugDto: CreateDrugDto): Promise<DrugResponse> {
     try {
-      // check if facility exists
-      this.logger.log(`checking facility with id: ${createDrugDto.facilityId}`);
-      await this.facilityService.findOne(createDrugDto.facilityId);
-
-      // check if department exists
-      this.logger.log(
-        `checking department with id: ${createDrugDto.departmentId}`,
-      );
-      await this.departmentService.findOne(createDrugDto.departmentId);
-
-      // check if category exists
-      this.logger.log(
-        `checking drug category with id: ${createDrugDto.categoryId}`,
-      );
-      await this.drugCategoryService.findOne(createDrugDto.categoryId);
-
-      // check if supplier exists
-      this.logger.log(
-        `checking drug supplier with id: ${createDrugDto.supplierId}`,
-      );
-      await this.supplierService.findOne(createDrugDto.supplierId);
-
       const createdDrug = await this.drugRepo.create({
         ...createDrugDto,
         status: DrugStatus.STOCKED,
@@ -171,6 +139,8 @@ export class DrugsService {
   private applyFilter(query: DrugPaginationDto): FindAndCountOptions<Drug> {
     const whereOptions: WhereOptions<Drug> = {
       [Op.and]: [
+        query.facilityId && { facilityId: query.facilityId },
+        query.departmentId && { departmentId: query.departmentId },
         query.search && {
           [Op.or]: [
             { name: { [Op.iLike]: `%${query.search}%` } },

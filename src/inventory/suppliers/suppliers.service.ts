@@ -1,5 +1,4 @@
 import {
-  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,12 +7,7 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Supplier } from './models/supplier.model';
 import { CreateSupplierDto, SupplierResponse, UpdateSupplierDto } from './dto';
-import { throwError } from 'src/utils/responses/error.response';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
-import {
-  ApiSuccessResponseDto,
-  PaginatedDataResponseDto,
-} from 'src/utils/responses/success.response';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { Drug } from '../drugs/models/drug.model';
 
@@ -27,27 +21,20 @@ export class SuppliersService {
   }
   async create(
     createSupplierDto: CreateSupplierDto,
-  ): Promise<ApiSuccessResponseDto<SupplierResponse>> {
+  ): Promise<SupplierResponse> {
     try {
       const supplier = await this.supplierRepo.create({ ...createSupplierDto });
 
       this.logger.log(`Created supplier with ID: ${supplier.id}`);
-
-      return new ApiSuccessResponseDto(
-        supplier,
-        HttpStatus.CREATED,
-        `Supplier created successfully`,
-      );
+      return supplier;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
   async findAll(
     query: PaginationRequestDto,
-  ): Promise<
-    ApiSuccessResponseDto<PaginatedDataResponseDto<SupplierResponse[]>>
-  > {
+  ): Promise<[SupplierResponse[], number]> {
     try {
       // todo: refactor filter
       const filter: FindAndCountOptions<Supplier> = {
@@ -59,22 +46,13 @@ export class SuppliersService {
       };
       const suppliers = await this.supplierRepo.findAndCountAll(filter);
       this.logger.log(`Retrieved ${suppliers.count} supplier(s)`);
-      return new ApiSuccessResponseDto(
-        new PaginatedDataResponseDto(
-          suppliers.rows,
-          query.page || 1,
-          query.pageSize,
-          suppliers.count,
-        ),
-        HttpStatus.FOUND,
-        'Suppliers retrieved successfully',
-      );
+      return [suppliers.rows, suppliers.count];
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
-  async findOne(id: string): Promise<ApiSuccessResponseDto<SupplierResponse>> {
+  async findOne(id: string): Promise<SupplierResponse> {
     try {
       this.logger.log(`Finding supplier with ID: ${id}`);
       const supplier = await this.supplierRepo.findByPk(id, {
@@ -86,13 +64,9 @@ export class SuppliersService {
         throw new NotFoundException(`supplier with id: ${id} not found`);
       }
       this.logger.log(`Found suppliier with ID: ${id}`);
-      return new ApiSuccessResponseDto(
-        supplier,
-        HttpStatus.FOUND,
-        'supplier retrieved successfully',
-      );
+      return supplier;
     } catch (error) {
-      throw throwError(this.logger, error);
+      throw error;
     }
   }
 
