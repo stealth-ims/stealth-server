@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { instanceToPlain } from 'class-transformer';
+import { UpdateReportDto } from './dto/edit.dto';
 
 @Injectable()
 export class ReportsService {
@@ -79,6 +80,19 @@ export class ReportsService {
     });
 
     return new GetReportDto(report);
+  }
+
+  async update(id: string, dto: UpdateReportDto) {
+    const [rowsUpdated] = await this.reportRepository.update(
+      { ...dto },
+      {
+        where: { id },
+      },
+    );
+
+    if (rowsUpdated == 0) {
+      throw new NotFoundException(`Report not found`);
+    }
   }
 
   async fetchOne(id: string) {

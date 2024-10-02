@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   Res,
@@ -21,6 +22,7 @@ import {
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { Response } from 'express';
+import { UpdateReportDto } from './dto/edit.dto';
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -110,6 +112,20 @@ export class ReportsController {
     return new ApiSuccessResponseNoData(
       HttpStatus.OK,
       'Report deleted successfully',
+    );
+  }
+
+  @Patch(':id')
+  @CustomApiResponse(['patch', 'unauthorized', 'forbidden', 'notfound'], {
+    type: null,
+    message: 'Report updated successfully',
+  })
+  @HttpCode(HttpStatus.OK)
+  async editDepartment(@Body() dto: UpdateReportDto, @Param('id') id: string) {
+    await this.reportsService.update(id, dto);
+    return new ApiSuccessResponseNoData(
+      HttpStatus.OK,
+      'Report updated successfully',
     );
   }
 }
