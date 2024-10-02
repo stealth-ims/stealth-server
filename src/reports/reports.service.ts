@@ -84,7 +84,7 @@ export class ReportsService {
   async fetchOne(id: string) {
     const report = await this.reportRepository.findByPk(id);
     if (!report) {
-      throw new NotFoundException(`No report found`);
+      throw new NotFoundException(`Report not found`);
     }
 
     return new GetReportDto(report);
