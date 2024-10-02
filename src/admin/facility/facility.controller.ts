@@ -38,7 +38,7 @@ export class FacilityController {
   }
 
   @Post()
-  @CustomApiResponse(['created', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'paginated'], {
     type: FacilityResponse,
     message: 'Facility created successfully',
   })
@@ -59,7 +59,7 @@ export class FacilityController {
   }
 
   @Get()
-  @CustomApiResponse(['paginated', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['paginated', 'authorize'], {
     type: FacilityResponse,
     message: 'Facilities retrieved successfully',
   })
@@ -82,7 +82,7 @@ export class FacilityController {
   }
 
   @Get(':id')
-  @CustomApiResponse(['accepted', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'paginated', 'notfound'], {
     type: FacilityResponse,
     message: 'Facility retrieved successfully',
   })
@@ -100,7 +100,7 @@ export class FacilityController {
   }
 
   @Patch(':id')
-  @CustomApiResponse(['null', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: null,
     message: 'Facility updated successfully',
   })
@@ -122,7 +122,7 @@ export class FacilityController {
   }
 
   @Delete(':id')
-  @CustomApiResponse(['null', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: null,
     message: 'Facility deleted successfully',
   })
