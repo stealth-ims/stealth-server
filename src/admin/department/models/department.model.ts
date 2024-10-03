@@ -11,6 +11,7 @@ import { BaseModel } from '../../../shared/models/base.model';
 import { User } from '../../../auth/models/user.model';
 // import { Drug } from '../../../inventory/drugs/models/drug.model';
 import { Facility } from '../../facility/models/facility.model';
+import { StockRequest } from 'src/stock-adjustments/requests/model/stock-request.model';
 
 @Table({
   tableName: 'departments',
@@ -41,6 +42,9 @@ export class Department extends BaseModel {
 
   @HasMany(() => User)
   workers: User[];
+
+  @HasMany(() => StockRequest)
+  stockRequests: StockRequest[];
 
   @Column({ field: 'created_by', allowNull: true })
   createdBy: string;
