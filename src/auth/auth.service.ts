@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
-import { CreateUserDto } from '../user/dto';
+import { CreateUserDto, UpdateUserDto } from '../user/dto';
 import { LoginDto, LoginTokenDto, TokenDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -40,7 +40,17 @@ export class AuthService {
       password: hashPassword,
     });
     const createdUser = await this.userRepository.findByPk(user.id, {
-      attributes: { exclude: ['password'] },
+      attributes: {
+        exclude: [
+          'password',
+          'passwordResetCode',
+          'passwordResetExpires',
+          'deactivatedAt',
+          'deactivatedBy',
+          'deletedAt',
+          'deletedBy',
+        ],
+      },
     });
     return createdUser;
   }
@@ -171,6 +181,19 @@ export class AuthService {
 
     this.sendResetPasswordConfirmation(email);
     return true;
+  }
+
+  async updateUser(userId: string, dto: UpdateUserDto) {
+    const updateUser = await this.userRepository.update(
+      { ...dto },
+      { where: { id: userId } },
+    );
+
+    const affected = updateUser[0];
+    if (affected == 0) {
+      throw new NotFoundException(`User not found`);
+    }
+    return;
   }
 
   private async signToken<T>(userId: string, expiresIn: number, payload?: T) {

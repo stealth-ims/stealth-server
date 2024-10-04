@@ -10,12 +10,13 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { CreateUserDto, GetUserDto } from '../user/dto';
+import { CreateUserDto, GetUserDto, UpdateUserDto } from '../user/dto';
 import { AuthService } from './auth.service';
 import { User } from './models/user.model';
 import {
   ApiCreatedSuccessResponse,
   ApiSuccessResponse,
+  ApiSuccessResponseNullData,
 } from '../shared/docs/decorators/response.decorators';
 import {
   CheckCodeDto,
@@ -29,12 +30,16 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Authorize, GetUser } from './decorator';
 import { ApiErrorResponse } from '../utils/responses/error.response';
-import { ApiSuccessResponseDto } from '../utils/responses/success.response';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+} from '../utils/responses/success.response';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -258,6 +263,48 @@ export class AuthController {
         'Password reset successful',
         HttpStatus.OK,
         'password has been reset successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @Patch('')
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @ApiSuccessResponseNullData({
+    description: 'User updated successfully',
+  })
+  @ApiBadRequestResponse({
+    type: ApiErrorResponse,
+    description: 'A validtion error occured',
+  })
+  @ApiNotFoundResponse({
+    type: ApiErrorResponse,
+    description: 'User not found',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @HttpCode(HttpStatus.OK)
+  async updateUserDetails(
+    @Body() dto: UpdateUserDto,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.updateUser(userId, dto);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'User has been updated successfully',
       );
     } catch (error) {
       if (error instanceof HttpException) {
