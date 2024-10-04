@@ -40,7 +40,17 @@ export class AuthService {
       password: hashPassword,
     });
     const createdUser = await this.userRepository.findByPk(user.id, {
-      attributes: { exclude: ['password'] },
+      attributes: {
+        exclude: [
+          'password',
+          'passwordResetCode',
+          'passwordResetExpires',
+          'deactivatedAt',
+          'deactivatedBy',
+          'deletedAt',
+          'deletedBy',
+        ],
+      },
     });
     return createdUser;
   }
