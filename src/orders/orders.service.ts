@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CreateDrugOrderDto, GetOrdersDto, UpdateDrugOrderDto } from './dto';
 import { DrugOrder } from './models/drugOrder.model';
 import { Op } from 'sequelize'; // Sequelize operators for filtering
-import { generateOrderNumber } from 'src/utils/orders.utils';
+import { generateOrderNumber } from 'src/orders/utils/orders.utils';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 
 @Injectable()
@@ -83,8 +83,13 @@ export class DrugOrdersService {
       };
     }
 
-    const rows = await this.drugOrderModel.findAll(queryOptions);
-    return new PaginatedDataResponseDto(rows, page, pageSize, pageSize);
+    const orders = await this.drugOrderModel.findAndCountAll(queryOptions);
+    return new PaginatedDataResponseDto(
+      orders.rows,
+      page,
+      pageSize,
+      orders.count,
+    );
   }
 
   // Fetch a specific drug order by ID

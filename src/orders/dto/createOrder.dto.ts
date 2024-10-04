@@ -6,7 +6,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MinDate,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateDrugOrderDto {
   @ApiProperty({ description: 'The name of the drug', example: 'Paracetamol' })
@@ -40,6 +42,8 @@ export class CreateDrugOrderDto {
   })
   @IsOptional()
   @IsDateString()
+  @Type(() => Date)
+  @MinDate(new Date())
   expectedDeliveryDate?: Date;
 
   @ApiProperty({

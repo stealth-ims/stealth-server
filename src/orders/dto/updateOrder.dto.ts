@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { OrderStatus } from '../../shared/enums/drugOrder.enum';
-import { IsDateString, IsEnum, IsOptional } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, MinDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateDrugOrderDto {
   @ApiPropertyOptional({
@@ -8,7 +9,9 @@ export class UpdateDrugOrderDto {
     example: new Date().toISOString(),
   })
   @IsOptional()
-  @IsDateString() // more validators will be added to this property when date format is provided
+  @IsDateString()
+  @Type(() => Date)
+  @MinDate(new Date())
   expectedDeliveryDate?: Date;
 
   @ApiProperty({
