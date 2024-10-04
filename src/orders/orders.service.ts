@@ -17,8 +17,8 @@ export class DrugOrdersService {
   public async createDrugOrder(dto: CreateDrugOrderDto): Promise<DrugOrder> {
     // Convert DTO to a plain object to match the Sequelize model format
     const orderData: any = {
-      drug_name: dto.drugName,
-      order_number: generateOrderNumber(),
+      drugName: dto.drugName,
+      orderNumber: generateOrderNumber(),
       supplier: dto.supplier,
       date: dto.dateCreated,
       quantity: dto.quantity,
@@ -70,7 +70,7 @@ export class DrugOrdersService {
 
     // Apply drug name filter if provided
     if (drugName) {
-      queryOptions.where.drug_name = {
+      queryOptions.where.drugName = {
         [Op.like]: `%${drugName}%`,
       };
     }
