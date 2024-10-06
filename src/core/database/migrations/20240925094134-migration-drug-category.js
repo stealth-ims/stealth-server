@@ -12,21 +12,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
       },
       status: {
         type: Sequelize.ENUM('ACTIVE', 'DEACTIVATED'),
         defaultValue: 'ACTIVE',
-      },
-      drugCount: {
-        type: Sequelize.INTEGER,
-        get: async () => {
-          return await Sequelize.Model.count(
-            'drugs',
-            where({ category_id: this.id }),
-          );
-        },
-        field: 'drug_count',
       },
     });
   },

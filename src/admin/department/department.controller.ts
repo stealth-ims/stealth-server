@@ -42,7 +42,7 @@ export class DepartmentController {
   }
 
   @Post()
-  @CustomApiResponse(['created', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: DepartmentResponse,
     message: 'Department created successfully',
   })
@@ -63,7 +63,7 @@ export class DepartmentController {
   }
 
   @Get()
-  @CustomApiResponse(['paginated', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['paginated', 'authorize', 'notfound'], {
     type: DepartmentResponse,
     message: 'Departments retrieved successfully',
   })
@@ -92,7 +92,7 @@ export class DepartmentController {
   }
 
   @Get(':id')
-  @CustomApiResponse(['accepted', 'unauthorized', 'forbidden', 'notfound'], {
+  @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: DepartmentResponse,
     message: 'Department retrieved successfully',
   })
@@ -110,7 +110,7 @@ export class DepartmentController {
   }
 
   @Patch(':id')
-  @CustomApiResponse(['patch', 'unauthorized', 'forbidden', 'notfound'], {
+  @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: null,
     message: 'Department updated successfully',
   })
@@ -132,7 +132,7 @@ export class DepartmentController {
   }
 
   @Delete(':id')
-  @CustomApiResponse(['patch', 'unauthorized', 'forbidden'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: null,
     message: 'Department deleted successfully',
   })
