@@ -56,7 +56,7 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse([...generalResponses, 'paginated'], {
+  @CustomApiResponse(['authorize', 'paginated'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
     isArray: true,
