@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { IndexModels } from './shared/models/index.models';
 import { IndexModules } from './shared/modules/index.modules';
+import { DepartmentRequestsModule } from './department-requests/department-requests.module';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 @Module({
@@ -31,6 +32,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
       models: [...IndexModels],
     }),
     ...IndexModules,
+    DepartmentRequestsModule,
   ],
 })
 export class AppModule {}
