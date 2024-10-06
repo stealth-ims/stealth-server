@@ -78,4 +78,8 @@ export function CustomApiResponse(
   return applyDecorators(...docs);
 }
 
-type CustomResponses = 'success' | 'authorize' | 'paginated' | 'notfound';
+export type CustomResponses =
+  | 'success'
+  | 'authorize'
+  | 'paginated'
+  | 'notfound';

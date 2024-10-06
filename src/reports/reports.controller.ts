@@ -15,7 +15,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dto/create.dto';
-import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
+import {
+  CustomApiResponse,
+  CustomResponses,
+} from 'src/shared/docs/decorators/default.response.decorators';
 import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import {
   ApiSuccessResponseDto,
@@ -25,6 +28,7 @@ import {
 import { Response } from 'express';
 import { UpdateReportDto } from './dto/edit.dto';
 import { throwError } from 'src/utils/responses/error.response';
+const generalResponses: CustomResponses[] = ['success', 'authorize'];
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -33,7 +37,7 @@ export class ReportsController {
 
   constructor(private readonly reportsService: ReportsService) {}
 
-  @CustomApiResponse(['created', 'forbidden', 'unauthorized'], {
+  @CustomApiResponse([...generalResponses], {
     type: GetReportDto,
     message: 'Report created successfully',
   })
@@ -52,7 +56,7 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse(['paginated', 'forbidden', 'unauthorized'], {
+  @CustomApiResponse([...generalResponses, 'paginated'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
     isArray: true,
@@ -74,7 +78,7 @@ export class ReportsController {
   }
 
   @Get('/export')
-  @CustomApiResponse(['null', 'forbidden', 'unauthorized'], {
+  @CustomApiResponse([...generalResponses], {
     type: null,
     message: 'Report exported successfully',
   })
@@ -102,7 +106,7 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
+  @CustomApiResponse([...generalResponses, 'notfound'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
   })
@@ -121,7 +125,7 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse(['accepted', 'forbidden', 'unauthorized', 'notfound'], {
+  @CustomApiResponse([...generalResponses, 'notfound'], {
     type: String,
     message: 'Report deleted successfully',
   })
@@ -140,7 +144,7 @@ export class ReportsController {
   }
 
   @Patch(':id')
-  @CustomApiResponse(['patch', 'unauthorized', 'forbidden', 'notfound'], {
+  @CustomApiResponse([...generalResponses, 'notfound'], {
     type: null,
     message: 'Report updated successfully',
   })
