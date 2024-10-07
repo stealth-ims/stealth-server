@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUUID, Min } from 'class-validator';
 
 export class CreateDepartmentRequestDto {
   @ApiProperty({
@@ -23,7 +23,9 @@ export class CreateDepartmentRequestDto {
     description: 'The quantity of the selected drug',
   })
   @IsNotEmpty()
-  quantity: string;
+  @IsNumber()
+  @Min(1)
+  quantity: number;
 
   @ApiProperty({
     example: 'The recent drugs had expired',

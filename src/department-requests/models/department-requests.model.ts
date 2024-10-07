@@ -39,8 +39,8 @@ export class DepartmentRequest extends BaseModel {
   @Column({ type: DataType.STRING, field: 'request_id' })
   requestId: string;
 
-  @Column({ type: DataType.NUMBER, field: 'quantity' })
-  quantity: string;
+  @Column({ type: DataType.INTEGER, field: 'quantity' })
+  quantity: number;
 
   @Column({
     type: DataType.ENUM(...Object.values(DepartmentRequestStatus)),

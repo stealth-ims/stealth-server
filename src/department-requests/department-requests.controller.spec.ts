@@ -51,7 +51,7 @@ describe('DepartmentRequestsController', () => {
       const payload: CreateDepartmentRequestDto = {
         drugId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
         departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-        quantity: '4',
+        quantity: 4,
         additionalNotes: 'The recent drugs had expired',
       };
 
@@ -68,7 +68,7 @@ describe('DepartmentRequestsController', () => {
       const payload: CreateDepartmentRequestDto = {
         drugId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
         departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-        quantity: '4',
+        quantity: 4,
         additionalNotes: 'The recent drugs had expired',
       };
 
@@ -83,7 +83,7 @@ describe('DepartmentRequestsController', () => {
       const payload: CreateDepartmentRequestDto = {
         drugId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
         departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-        quantity: '4',
+        quantity: 4,
         additionalNotes: 'The recent drugs had expired',
       };
 
@@ -97,7 +97,7 @@ describe('DepartmentRequestsController', () => {
     it('should spit out 400', async () => {
       const payload: Omit<CreateDepartmentRequestDto, 'drugId'> = {
         departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-        quantity: '4',
+        quantity: 4,
         additionalNotes: 'The recent drugs had expired',
       };
 
