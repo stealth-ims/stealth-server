@@ -23,11 +23,11 @@ import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
-  PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { Response } from 'express';
 import { UpdateReportDto } from './dto/edit.dto';
 import { throwError } from 'src/utils/responses/error.response';
+
 const generalResponses: CustomResponses[] = ['success', 'authorize'];
 
 @ApiTags('Reports')
@@ -59,18 +59,16 @@ export class ReportsController {
   @CustomApiResponse(['authorize', 'paginated'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
-    isArray: true,
   })
   @Get()
   async getReports(@Query() query: GetReportPaginationDto) {
     try {
-      const { rows, count } = await this.reportsService.fetchAll(query);
+      const response = await this.reportsService.fetchAll(query);
 
-      return new PaginatedDataResponseDto<GetReportDto[]>(
-        rows,
-        query.page || 1,
-        query.pageSize,
-        count,
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Report fetched successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
@@ -149,7 +147,7 @@ export class ReportsController {
     message: 'Report updated successfully',
   })
   @HttpCode(HttpStatus.OK)
-  async editDepartment(@Body() dto: UpdateReportDto, @Param('id') id: string) {
+  async editReport(@Body() dto: UpdateReportDto, @Param('id') id: string) {
     try {
       await this.reportsService.update(id, dto);
 

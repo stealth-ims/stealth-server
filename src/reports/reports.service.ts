@@ -6,6 +6,7 @@ import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { instanceToPlain } from 'class-transformer';
 import { UpdateReportDto } from './dto/edit.dto';
+import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 
 @Injectable()
 export class ReportsService {
@@ -38,7 +39,14 @@ export class ReportsService {
 
     const { rows, count } = await this.reportRepository.findAndCountAll(filter);
 
-    return { rows: rows.map((report) => new GetReportDto(report)), count };
+    const response = new PaginatedDataResponseDto<GetReportDto[]>(
+      rows,
+      query.page || 1,
+      query.pageSize,
+      count,
+    );
+
+    return response;
   }
 
   async export(query: GetReportPaginationDto) {
@@ -79,7 +87,7 @@ export class ReportsService {
       ...dto,
     });
 
-    return new GetReportDto(report);
+    return report;
   }
 
   async update(id: string, dto: UpdateReportDto) {
@@ -93,6 +101,8 @@ export class ReportsService {
     if (rowsUpdated == 0) {
       throw new NotFoundException(`Report not found`);
     }
+
+    return rowsUpdated;
   }
 
   async fetchOne(id: string) {
@@ -101,7 +111,7 @@ export class ReportsService {
       throw new NotFoundException(`Report not found`);
     }
 
-    return new GetReportDto(report);
+    return report;
   }
 
   async removeOne(id: string) {
@@ -112,5 +122,7 @@ export class ReportsService {
     if (destroyedRows == 0) {
       throw new NotFoundException(`No report found`);
     }
+
+    return;
   }
 }
