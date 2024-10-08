@@ -6,10 +6,30 @@ import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { instanceToPlain } from 'class-transformer';
 import { UpdateReportDto } from './dto/edit.dto';
+import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 
 @Injectable()
 export class ReportsService {
   constructor(@InjectModel(Report) private reportRepository: typeof Report) {}
+
+  private dataToCSV(headerLabels: Record<string, string>, rowsJson: any[]) {
+    const csvRows = [];
+
+    csvRows.push(Object.values(headerLabels).join(','));
+
+    for (const [index, row] of rowsJson.entries()) {
+      const values = Object.keys(headerLabels).map((header) => {
+        const escaped =
+          headerLabels[header] === '#'
+            ? index + 1
+            : ('' + (row[header] ?? '')).replace(/"/g, '\\"');
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+
+    return csvRows.join('\n');
+  }
 
   async fetchAll(query: GetReportPaginationDto) {
     const whereConditions: Record<string, Record<any, any>> = {};
@@ -38,12 +58,17 @@ export class ReportsService {
 
     const { rows, count } = await this.reportRepository.findAndCountAll(filter);
 
-    return { rows: rows.map((report) => new GetReportDto(report)), count };
+    const response = new PaginatedDataResponseDto<GetReportDto[]>(
+      rows,
+      query.page || 1,
+      query.pageSize,
+      count,
+    );
+
+    return response;
   }
 
-  async export(query: GetReportPaginationDto) {
-    const { rows } = await this.fetchAll(query);
-
+  async export({ query, id }: { query?: GetReportPaginationDto; id?: string }) {
     const headerLabels = {
       '#': '#',
       id: 'Report ID',
@@ -54,24 +79,19 @@ export class ReportsService {
       reportLayout: 'Report Layout',
     };
 
-    const rowsJson = rows.map((report) => instanceToPlain(report));
+    let rowsJson = [];
 
-    const csvRows = [];
+    if (query) {
+      const { rows } = await this.fetchAll(query);
 
-    csvRows.push(Object.values(headerLabels).join(','));
-
-    for (const [index, row] of rowsJson.entries()) {
-      const values = Object.keys(headerLabels).map((header) => {
-        const escaped =
-          headerLabels[header] === '#'
-            ? index + 1
-            : ('' + (row[header] ?? '')).replace(/"/g, '\\"');
-        return `"${escaped}"`;
-      });
-      csvRows.push(values.join(','));
+      rowsJson = rows.map((report) => instanceToPlain(report));
     }
 
-    return csvRows.join('\n');
+    if (id) {
+      //TODO: Get inventory
+    }
+
+    return this.dataToCSV(headerLabels, rowsJson);
   }
 
   async create(dto: CreateReportDto) {
@@ -79,7 +99,7 @@ export class ReportsService {
       ...dto,
     });
 
-    return new GetReportDto(report);
+    return report;
   }
 
   async update(id: string, dto: UpdateReportDto) {
@@ -93,6 +113,8 @@ export class ReportsService {
     if (rowsUpdated == 0) {
       throw new NotFoundException(`Report not found`);
     }
+
+    return rowsUpdated;
   }
 
   async fetchOne(id: string) {
@@ -101,7 +123,7 @@ export class ReportsService {
       throw new NotFoundException(`Report not found`);
     }
 
-    return new GetReportDto(report);
+    return report;
   }
 
   async removeOne(id: string) {
@@ -112,5 +134,7 @@ export class ReportsService {
     if (destroyedRows == 0) {
       throw new NotFoundException(`No report found`);
     }
+
+    return;
   }
 }
