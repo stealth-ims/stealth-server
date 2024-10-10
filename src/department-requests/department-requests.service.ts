@@ -17,8 +17,11 @@ export class DepartmentRequestsService {
   ) {}
 
   async create(dto: CreateDepartmentRequestDto) {
-    await this.departmentService.findOne(dto.departmentId)
+    await this.departmentService.findOne(dto.departmentId);
     await this.drugService.findOne(+dto.drugId);
+
+    dto.requestId = `R-${new Date().getTime()}`;
+    dto.status = 'PENDING';
 
     const result = await this.reportRepository.create({
       ...dto,
