@@ -7,6 +7,11 @@ import { DepartmentRequestsService } from './department-requests.service';
 import { CreateDepartmentRequestDto } from './dto/create-department-request.dto';
 import * as request from 'supertest';
 import { IndexModels } from 'src/shared/models/index.models';
+import { DepartmentService } from 'src/admin/department/department.service';
+import { Department } from 'src/admin/department/models/department.model';
+import { FacilityService } from 'src/admin/facility/facility.service';
+import { Facility } from 'src/admin/facility/models/facility.model';
+import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 
 describe('DepartmentRequestsController', () => {
   let controller: DepartmentRequestsController;
@@ -46,13 +51,31 @@ describe('DepartmentRequestsController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('Creating requests', async () => {
-    const payload: Partial<CreateDepartmentRequestDto> = {
-      drugId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-      departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-      quantity: 4,
-      additionalNotes: 'The recent drugs had expired',
-    };
+  describe('Creating requests', () => {
+    const facilityService = new FacilityService(Facility);
+    const departmentService = new DepartmentService(Department);
+
+    const query = new PaginationRequestDto();
+
+    let departmentId: string;
+    let payload: Partial<CreateDepartmentRequestDto>;
+
+    beforeAll(async () => {
+      const facilities = await facilityService.findAll(query);
+
+      const facilityId = facilities.rows[0].id;
+
+      const departments = await departmentService.findAll(query, facilityId);
+
+      departmentId = departments.rows[0].id;
+
+      payload = {
+        departmentId,
+        drugId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
+        quantity: 4,
+        additionalNotes: 'The recent drugs had expired',
+      };
+    });
 
     it('should create successfully', async () => {
       const response = await request(server)
@@ -67,18 +90,22 @@ describe('DepartmentRequestsController', () => {
     it('should fail for missing department', async () => {
       const response = await request(server)
         .post('/department-requests')
-        .send(payload);
+        .send({
+          ...payload,
+          departmentId: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
+        });
 
       expect(response.statusCode).toBe(404);
     });
 
-    it('should fail for missing drug', async () => {
-      const response = await request(server)
-        .post('/department-requests')
-        .send(payload);
-
-      expect(response.statusCode).toBe(404);
-    });
+    // TODO: Implement when drugs are implemented
+    // it('should fail for missing drug', async () => {
+    //   const response = await request(server)
+    //     .post('/department-requests')
+    //     .send(payload);
+    //
+    //   expect(response.statusCode).toBe(404);
+    // });
 
     it('should spit out 400', async () => {
       delete payload.departmentId;
