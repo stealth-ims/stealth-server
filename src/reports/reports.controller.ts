@@ -75,35 +75,6 @@ export class ReportsController {
     }
   }
 
-  @Get('/export')
-  @CustomApiResponse([...generalResponses], {
-    type: null,
-    message: 'Report exported successfully',
-  })
-  @HttpCode(HttpStatus.OK)
-  async exportReports(
-    @Query() query: GetReportPaginationDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const csv = await this.reportsService.export({ query });
-
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename=report-${Date.now()}.csv`,
-      );
-      res.send(csv);
-
-      return new ApiSuccessResponseNoData(
-        HttpStatus.OK,
-        'Report exported successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
   @Get(':id/export')
   @CustomApiResponse([...generalResponses], {
     type: null,
@@ -112,7 +83,7 @@ export class ReportsController {
   @HttpCode(HttpStatus.OK)
   async exportReport(@Res() res: Response, @Param('id') id: string) {
     try {
-      const csv = await this.reportsService.export({ id });
+      const csv = await this.reportsService.export(id);
 
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader(

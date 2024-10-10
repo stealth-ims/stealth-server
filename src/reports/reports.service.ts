@@ -4,7 +4,6 @@ import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
-import { instanceToPlain } from 'class-transformer';
 import { UpdateReportDto } from './dto/edit.dto';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 
@@ -68,28 +67,17 @@ export class ReportsService {
     return response;
   }
 
-  async export({ query, id }: { query?: GetReportPaginationDto; id?: string }) {
+  async export(id: string) {
+    //TODO: Get inventory
+
+    await this.fetchOne(id);
+
     const headerLabels = {
-      '#': '#',
-      id: 'Report ID',
-      reportName: 'Report Name',
-      nameInExport: 'Name in Export',
-      startDate: 'Start Date',
-      endDate: 'End Date',
-      reportLayout: 'Report Layout',
+      clinicName: 'Clinic Name',
+      date: 'date',
     };
 
-    let rowsJson = [];
-
-    if (query) {
-      const { rows } = await this.fetchAll(query);
-
-      rowsJson = rows.map((report) => instanceToPlain(report));
-    }
-
-    if (id) {
-      //TODO: Get inventory
-    }
+    const rowsJson = [];
 
     return this.dataToCSV(headerLabels, rowsJson);
   }
