@@ -6,9 +6,14 @@ import {
   Logger,
   Get,
   Query,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { DepartmentRequestsService } from './department-requests.service';
-import { CreateDepartmentRequestDto } from './dto/create-department-request.dto';
+import {
+  CreateDepartmentRequestDto,
+  UpdateDepartmentRequestDto,
+} from './dto/create-department-request.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators';
 import { ApiSuccessResponseDto } from 'src/utils/responses/success.response';
@@ -51,7 +56,7 @@ export class DepartmentRequestsController {
     message: 'Requests fetched successfully',
   })
   @Get()
-  async getReports(@Query() query: PaginationRequestDto) {
+  async getRequests(@Query() query: PaginationRequestDto) {
     try {
       const response = await this.departmentRequestsService.fetchAll(query);
 
@@ -59,6 +64,28 @@ export class DepartmentRequestsController {
         response,
         HttpStatus.OK,
         'Requests fetched successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetDepartmentRequestDto,
+    message: 'Request updated successfully',
+  })
+  @Patch(':id')
+  async updateRequest(
+    @Body() data: UpdateDepartmentRequestDto,
+    @Param() id: string,
+  ) {
+    try {
+      const response = await this.departmentRequestsService.update(id, data);
+
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Request updated successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

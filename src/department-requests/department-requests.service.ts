@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDepartmentRequestDto } from './dto/create-department-request.dto';
+import {
+  CreateDepartmentRequestDto,
+  UpdateDepartmentRequestDto,
+} from './dto/create-department-request.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { DepartmentRequest } from './models/department-requests.model';
 import { DrugsService } from 'src/inventory/drugs/drugs.service';
@@ -42,5 +45,9 @@ export class DepartmentRequestsService {
     );
 
     return response;
+  }
+
+  async update(_: string, __: UpdateDepartmentRequestDto) {
+    return new GetDepartmentRequestDto();
   }
 }
