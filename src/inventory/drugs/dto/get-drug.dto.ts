@@ -2,11 +2,12 @@ import {
   ApiProperty,
   ApiPropertyOptional,
   IntersectionType,
+  OmitType,
 } from '@nestjs/swagger';
-import { CreateDrugDto } from './create-drug.dto';
 import { IsString, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import { Batch, Drug } from '../models';
 
 export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
@@ -67,7 +68,13 @@ export class DrugAnalytics {
   lowStocked: number;
 }
 
-export class DrugResponse extends IntersectionType(
-  CreateDrugDto,
+export class OneDrug extends IntersectionType(Drug, GenericResponseDto) {
+  batches: Batch[];
+}
+
+export class ManyDrugs extends IntersectionType(
+  OmitType(Drug, ['batches']),
   GenericResponseDto,
-) {}
+) {
+  batch: Batch;
+}

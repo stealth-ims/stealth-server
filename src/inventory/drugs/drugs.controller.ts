@@ -18,7 +18,8 @@ import {
   CreateDrugDto,
   DrugAnalytics,
   DrugPaginationDto,
-  DrugResponse,
+  ManyDrugs,
+  OneDrug,
   UpdateDrugDto,
 } from './dto';
 import { Roles } from 'src/auth/decorator';
@@ -39,7 +40,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: DrugResponse,
+    type: OneDrug,
     message: 'Drug created successfully',
   })
   @Roles(
@@ -65,7 +66,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: DrugResponse,
+    type: ManyDrugs,
     isArray: true,
     message: 'Drugs retrieved successfully',
   })
@@ -98,7 +99,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: DrugResponse,
+    type: OneDrug,
     message: 'Drug retrieved successfully',
   })
   @Get(':id')

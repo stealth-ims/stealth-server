@@ -7,17 +7,21 @@ import {
 import {
   CreateDrugDto,
   DrugPaginationDto,
-  DrugResponse,
+  ManyDrugs,
+  OneDrug,
   UpdateDrugDto,
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Drug, DrugStatus } from './models/drug.model';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
+import { Batch, Drug, DrugStatus } from './models';
 
 @Injectable()
 export class DrugsService {
   private readonly logger: Logger;
-  constructor(@InjectModel(Drug) private readonly drugRepo: typeof Drug) {
+  constructor(
+    @InjectModel(Drug) private readonly drugRepo: typeof Drug,
+    @InjectModel(Batch) private readonly batchRepo: typeof Batch,
+  ) {
     this.logger = new Logger(DrugsService.name);
   }
 
@@ -28,27 +32,42 @@ export class DrugsService {
    * @returns A promise that resolves to the created drug.
    * @throws If any error occurs during the creation process.
    */
-  async create(createDrugDto: CreateDrugDto): Promise<DrugResponse> {
+  async create(createDrugDto: CreateDrugDto): Promise<OneDrug> {
     const createdDrug = await this.drugRepo.create({
       ...createDrugDto,
       status: DrugStatus.STOCKED,
     });
+    const batch = await this.batchRepo.create({
+      ...createDrugDto,
+      drugId: createdDrug.id,
+    });
+    const oneDrug = createdDrug.toJSON() as OneDrug;
+    oneDrug.batches = [batch];
     this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-    return createdDrug;
+    return oneDrug;
   }
 
   /**
    * Retrieves all drugs based on the provided query parameters.
    *
    * @param query - The query parameters for filtering drugs.
-   * @returns A promise that resolves to an array of DrugResponse and the total count of drugs.
+   * @returns A promise that resolves to an array of OneDrug and the total count of drugs.
    * @throws Throws an error if there was an issue retrieving the drugs.
    */
-  async findAll(query: DrugPaginationDto): Promise<[DrugResponse[], number]> {
+  async findAll(query: DrugPaginationDto): Promise<[ManyDrugs[], number]> {
     const filter = this.applyFilter(query);
     const drugs = await this.drugRepo.findAndCountAll(filter);
+
+    const drugList = [];
+    drugs.rows.forEach((drug) => {
+      for (const batch of drug.batches) {
+        const drugData = drug.toJSON() as ManyDrugs;
+        drugData.batch = batch;
+        drugList.push(drugData);
+      }
+    });
     this.logger.log(`Retrieved ${drugs.count} drugs`);
-    return [drugs.rows, drugs.count];
+    return [drugList, drugs.count];
   }
 
   /**
@@ -58,7 +77,7 @@ export class DrugsService {
    * @returns A promise that resolves to the found drug.
    * @throws {NotFoundException} If the drug with the given ID is not found.
    */
-  async findOne(id: string): Promise<DrugResponse> {
+  async findOne(id: string): Promise<OneDrug> {
     this.logger.log(`finding drug with id: ${id}`);
     const drug = await this.drugRepo.findByPk(id);
     if (!drug) {
@@ -131,10 +150,14 @@ export class DrugsService {
             { brandName: { [Op.iLike]: `%${query.search}` } },
           ],
         },
-        query.supplierId && { supplierId: query.supplierId },
         query.categories && {
           category: {
             name: { [Op.in]: query.categories },
+          },
+        },
+        query.supplierId && {
+          batches: {
+            supplierId: query.supplierId,
           },
         },
       ],
