@@ -1,5 +1,6 @@
 import { AdminModule } from '../../admin/admin.module';
 import { AuthModule } from '../../auth/auth.module';
+import { CloudinaryModule } from '../../cloudinary/cloudinary.module';
 import { InventoryModule } from '../../inventory/inventory.module';
 import { NotificationModule } from '../../notification/notification.module';
 import { OrdersModule } from '../../orders/orders.module';
@@ -8,6 +9,7 @@ import { UserModule } from '../../user/user.module';
 
 export const IndexModules = [
   NotificationModule,
+  CloudinaryModule,
   AuthModule,
   UserModule,
   AdminModule,
