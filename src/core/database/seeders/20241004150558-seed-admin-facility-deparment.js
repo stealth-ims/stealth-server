@@ -94,7 +94,7 @@ module.exports = {
           role: 'hospital_admin',
           password: hashedPassword,
           account_approved: true,
-          status: 'ACTIVE',
+          status: 'Accepted',
           deactivated_by: null,
           deleted_at: null,
           deleted_by: null,

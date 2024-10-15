@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, Matches, Max, Min } from 'class-validator';
 
 export class SendForgotPasswordEmailDto {
@@ -21,12 +21,12 @@ export class CheckCodeDto {
   email: string;
 
   @ApiProperty({
-    example: 1492,
+    example: 14925,
     description: 'email received code',
   })
   @IsNotEmpty()
-  @Max(9999)
-  @Min(1000)
+  @Max(99999)
+  @Min(10000)
   code: number;
 }
 
@@ -53,3 +53,7 @@ export class ResetPasswordDto {
   )
   newPassword: string;
 }
+
+export class ChangePasswordDto extends PickType(ResetPasswordDto, [
+  'newPassword',
+]) {}
