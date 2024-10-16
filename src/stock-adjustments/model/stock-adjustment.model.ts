@@ -1,48 +1,154 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { Column, DataType, Table } from 'sequelize-typescript';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Table,
+} from 'sequelize-typescript';
+import { Department } from 'src/admin/department/models/department.model';
+import { Facility } from 'src/admin/facility/models/facility.model';
+import { Drug } from 'src/inventory/drugs/models';
 import { BaseModel } from 'src/shared/models/base.model';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum StockAdjustmentType {
-  REDUCTION,
-  INCREMENT,
+  REDUCTION = 'REDUCTION',
+  INCREMENT = 'INCREMENT',
 }
 
 export enum StockAdjustmentStatus {
-  SUBMITTED,
-  ADJUSTED,
-  REJECTED,
+  SUBMITTED = 'SUBMITTED',
+  ADJUSTED = 'ADJUSTED',
+  REJECTED = 'REJECTED',
 }
 
-@Table({ tableName: 'stock_adjustments', underscored: true })
+@Table({
+  tableName: 'stock_adjustments',
+  underscored: true,
+  paranoid: true,
+  timestamps: true,
+})
 export class StockAdjustment extends BaseModel {
+  @ApiProperty({
+    example: 'Expired stock',
+    description: 'The reason for the stock adjustment',
+  })
   @Column
   @IsString()
   @IsNotEmpty()
   reason: string;
 
+  @ApiProperty({
+    example: 'Additional details about the adjustment',
+    description: 'Notes about the stock adjustment',
+  })
   @Column(DataType.TEXT)
   @IsString()
   notes: string;
 
+  @ApiProperty({
+    example: StockAdjustmentStatus.SUBMITTED,
+    enum: StockAdjustmentStatus,
+    description: 'The status of the stock adjustment',
+  })
   @Column
   status: StockAdjustmentStatus;
 
+  @ApiProperty({
+    example: StockAdjustmentType.REDUCTION,
+    enum: StockAdjustmentType,
+    description: 'The type of stock adjustment',
+  })
   @Column
   @IsNotEmpty()
   @IsEnum(StockAdjustmentType)
   type: StockAdjustmentType;
 
+  @ApiProperty({
+    example: 'Kratos Godson',
+    description: 'The user who created the stock adjustment',
+  })
   @Column
   createdBy: string;
 
+  @ApiProperty({
+    example: 100,
+    description: 'The current stock quantity before adjustment',
+  })
   @Column
   @IsNumber()
   currentStock: number;
 
+  @ApiProperty({
+    example: 90,
+    description: 'The actual stock quantity after adjustment',
+  })
   @Column
   @IsNumber()
   actualStock: number;
 
+  @ApiProperty({
+    example: '2023-05-15T10:30:00Z',
+    description: 'The date when the stock adjustment was added',
+  })
   @Column(DataType.DATE)
   dateAdded: Date;
+
+  // relationships
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The ID of the drug being adjusted',
+  })
+  @ForeignKey(() => Drug)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
+  drugId: string;
+
+  @ApiProperty({
+    type: () => Drug,
+    description: 'The drug associated with this stock adjustment',
+  })
+  @BelongsTo(() => Drug)
+  drug: Drug;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The ID of the facility where the adjustment is made',
+  })
+  @IsUUID()
+  @IsOptional()
+  @ForeignKey(() => Facility)
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  facilityId: string;
+
+  @BelongsTo(() => Facility)
+  facility: Facility;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The ID of the department where the adjustment is made',
+  })
+  @IsUUID()
+  @IsOptional()
+  @ForeignKey(() => Department)
+  @Column({
+    type: DataType.UUID,
+  })
+  departmentId: string;
+
+  @BelongsTo(() => Department)
+  department: Department;
 }

@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { StockAdjustmentsService } from './stock-adjustments.service';
 import { StockAdjustmentsController } from './stock-adjustments.controller';
-import { RequestsModule } from './requests/requests.module';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { StockAdjustment } from './model';
 
 @Module({
+  imports: [SequelizeModule.forFeature([StockAdjustment])],
   controllers: [StockAdjustmentsController],
   providers: [StockAdjustmentsService],
-  imports: [RequestsModule],
 })
 export class StockAdjustmentsModule {}

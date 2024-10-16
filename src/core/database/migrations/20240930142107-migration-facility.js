@@ -34,7 +34,8 @@ module.exports = {
   },
 
   async down(queryInterface, _Sequelize) {
-    await queryInterface.dropTable('facilities');
+    await queryInterface.removeConstraint('users', 'users_facility_id_fkey');
     await queryInterface.removeColumn('users', 'facility_id');
+    await queryInterface.dropTable('facilities');
   },
 };

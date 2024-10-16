@@ -10,6 +10,13 @@ import { BaseModel } from '../../shared/models/base.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { Department } from '../../admin/department/models/department.model';
 
+export enum AccountState {
+  PENDING = 'Pending',
+  ACCEPTED = 'Accepted',
+  DECLINED = 'Declined',
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+}
 @Table({
   tableName: 'users',
   underscored: true,
@@ -47,8 +54,8 @@ export class User extends BaseModel {
   @Column({ defaultValue: false })
   accountApproved: boolean;
 
-  @Column({ defaultValue: 'ACTIVE' })
-  status: string; //ACTIVE | DEACTIVATED
+  @Column({ defaultValue: AccountState.PENDING })
+  status: string; //Pending | Accepted | Declined
 
   @Column({ allowNull: true })
   deactivatedBy: string;
@@ -56,16 +63,25 @@ export class User extends BaseModel {
   @Column({ allowNull: true })
   deactivatedAt: Date;
 
-  @Column({ type: DataType.STRING(400), allowNull: true })
-  passwordResetCode: string;
+  @Column({ allowNull: true })
+  imageId: string;
 
   @Column({ allowNull: true })
-  passwordResetExpires: Date;
+  imageUrl: string;
+
+  @Column({ type: DataType.STRING(400), allowNull: true })
+  resetCode: string;
+
+  @Column({ allowNull: true })
+  resetCodeExpires: Date;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  updatedBy: string;
 
   @DeletedAt
-  @Column({ type: DataType.DATE, field: 'deleted_at' })
+  @Column({ type: DataType.DATE })
   deletedAt: Date;
 
-  @Column({ type: DataType.STRING, field: 'deleted_by' })
+  @Column({ type: DataType.STRING })
   deletedBy: string;
 }

@@ -22,52 +22,45 @@ export class SuppliersService {
   async create(
     createSupplierDto: CreateSupplierDto,
   ): Promise<SupplierResponse> {
-    try {
-      const supplier = await this.supplierRepo.create({ ...createSupplierDto });
+    const supplier = await this.supplierRepo.create({ ...createSupplierDto });
 
-      this.logger.log(`Created supplier with ID: ${supplier.id}`);
-      return supplier;
-    } catch (error) {
-      throw error;
-    }
+    this.logger.log(`Created supplier with ID: ${supplier.id}`);
+    return supplier;
   }
 
   async findAll(
     query: PaginationRequestDto,
   ): Promise<[SupplierResponse[], number]> {
-    try {
-      // todo: refactor filter
-      const filter: FindAndCountOptions<Supplier> = {
-        where:
-          (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
-        limit: query.pageSize || 10,
-        offset: query.pageSize * (query.page - 1) || 0,
-        order: query.orderBy && [[query.orderBy, 'ASC']],
-      };
-      const suppliers = await this.supplierRepo.findAndCountAll(filter);
-      this.logger.log(`Retrieved ${suppliers.count} supplier(s)`);
-      return [suppliers.rows, suppliers.count];
-    } catch (error) {
-      throw error;
-    }
+    // todo: refactor filter
+    const filter: FindAndCountOptions<Supplier> = {
+      where:
+        (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
+      limit: query.pageSize || 10,
+      offset: query.pageSize * (query.page - 1) || 0,
+      order: query.orderBy && [[query.orderBy, 'ASC']],
+    };
+    const suppliers = await this.supplierRepo.findAndCountAll(filter);
+    this.logger.log(`Retrieved ${suppliers.count} supplier(s)`);
+    return [suppliers.rows, suppliers.count];
+  }
+
+  async exists(id: string): Promise<boolean> {
+    const supplier = await this.supplierRepo.findByPk(id);
+    return !!supplier;
   }
 
   async findOne(id: string): Promise<SupplierResponse> {
-    try {
-      this.logger.log(`Finding supplier with ID: ${id}`);
-      const supplier = await this.supplierRepo.findByPk(id, {
-        include: [Drug],
-      });
+    this.logger.log(`Finding supplier with ID: ${id}`);
+    const supplier = await this.supplierRepo.findByPk(id, {
+      include: [Drug],
+    });
 
-      if (!supplier) {
-        this.logger.warn('supplier not found');
-        throw new NotFoundException(`supplier with id: ${id} not found`);
-      }
-      this.logger.log(`Found suppliier with ID: ${id}`);
-      return supplier;
-    } catch (error) {
-      throw error;
+    if (!supplier) {
+      this.logger.warn('supplier not found');
+      throw new NotFoundException(`supplier with id: ${id} not found`);
     }
+    this.logger.log(`Found suppliier with ID: ${id}`);
+    return supplier;
   }
 
   update(_id: string, _updateSupplierDto: UpdateSupplierDto) {

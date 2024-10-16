@@ -2,19 +2,22 @@ import {
   ApiProperty,
   ApiPropertyOptional,
   IntersectionType,
+  OmitType,
 } from '@nestjs/swagger';
-import { CreateDrugDto } from './create-drug.dto';
-import { IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import { Batch, Drug } from '../models';
 
 export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
+  @IsOptional()
   @ApiPropertyOptional()
   supplierId: string;
 
   @ApiPropertyOptional()
   @IsString({ each: true })
+  @IsOptional()
   categories: string[];
 
   @IsUUID()
@@ -23,6 +26,7 @@ export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
 
   @IsUUID()
   @ApiPropertyOptional()
+  @IsOptional()
   departmentId: string;
 }
 
@@ -67,7 +71,15 @@ export class DrugAnalytics {
   lowStocked: number;
 }
 
-export class DrugResponse extends IntersectionType(
-  CreateDrugDto,
+export class OneDrug extends IntersectionType(Drug, GenericResponseDto) {
+  @ApiProperty({ description: 'The batches of the drug', type: () => Batch })
+  batches: Batch[];
+}
+
+export class ManyDrugs extends IntersectionType(
+  OmitType(Drug, ['batches']),
   GenericResponseDto,
-) {}
+) {
+  @ApiProperty({ description: 'The batch of the drug', type: () => Batch })
+  batch: Batch;
+}

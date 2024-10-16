@@ -22,13 +22,12 @@ import {
 import { PaginationRequestDto } from '../../shared/docs/dto/pagination.dto';
 import { throwError } from '../../utils/responses/error.response';
 import { CustomApiResponse } from '../../shared/docs/decorators';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Authorize, GetUser, Roles } from '../../auth/decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { GetUser, Public, Roles } from '../../auth/decorator';
 import { Role } from '../../auth/interface/roles.enum';
 
 @ApiTags('Facility')
-@ApiBearerAuth('access-token')
-@Authorize()
+@Public()
 @Roles(Role.HospitalAdmin, Role.RegionalAdmin, Role.NationalAdmin)
 @Controller('facilities')
 export class FacilityController {
@@ -38,7 +37,7 @@ export class FacilityController {
   }
 
   @Post()
-  @CustomApiResponse(['success', 'paginated'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: FacilityResponse,
     message: 'Facility created successfully',
   })
@@ -59,7 +58,7 @@ export class FacilityController {
   }
 
   @Get()
-  @CustomApiResponse(['paginated', 'authorize'], {
+  @CustomApiResponse(['paginated'], {
     type: FacilityResponse,
     message: 'Facilities retrieved successfully',
   })
@@ -82,7 +81,7 @@ export class FacilityController {
   }
 
   @Get(':id')
-  @CustomApiResponse(['success', 'paginated', 'notfound'], {
+  @CustomApiResponse(['success', 'notfound'], {
     type: FacilityResponse,
     message: 'Facility retrieved successfully',
   })
@@ -100,8 +99,7 @@ export class FacilityController {
   }
 
   @Patch(':id')
-  @CustomApiResponse(['success', 'authorize'], {
-    type: null,
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Facility updated successfully',
   })
   @HttpCode(HttpStatus.OK)
@@ -122,8 +120,7 @@ export class FacilityController {
   }
 
   @Delete(':id')
-  @CustomApiResponse(['success', 'authorize'], {
-    type: null,
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Facility deleted successfully',
   })
   @HttpCode(HttpStatus.OK)

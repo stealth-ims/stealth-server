@@ -7,17 +7,22 @@ import {
 import {
   CreateDrugDto,
   DrugPaginationDto,
-  DrugResponse,
+  ManyDrugs as ManyDrug,
+  OneDrug,
   UpdateDrugDto,
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Drug, DrugStatus } from './models/drug.model';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
+import { Batch, Drug, DrugStatus } from './models';
+import { BatchService } from './batch.service';
 
 @Injectable()
 export class DrugsService {
   private readonly logger: Logger;
-  constructor(@InjectModel(Drug) private readonly drugRepo: typeof Drug) {
+  constructor(
+    @InjectModel(Drug) private readonly drugRepo: typeof Drug,
+    private readonly batchService: BatchService,
+  ) {
     this.logger = new Logger(DrugsService.name);
   }
 
@@ -28,35 +33,46 @@ export class DrugsService {
    * @returns A promise that resolves to the created drug.
    * @throws If any error occurs during the creation process.
    */
-  async create(createDrugDto: CreateDrugDto): Promise<DrugResponse> {
-    try {
-      const createdDrug = await this.drugRepo.create({
-        ...createDrugDto,
-        status: DrugStatus.STOCKED,
-      });
-      this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-      return createdDrug;
-    } catch (error) {
-      throw error;
-    }
+  async create(createDrugDto: CreateDrugDto): Promise<OneDrug> {
+    const createdDrug = await this.drugRepo.create({
+      ...createDrugDto,
+      status: DrugStatus.STOCKED,
+    });
+
+    const batch = await this.batchService.create({
+      ...createDrugDto,
+      drugId: createdDrug.id,
+    });
+    const oneDrug = createdDrug.toJSON() as OneDrug;
+    oneDrug.batches = [batch];
+    this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
+    return oneDrug;
   }
 
   /**
    * Retrieves all drugs based on the provided query parameters.
    *
    * @param query - The query parameters for filtering drugs.
-   * @returns A promise that resolves to an array of DrugResponse and the total count of drugs.
+   * @returns A promise that resolves to an array of OneDrug and the total count of drugs.
    * @throws Throws an error if there was an issue retrieving the drugs.
    */
-  async findAll(query: DrugPaginationDto): Promise<[DrugResponse[], number]> {
-    try {
-      const filter = this.applyFilter(query);
-      const drugs = await this.drugRepo.findAndCountAll(filter);
-      this.logger.log(`Retrieved ${drugs.count} drugs`);
-      return [drugs.rows, drugs.count];
-    } catch (error) {
-      throw error;
-    }
+  async findAll(query: DrugPaginationDto): Promise<[ManyDrug[], number]> {
+    const filter = this.applyFilter(query);
+    const drugs = await this.drugRepo.findAndCountAll(filter);
+
+    const drugList = [];
+
+    drugs.rows.forEach((drug) => {
+      drug.batches.forEach((batch) => {
+        delete drug.dataValues.batches;
+        const drugData = drug.toJSON() as ManyDrug;
+        drugData.batch = batch;
+        drugList.push(drugData);
+      });
+    });
+
+    this.logger.log(`Retrieved ${drugs.count} drugs`);
+    return [drugList, drugs.count];
   }
 
   /**
@@ -66,19 +82,15 @@ export class DrugsService {
    * @returns A promise that resolves to the found drug.
    * @throws {NotFoundException} If the drug with the given ID is not found.
    */
-  async findOne(id: string): Promise<DrugResponse> {
-    try {
-      this.logger.log(`finding drug with id: ${id}`);
-      const drug = await this.drugRepo.findByPk(id);
-      if (!drug) {
-        throw new NotFoundException(`drug with id: ${id} not found`);
-      }
-
-      this.logger.log(`Found drugs category with ID: ${id}`);
-      return drug;
-    } catch (error) {
-      throw error;
+  async findOne(id: string): Promise<OneDrug> {
+    this.logger.log(`finding drug with id: ${id}`);
+    const drug = await this.drugRepo.findByPk(id, { include: [Batch] });
+    if (!drug) {
+      throw new NotFoundException(`drug with id: ${id} not found`);
     }
+
+    this.logger.log(`Found drugs category with ID: ${id}`);
+    return drug;
   }
 
   /**
@@ -90,20 +102,15 @@ export class DrugsService {
    * @returns A Promise that resolves to void.
    */
   async update(id: string, updateDrugDto: UpdateDrugDto): Promise<void> {
-    try {
-      const result = await this.drugRepo.update(
-        { ...updateDrugDto },
-        { where: { id: id } },
-      );
-      if (result[0] == 0) {
-        this.logger.warn(`drug with id ${id} not found`);
-        throw new NotFoundException(`drug with id ${id} not found`);
-      }
-      this.logger.log(`Updated drug with ID: ${id}`);
-      return;
-    } catch (error) {
-      throw error;
+    const result = await this.drugRepo.update(
+      { ...updateDrugDto },
+      { where: { id: id } },
+    );
+    if (result[0] == 0) {
+      throw new NotFoundException(`drug with id ${id} not found`);
     }
+    this.logger.log(`Updated drug with ID: ${id}`);
+    return;
   }
 
   /**
@@ -116,7 +123,6 @@ export class DrugsService {
     try {
       const res = await this.drugRepo.destroy({ where: { id: id } });
       if (res == 0) {
-        this.logger.warn(`drug with id ${id} not found`);
         throw new NotFoundException(`drug with id ${id} not found`);
       }
       this.logger.log(`Deleted Drug with id: ${id}`);
@@ -147,10 +153,14 @@ export class DrugsService {
             { brandName: { [Op.iLike]: `%${query.search}` } },
           ],
         },
-        query.supplierId && { supplierId: query.supplierId },
         query.categories && {
           category: {
             name: { [Op.in]: query.categories },
+          },
+        },
+        query.supplierId && {
+          batches: {
+            supplierId: query.supplierId,
           },
         },
       ],
@@ -160,6 +170,7 @@ export class DrugsService {
       limit: query.pageSize || 10,
       offset: query.pageSize * (query.page - 1) || 0,
       order: query.orderBy && [[query.orderBy, 'ASC']],
+      include: [Batch],
     };
   }
 }

@@ -1,0 +1,18 @@
+extends baseEmail
+
+block content
+  p Dear #{fullName},
+  p Thank you for registering with Stealth IMS. We're excited to have you on board!
+  p Your account has been successfully created but is currently awaiting approval by one of our administrators. Once your account is approved, you will receive an email notification granting you full access to our platform.
+  hr
+  p Account Details:
+  ul
+    li Full Name: #{fullName}
+    li Email: #{email}
+    li Role: #{role}
+    li Status: Approved
+  hr
+  p If you have any questions or need assistance, please don't hesitate to contact our support team.
+  p We appreciate your patience and look forward to having you as a valued member of our platform!
+  p Best Regards,
+  p Stealth
