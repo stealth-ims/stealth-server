@@ -10,15 +10,18 @@ import {
   Query,
   HttpStatus,
   Logger,
+  ConflictException,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
+  AdjustPriceDto,
   CreateDrugDto,
   DrugAnalytics,
   DrugPaginationDto,
-  DrugResponse,
+  ManyDrugs,
+  OneDrug,
   UpdateDrugDto,
 } from './dto';
 import { Roles } from 'src/auth/decorator';
@@ -29,17 +32,21 @@ import {
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
+import { BatchService } from './batch.service';
 
 @ApiTags('Drugs')
 @Controller('drugs')
 export class DrugsController {
   private readonly logger: Logger;
-  constructor(private readonly drugsService: DrugsService) {
+  constructor(
+    private readonly drugsService: DrugsService,
+    private readonly batchService: BatchService,
+  ) {
     this.logger = new Logger(DrugsController.name);
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: DrugResponse,
+    type: OneDrug,
     message: 'Drug created successfully',
   })
   @Roles(
@@ -60,12 +67,30 @@ export class DrugsController {
         'Drug category created successfully',
       );
     } catch (error) {
+      if (error instanceof ConflictException) {
+        try {
+          const id = JSON.parse(error.message).id;
+          this.logger.log(`Drug already existed. ID: ${id}`);
+          await this.batchService.create({
+            ...createDrugDto,
+            drugId: id,
+          });
+          const drug = await this.drugsService.findOne(id);
+          return new ApiSuccessResponseDto(
+            drug,
+            HttpStatus.CREATED,
+            'Drug already existed. New batch created successfully',
+          );
+        } catch (error) {
+          throw throwError(this.logger, error);
+        }
+      }
       throw throwError(this.logger, error);
     }
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: DrugResponse,
+    type: ManyDrugs,
     isArray: true,
     message: 'Drugs retrieved successfully',
   })
@@ -98,7 +123,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: DrugResponse,
+    type: OneDrug,
     message: 'Drug retrieved successfully',
   })
   @Get(':id')
@@ -137,6 +162,34 @@ export class DrugsController {
       return new ApiSuccessResponseNoData(
         HttpStatus.ACCEPTED,
         'Drug updated successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['success', 'authorize'], {
+    type: String,
+    message: 'Drug prices adjusted successfully',
+  })
+  @Roles(
+    Role.NationalAdmin,
+    Role.NationalSCM,
+    Role.RegionalAdmin,
+    Role.RegionalSCM,
+    Role.HospitalAdmin,
+    Role.HospitalSCM,
+  )
+  @Patch('/adjust-prices/:id')
+  async adjustPrice(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdjustPriceDto,
+  ) {
+    try {
+      await this.drugsService.update(id, dto);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug prices adjusted successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);

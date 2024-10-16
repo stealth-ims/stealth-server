@@ -1,20 +1,22 @@
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiErrorResponse } from 'src/utils/responses/error.response';
-import { ApiSuccessResponse } from './response.decorators';
+import {
+  ApiSuccessResponse,
+  ApiSuccessResponseNullData,
+} from './response.decorators';
 import { ApiOkResponsePaginated } from './paginated-success.response.decorators';
 import { Authorize } from 'src/auth/decorator';
 
 export function CustomApiResponse(
   responseTypes: CustomResponses[],
-  options: { type: any; message?: string; isArray?: boolean },
+  options: { type?: any; message?: string; isArray?: boolean },
 ) {
   const docs = [
     ApiBadRequestResponse({
@@ -34,6 +36,13 @@ export function CustomApiResponse(
             type: options.type ?? 'any',
             description: options.message || 'Request successful',
             isArray: options.isArray,
+          }),
+        );
+        break;
+      case 'successNull':
+        docs.push(
+          ApiSuccessResponseNullData({
+            description: options.message || 'Request successful',
           }),
         );
         break;
@@ -59,7 +68,6 @@ export function CustomApiResponse(
               type: ApiErrorResponse,
               description: 'Unauthorized access',
             }),
-            ApiBearerAuth('access-token'),
             Authorize(),
           ],
         );
@@ -78,4 +86,9 @@ export function CustomApiResponse(
   return applyDecorators(...docs);
 }
 
-type CustomResponses = 'success' | 'authorize' | 'paginated' | 'notfound';
+type CustomResponses =
+  | 'success'
+  | 'successNull'
+  | 'authorize'
+  | 'paginated'
+  | 'notfound';

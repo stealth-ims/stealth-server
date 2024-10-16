@@ -119,15 +119,40 @@ export class DrugsCategoryController {
     message: 'Drug category updated successfully',
   })
   @Patch(':id')
-  async update(
+  async changeName(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDrugsCategoryDto: UpdateDrugsCategoryDto,
   ) {
     try {
-      await this.drugsCategoryService.update(id, updateDrugsCategoryDto);
+      await this.drugsCategoryService.changeName(id, updateDrugsCategoryDto);
       return new ApiSuccessResponseNoData(
         HttpStatus.ACCEPTED,
         'Drug updated successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
+  @Roles(
+    Role.HospitalAdmin,
+    Role.NationalAdmin,
+    Role.RegionalAdmin,
+    Role.HospitalSCM,
+    Role.NationalSCM,
+    Role.RegionalSCM,
+  )
+  @CustomApiResponse(['success', 'authorize'], {
+    type: null,
+    message: 'Drug category status updated successfully',
+  })
+  @Patch(':id')
+  async toggleStatus(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.drugsCategoryService.toggleStatus(id);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.ACCEPTED,
+        'Drug category status updated successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);

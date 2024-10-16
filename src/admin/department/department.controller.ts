@@ -14,6 +14,7 @@ import {
 import { DepartmentService } from './department.service';
 import {
   CreateDepartmentDto,
+  DepartmentPaginationRequestDto,
   DepartmentResponse,
   UpdateDepartmentDto,
 } from './dto';
@@ -22,18 +23,14 @@ import {
   ApiSuccessResponseNoData,
   PaginatedDataResponseDto,
 } from '../../utils/responses/success.response';
-import { Authorize, GetUser, Roles } from '../../auth/decorator';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { GetUser, Roles } from '../../auth/decorator';
+import { ApiTags } from '@nestjs/swagger';
 import { Role } from '../../auth/interface/roles.enum';
 import { CustomApiResponse } from '../../shared/docs/decorators';
-import { PaginationRequestDto } from '../../shared/docs/dto/pagination.dto';
 import { Department } from './models/department.model';
 import { throwError } from '../../utils/responses/error.response';
 
 @ApiTags('Department')
-@ApiBearerAuth('access-token')
-@Authorize()
-@Roles(Role.HospitalAdmin)
 @Controller('departments')
 export class DepartmentController {
   private readonly logger;
@@ -46,6 +43,7 @@ export class DepartmentController {
     type: DepartmentResponse,
     message: 'Department created successfully',
   })
+  @Roles(Role.HospitalAdmin)
   async addDepartment(
     @Body() dto: CreateDepartmentDto,
     @GetUser('sub') adminId: string,
@@ -63,18 +61,15 @@ export class DepartmentController {
   }
 
   @Get()
-  @CustomApiResponse(['paginated', 'authorize', 'notfound'], {
+  @CustomApiResponse(['paginated'], {
     type: DepartmentResponse,
     message: 'Departments retrieved successfully',
   })
-  async getDepartments(
-    @Query() query: PaginationRequestDto,
-    @GetUser('facility') facilityId: string,
-  ) {
+  async getDepartments(@Query() query: DepartmentPaginationRequestDto) {
     try {
       const { rows, count } = await this.departmentService.findAll(
         query,
-        facilityId,
+        query.facilityId,
       );
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto<Department[]>(
@@ -92,7 +87,7 @@ export class DepartmentController {
   }
 
   @Get(':id')
-  @CustomApiResponse(['success', 'authorize', 'notfound'], {
+  @CustomApiResponse(['success', 'notfound'], {
     type: DepartmentResponse,
     message: 'Department retrieved successfully',
   })
@@ -110,10 +105,10 @@ export class DepartmentController {
   }
 
   @Patch(':id')
-  @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: null,
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Department updated successfully',
   })
+  @Roles(Role.HospitalAdmin)
   @HttpCode(HttpStatus.OK)
   async editDepartment(
     @Body() dto: UpdateDepartmentDto,
@@ -132,10 +127,10 @@ export class DepartmentController {
   }
 
   @Delete(':id')
-  @CustomApiResponse(['success', 'authorize'], {
-    type: null,
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Department deleted successfully',
   })
+  @Roles(Role.HospitalAdmin)
   @HttpCode(HttpStatus.OK)
   async deleteDepartment(@Param('id') id: string) {
     try {

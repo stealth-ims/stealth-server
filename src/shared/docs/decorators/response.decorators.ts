@@ -61,7 +61,7 @@ export const ApiSuccessResponseNullData = ({
 }) =>
   applyDecorators(
     ApiExtraModels(ApiSuccessResponseNoData),
-    ApiCreatedResponse({
+    ApiOkResponse({
       description,
       schema: {
         allOf: [{ $ref: getSchemaPath(ApiSuccessResponseNoData) }],

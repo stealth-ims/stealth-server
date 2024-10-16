@@ -37,20 +37,36 @@ module.exports = {
         allowNull: true,
         field: 'deactivated_at',
       },
-
-      passwordResetCode: {
-        type: Sequelize.STRING(400),
+      imageId: {
+        type: Sequelize.STRING,
         allowNull: true,
-        field: 'password_reset_code',
+        field: 'image_id',
+      },
+      imageUrl: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: 'image_url',
       },
 
-      passwordResetExpires: {
+      resetCode: {
+        type: Sequelize.STRING(400),
+        allowNull: true,
+        field: 'reset_code',
+      },
+
+      resetCodeExpires: {
         type: Sequelize.DATE,
         allowNull: true,
-        field: 'password_reset_expires',
+        field: 'reset_code_expires',
       },
 
       ...baseModelColumns,
+
+      updatedBy: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: 'updated_by',
+      },
 
       deletedAt: {
         type: Sequelize.DATE,

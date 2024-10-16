@@ -9,16 +9,22 @@ import {
   Logger,
   Patch,
   Post,
+  Put,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { CreateUserDto, GetUserDto } from '../user/dto';
+import { CreateUserDto, GetUserDto, UpdateUserDto } from '../user/dto';
 import { AuthService } from './auth.service';
 import { User } from './models/user.model';
 import {
   ApiCreatedSuccessResponse,
   ApiSuccessResponse,
+  ApiSuccessResponseNullData,
 } from '../shared/docs/decorators/response.decorators';
 import {
+  ChangePasswordDto,
   CheckCodeDto,
+  ImageUploadDto,
   LoginDto,
   LoginTokenDto,
   ResetPasswordDto,
@@ -28,19 +34,30 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Authorize, GetUser } from './decorator';
 import { ApiErrorResponse } from '../utils/responses/error.response';
-import { ApiSuccessResponseDto } from '../utils/responses/success.response';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+} from '../utils/responses/success.response';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   @ApiCreatedSuccessResponse({
     type: GetUserDto,
@@ -62,6 +79,54 @@ export class AuthController {
         response,
         HttpStatus.CREATED,
         'User created successfully awaiting approval from admin',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @UseInterceptors(FileInterceptor('file'))
+  @Put('profile-picture')
+  @ApiSuccessResponseNullData({
+    description: 'Picture uploaded successfully',
+  })
+  @ApiBadRequestResponse({
+    type: ApiErrorResponse,
+    description: 'A validtion error occured',
+  })
+  @ApiNotFoundResponse({
+    type: ApiErrorResponse,
+    description: 'User not found',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Profile Picture',
+    type: ImageUploadDto,
+  })
+  @HttpCode(HttpStatus.OK)
+  async uploadProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.uploadUserPicture(userId, file);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Image has been uploaded successfully',
       );
     } catch (error) {
       if (error instanceof HttpException) {
@@ -180,9 +245,8 @@ export class AuthController {
   }
 
   @Post('forgot-password/send-mail')
-  @ApiSuccessResponse({
-    type: String,
-    description: 'email sent successfully',
+  @ApiSuccessResponseNullData({
+    description: 'Email sent successfully',
   })
   @ApiInternalServerErrorResponse({
     type: ApiErrorResponse,
@@ -192,8 +256,7 @@ export class AuthController {
   async sendMail(@Body() dto: SendForgotPasswordEmailDto) {
     try {
       await this.authService.sendResetPasswordCode(dto.email);
-      return new ApiSuccessResponseDto<string>(
-        'email sent successfully',
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'email has been sent successfully',
       );
@@ -211,9 +274,8 @@ export class AuthController {
   }
 
   @Post('forgot-password/validate-code')
-  @ApiSuccessResponse({
-    type: String,
-    description: 'code has been validated successfully',
+  @ApiSuccessResponseNullData({
+    description: 'Code has been validated successfully',
   })
   @ApiInternalServerErrorResponse({
     type: ApiErrorResponse,
@@ -223,8 +285,7 @@ export class AuthController {
   async validateCode(@Body() dto: CheckCodeDto) {
     try {
       await this.authService.checkCode(dto);
-      return new ApiSuccessResponseDto<string>(
-        'Code validated. Proceed with password reset',
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'code has been validated successfully',
       );
@@ -242,9 +303,8 @@ export class AuthController {
   }
 
   @Patch('forgot-password/reset')
-  @ApiSuccessResponse({
-    type: String,
-    description: 'password has been reset successfully',
+  @ApiSuccessResponseNullData({
+    description: 'Password has been reset successfully',
   })
   @ApiInternalServerErrorResponse({
     type: ApiErrorResponse,
@@ -254,10 +314,119 @@ export class AuthController {
   async changePassword(@Body() dto: ResetPasswordDto) {
     try {
       await this.authService.resetPassword(dto);
-      return new ApiSuccessResponseDto<string>(
-        'Password reset successful',
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'password has been reset successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @Patch('')
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @ApiSuccessResponseNullData({
+    description: 'User updated successfully',
+  })
+  @ApiBadRequestResponse({
+    type: ApiErrorResponse,
+    description: 'A validtion error occured',
+  })
+  @ApiNotFoundResponse({
+    type: ApiErrorResponse,
+    description: 'User not found',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @HttpCode(HttpStatus.OK)
+  async updateUserDetails(
+    @Body() dto: UpdateUserDto,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.updateUser(userId, dto);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'user has been updated successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @Post('change-email/validate-otp')
+  @ApiSuccessResponseNullData({
+    description: 'OTP validated. User email updated successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @HttpCode(HttpStatus.OK)
+  async validateEmailCode(
+    @Body() dto: CheckCodeDto,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.verifychangeEmailCode(dto, userId);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'OTP validated. User email updated successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @ApiBearerAuth('access-token')
+  @Authorize()
+  @Put('/change-password')
+  @ApiSuccessResponseNullData({
+    description: 'User password updated successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @HttpCode(HttpStatus.OK)
+  async passwordChange(
+    @Body() dto: ChangePasswordDto,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.changePassword(dto, userId);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'user password changed successfully',
       );
     } catch (error) {
       if (error instanceof HttpException) {

@@ -41,7 +41,7 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
     example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
     description: 'The department id the user is registering to',
   })
-  @IsNotEmpty()
+  // @IsNotEmpty()
   departmentId: string;
 
   @ApiProperty({

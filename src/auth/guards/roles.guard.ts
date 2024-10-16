@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorator/roles.decorator';
 import { Role } from '../interface/roles.enum';
 import { IUserPayload } from '../interface/payload.interface';
+import { IS_PUBLIC_KEY } from '../decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -13,7 +14,11 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredRoles || requiredRoles.length == 0) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (!requiredRoles || requiredRoles.length == 0 || isPublic) {
       return true;
     }
     const user: IUserPayload = context.switchToHttp().getRequest()['user'];

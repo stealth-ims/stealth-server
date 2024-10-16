@@ -10,6 +10,7 @@ import { MailService } from '../notification/mail/mail.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RolesGuard } from './guards/roles.guard';
   providers: [
     AuthService,
     MailService,
+    CloudinaryService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,

@@ -10,7 +10,7 @@ import { Request } from 'express';
 import jwtConfig from '../interface/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
-import { AUTHORIZE_KEY } from '../decorator';
+import { AUTHORIZE_KEY, IS_PUBLIC_KEY } from '../decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -22,12 +22,16 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     const authorize = this.reflector.getAllAndOverride<boolean>(AUTHORIZE_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
-    if (!authorize) {
+    if (!authorize || isPublic) {
       return true;
     }
 
