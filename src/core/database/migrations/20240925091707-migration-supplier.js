@@ -18,6 +18,10 @@ module.exports = {
         allowNull: false,
         field: 'contact_person',
       },
+      position: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       contact: {
         type: Sequelize.STRING,
         allowNull: false,

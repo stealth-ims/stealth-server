@@ -13,14 +13,15 @@ import {
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
-import { Batch, Drug, DrugStatus } from './models';
+import { Drug, DrugStatus } from './models';
+import { BatchService } from './batch.service';
 
 @Injectable()
 export class DrugsService {
   private readonly logger: Logger;
   constructor(
     @InjectModel(Drug) private readonly drugRepo: typeof Drug,
-    @InjectModel(Batch) private readonly batchRepo: typeof Batch,
+    private readonly batchService: BatchService,
   ) {
     this.logger = new Logger(DrugsService.name);
   }
@@ -37,7 +38,8 @@ export class DrugsService {
       ...createDrugDto,
       status: DrugStatus.STOCKED,
     });
-    const batch = await this.batchRepo.create({
+
+    const batch = await this.batchService.create({
       ...createDrugDto,
       drugId: createdDrug.id,
     });

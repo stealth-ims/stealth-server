@@ -200,7 +200,10 @@ export class Drug extends BaseModel {
         (department && exists.departmentId == (department as Department).id))
     ) {
       throw new ConflictException(
-        'Drug already exists in facility or department',
+        JSON.stringify({
+          message: 'Drug already exists in facility or department',
+          id: drug.id,
+        }),
       );
     }
   }

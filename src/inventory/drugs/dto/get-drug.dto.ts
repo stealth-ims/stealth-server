@@ -4,18 +4,20 @@ import {
   IntersectionType,
   OmitType,
 } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { Batch, Drug } from '../models';
 
 export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
+  @IsOptional()
   @ApiPropertyOptional()
   supplierId: string;
 
   @ApiPropertyOptional()
   @IsString({ each: true })
+  @IsOptional()
   categories: string[];
 
   @IsUUID()
@@ -24,6 +26,7 @@ export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
 
   @IsUUID()
   @ApiPropertyOptional()
+  @IsOptional()
   departmentId: string;
 }
 

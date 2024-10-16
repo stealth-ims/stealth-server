@@ -44,6 +44,11 @@ export class SuppliersService {
     return [suppliers.rows, suppliers.count];
   }
 
+  async exists(id: string): Promise<boolean> {
+    const supplier = await this.supplierRepo.findByPk(id);
+    return !!supplier;
+  }
+
   async findOne(id: string): Promise<SupplierResponse> {
     this.logger.log(`Finding supplier with ID: ${id}`);
     const supplier = await this.supplierRepo.findByPk(id, {

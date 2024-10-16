@@ -6,7 +6,7 @@ import {
   Matches,
   IsOptional,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { DosageForm } from '../models/drug.model';
 
 export class CreateDrugDto {
@@ -79,14 +79,14 @@ export class CreateDrugDto {
     description: 'The batch number of the drug',
   })
   @IsString()
-  batch: string;
+  batchNumber: string;
 
   @ApiProperty({
     example: 100,
     description: 'The stock quantity of the drug',
   })
   @IsNumber()
-  stock: number;
+  quantity: number;
 
   @ApiProperty({
     example: 10,
@@ -151,4 +151,18 @@ export class CreateDrugDto {
   @IsUUID()
   @IsOptional()
   departmentId: string;
+}
+
+export class CreateBatchDto extends PickType(CreateDrugDto, [
+  'batchNumber',
+  'validity',
+  'quantity',
+  'supplierId',
+]) {
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The drug ID',
+  })
+  @IsUUID()
+  drugId: string;
 }
