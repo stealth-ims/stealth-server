@@ -1,8 +1,9 @@
 import { ApiPropertyOptional, IntersectionType } from '@nestjs/swagger';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { CreateStockAdjustmentDto } from '.';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import { StockAdjustmentStatus, StockAdjustmentType } from '../model';
 
 export class OneStockAdjustment extends IntersectionType(
   CreateStockAdjustmentDto,
@@ -21,6 +22,22 @@ export class StockAdjustmentPaginationDto extends IntersectionType(
   @ApiPropertyOptional()
   @IsOptional()
   departmentId: string;
+
+  @IsOptional()
+  @IsEnum(StockAdjustmentType)
+  @ApiPropertyOptional({
+    enum: StockAdjustmentType,
+    description: 'Type of stock adjustment',
+  })
+  type?: StockAdjustmentType;
+
+  @IsOptional()
+  @IsEnum(StockAdjustmentStatus)
+  @ApiPropertyOptional({
+    enum: StockAdjustmentStatus,
+    description: 'Status of stock adjustment',
+  })
+  status?: StockAdjustmentStatus;
 
   @IsUUID()
   @IsOptional()

@@ -140,7 +140,7 @@ export class DrugsController {
     }
   }
 
-  @CustomApiResponse(['successNull', 'authorize'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: String,
     message: 'Drug updated successfully',
   })
@@ -168,7 +168,7 @@ export class DrugsController {
     }
   }
 
-  @CustomApiResponse(['successNull', 'authorize'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: String,
     message: 'Drug prices adjusted successfully',
   })
@@ -196,7 +196,7 @@ export class DrugsController {
     }
   }
 
-  @CustomApiResponse(['successNull', 'authorize'], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: String,
     message: 'Drug deleted successfully',
   })

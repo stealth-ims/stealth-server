@@ -12,11 +12,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { StockAdjustmentsService } from './stock-adjustments.service';
-import {
-  CreateStockAdjustmentDto,
-  StockAdjustmentPaginationDto,
-  UpdateStockAdjustmentDto,
-} from './dto';
+import { CreateStockAdjustmentDto, StockAdjustmentPaginationDto } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { Roles } from 'src/auth/decorator';
@@ -27,6 +23,7 @@ import {
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
+import { StockAdjustmentStatus } from './model';
 
 @ApiTags('Stock Adjustments')
 @Controller('stock-adjustments')
@@ -119,13 +116,41 @@ export class StockAdjustmentsController {
     type: null,
     message: 'Stock adjustment updated successfully',
   })
-  @Patch(':id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateStockAdjustmentDto: UpdateStockAdjustmentDto,
-  ) {
+  @Patch('/reject/:id')
+  async rejectAdjustment(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      await this.stockAdjustmentsService.update(id, updateStockAdjustmentDto);
+      await this.stockAdjustmentsService.update(
+        id,
+        StockAdjustmentStatus.REJECTED,
+      );
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Stock adjustment updated successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
+  @Roles(
+    Role.HospitalAdmin,
+    Role.NationalAdmin,
+    Role.RegionalAdmin,
+    Role.HospitalSCM,
+    Role.NationalSCM,
+    Role.RegionalSCM,
+  )
+  @CustomApiResponse(['successNull', 'authorize'], {
+    type: null,
+    message: 'Stock adjustment updated successfully',
+  })
+  @Patch('/accept/:id')
+  async acceptAdjustment(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.stockAdjustmentsService.update(
+        id,
+        StockAdjustmentStatus.ADJUSTED,
+      );
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Stock adjustment updated successfully',

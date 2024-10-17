@@ -1,11 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateStockAdjustmentDto } from './dto/create-stock-adjustment.dto';
-import { UpdateStockAdjustmentDto } from './dto/update-stock-adjustment.dto';
-import { StockAdjustment } from './model';
+import { StockAdjustment, StockAdjustmentStatus } from './model';
 import { ApiSuccessResponseNoData } from 'src/utils/responses/success.response';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
 import { StockAdjustmentPaginationDto } from './dto';
+import { DrugsService } from 'src/inventory/drugs/drugs.service';
 
 @Injectable()
 export class StockAdjustmentsService {
@@ -13,6 +13,7 @@ export class StockAdjustmentsService {
   constructor(
     @InjectModel(StockAdjustment)
     private readonly stockAdjustmentRepo: typeof StockAdjustment,
+    private readonly drugService: DrugsService,
   ) {
     this.logger = new Logger(StockAdjustmentsService.name);
   }
@@ -69,7 +70,6 @@ export class StockAdjustmentsService {
     const adjustment = await this.stockAdjustmentRepo.findByPk(id);
 
     if (!adjustment) {
-      this.logger.warn('Stock adjustment not found');
       throw new NotFoundException(`Stock adjustment with id: ${id} not found`);
     }
     this.logger.log(`Found stock adjustment with ID: ${id}`);
@@ -87,17 +87,14 @@ export class StockAdjustmentsService {
    */
   async update(
     id: string,
-    updateStockAdjustmentDto: UpdateStockAdjustmentDto,
+    status: StockAdjustmentStatus,
   ): Promise<ApiSuccessResponseNoData> {
-    const result = await this.stockAdjustmentRepo.update(
-      { ...updateStockAdjustmentDto },
-      { where: { id } },
-    );
-    const affected = result[0];
-    if (affected == 0) {
-      this.logger.warn(`Stock adjustment with id ${id} not found`);
-      throw new NotFoundException(`Stock adjustment with id ${id} not found`);
+    const adjustment = await this.findOne(id);
+    if (status == StockAdjustmentStatus.ADJUSTED) {
+      // const drug = await this.drugService.findOne(adjustment.drugId);
     }
+    adjustment.status = status;
+    await adjustment.save();
     this.logger.log(`Updated stock adjustment with ID: ${id}`);
     return;
   }
@@ -115,7 +112,6 @@ export class StockAdjustmentsService {
     const res = await this.stockAdjustmentRepo.destroy({ where: { id: id } });
 
     if (res == 0) {
-      this.logger.warn(`Stock adjustment with id ${id} not found`);
       throw new NotFoundException(`Stock adjustment with id ${id} not found`);
     }
     return;
@@ -135,11 +131,13 @@ export class StockAdjustmentsService {
         query.facilityId && { facilityId: query.facilityId },
         query.departmentId && { departmentId: query.departmentId },
         query.createdBy && { createdBy: query.createdBy },
+        query.type && { type: query.type },
+        query.status && { type: query.status },
         query.search && {
           [Op.or]: [{ reason: { [Op.iLike]: `%${query.search}%` } }],
         },
-        query.startDate && { createdAt: { [Op.gte]: query.startDate } },
-        query.endDate && { createdAt: { [Op.lte]: query.endDate } },
+        query.startDate && { dateAdded: { [Op.gte]: query.startDate } },
+        query.endDate && { dateAdded: { [Op.lte]: query.endDate } },
       ],
     };
     return {
