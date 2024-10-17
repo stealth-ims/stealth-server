@@ -31,16 +31,12 @@ import {
   PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
-import { BatchService } from './batch.service';
 
 @ApiTags('Drugs')
 @Controller('drugs')
 export class DrugsController {
   private readonly logger: Logger;
-  constructor(
-    private readonly drugsService: DrugsService,
-    private readonly batchService: BatchService,
-  ) {
+  constructor(private readonly drugsService: DrugsService) {
     this.logger = new Logger(DrugsController.name);
   }
 

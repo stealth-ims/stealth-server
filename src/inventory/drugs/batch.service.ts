@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Batch } from './models';
 import { CreateBatchDto } from './dto';
@@ -42,6 +47,17 @@ export class BatchService {
       throw new NotFoundException(`Batch with ID ${id} not found`);
     }
     return batch;
+  }
+
+  async removeStock(id: string, qty: number): Promise<void> {
+    const batch = await this.findOne(id);
+    if (batch.quantity - qty < 0)
+      throw new BadRequestException('Insufficient stock in batch');
+
+    batch.quantity -= qty;
+    await batch.save();
+    if (batch.quantity - qty == 0) await batch.destroy();
+    this.logger.log(`Stock removed from batch. ID: ${id}`);
   }
 
   // async update(id: string, updateBatchDto: UpdateBatchDto): Promise<Batch> {
