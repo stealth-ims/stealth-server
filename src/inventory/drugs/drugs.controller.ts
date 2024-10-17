@@ -10,7 +10,6 @@ import {
   Query,
   HttpStatus,
   Logger,
-  ConflictException,
 } from '@nestjs/common';
 import { DrugsService } from './drugs.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -67,24 +66,6 @@ export class DrugsController {
         'Drug category created successfully',
       );
     } catch (error) {
-      if (error instanceof ConflictException) {
-        try {
-          const id = JSON.parse(error.message).id;
-          this.logger.log(`Drug already existed. ID: ${id}`);
-          await this.batchService.create({
-            ...createDrugDto,
-            drugId: id,
-          });
-          const drug = await this.drugsService.findOne(id);
-          return new ApiSuccessResponseDto(
-            drug,
-            HttpStatus.CREATED,
-            'Drug already existed. New batch created successfully',
-          );
-        } catch (error) {
-          throw throwError(this.logger, error);
-        }
-      }
       throw throwError(this.logger, error);
     }
   }
@@ -105,7 +86,7 @@ export class DrugsController {
           query.pageSize,
           drugs[1],
         ),
-        HttpStatus.FOUND,
+        HttpStatus.OK,
         'Drugs retrieved successfully',
       );
     } catch (error) {
@@ -132,7 +113,7 @@ export class DrugsController {
       const drug = await this.drugsService.findOne(id);
       return new ApiSuccessResponseDto(
         drug,
-        HttpStatus.FOUND,
+        HttpStatus.OK,
         'Drug retrieved successfully',
       );
     } catch (error) {
@@ -213,7 +194,7 @@ export class DrugsController {
     try {
       await this.drugsService.remove(id);
       return new ApiSuccessResponseNoData(
-        HttpStatus.ACCEPTED,
+        HttpStatus.OK,
         'Drug deleted successfully',
       );
     } catch (error) {

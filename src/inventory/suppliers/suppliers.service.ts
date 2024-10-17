@@ -56,7 +56,6 @@ export class SuppliersService {
     });
 
     if (!supplier) {
-      this.logger.warn('supplier not found');
       throw new NotFoundException(`supplier with id: ${id} not found`);
     }
     this.logger.log(`Found suppliier with ID: ${id}`);

@@ -64,7 +64,7 @@ export class SuppliersController {
           query.pageSize,
           suppliers[1],
         ),
-        HttpStatus.FOUND,
+        HttpStatus.OK,
         'Suppliers retrieved successfully',
       );
     } catch (error) {
@@ -82,7 +82,7 @@ export class SuppliersController {
       const supplier = await this.suppliersService.findOne(id);
       return new ApiSuccessResponseDto(
         supplier,
-        HttpStatus.FOUND,
+        HttpStatus.OK,
         'supplier retrieved successfully',
       );
     } catch (error) {

@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -34,19 +35,31 @@ export class DrugsService {
    * @throws If any error occurs during the creation process.
    */
   async create(createDrugDto: CreateDrugDto): Promise<OneDrug> {
-    const createdDrug = await this.drugRepo.create({
-      ...createDrugDto,
-      status: DrugStatus.STOCKED,
-    });
+    try {
+      const createdDrug = await this.drugRepo.create({
+        ...createDrugDto,
+        status: DrugStatus.STOCKED,
+      });
 
-    const batch = await this.batchService.create({
-      ...createDrugDto,
-      drugId: createdDrug.id,
-    });
-    const oneDrug = createdDrug.toJSON() as OneDrug;
-    oneDrug.batches = [batch];
-    this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-    return oneDrug;
+      const batch = await this.batchService.create({
+        ...createDrugDto,
+        drugId: createdDrug.id,
+      });
+      const oneDrug = createdDrug.toJSON() as OneDrug;
+      oneDrug.batches = [batch];
+      this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
+      return oneDrug;
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        const id = JSON.parse(error.message).id;
+        this.logger.log(`Drug already existed. ID: ${id}`);
+        await this.batchService.create({
+          ...createDrugDto,
+          drugId: id,
+        });
+        return await this.findOne(id);
+      }
+    }
   }
 
   /**
