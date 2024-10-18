@@ -12,7 +12,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { StockAdjustmentsService } from './stock-adjustments.service';
-import { CreateStockAdjustmentDto, StockAdjustmentPaginationDto } from './dto';
+import {
+  CreateStockAdjustmentDto,
+  OneStockAdjustment,
+  StockAdjustmentPaginationDto,
+} from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import { Roles } from 'src/auth/decorator';
@@ -36,7 +40,7 @@ export class StockAdjustmentsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: CreateStockAdjustmentDto,
+    type: OneStockAdjustment,
     message: 'Stock adjustment created successfully',
   })
   @Roles(
@@ -64,7 +68,7 @@ export class StockAdjustmentsController {
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: CreateStockAdjustmentDto,
+    type: OneStockAdjustment,
     message: 'Stock adjustments retrieved successfully',
   })
   @Get()
@@ -87,7 +91,7 @@ export class StockAdjustmentsController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: CreateStockAdjustmentDto,
+    type: OneStockAdjustment,
     message: 'Stock adjustment retrieved successfully',
   })
   @Get(':id')
@@ -113,7 +117,6 @@ export class StockAdjustmentsController {
     Role.RegionalSCM,
   )
   @CustomApiResponse(['successNull', 'authorize'], {
-    type: null,
     message: 'Stock adjustment updated successfully',
   })
   @Patch('/reject/:id')
@@ -141,7 +144,6 @@ export class StockAdjustmentsController {
     Role.RegionalSCM,
   )
   @CustomApiResponse(['successNull', 'authorize'], {
-    type: null,
     message: 'Stock adjustment updated successfully',
   })
   @Patch('/accept/:id')
@@ -169,7 +171,6 @@ export class StockAdjustmentsController {
     Role.RegionalSCM,
   )
   @CustomApiResponse(['successNull', 'authorize'], {
-    type: null,
     message: 'Stock adjustment deleted successfully',
   })
   @Delete(':id')
