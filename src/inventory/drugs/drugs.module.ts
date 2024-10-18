@@ -11,6 +11,6 @@ import { Supplier } from '../suppliers/models/supplier.model';
   imports: [SequelizeModule.forFeature([Drug, Batch, Supplier])],
   controllers: [DrugsController],
   providers: [DrugsService, BatchService, SuppliersService],
-  exports: [DrugsService],
+  exports: [DrugsService, BatchService],
 })
 export class DrugsModule {}

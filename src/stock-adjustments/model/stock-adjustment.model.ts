@@ -1,7 +1,6 @@
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -18,6 +17,7 @@ import { Facility } from 'src/admin/facility/models/facility.model';
 import { Drug } from 'src/inventory/drugs/models';
 import { BaseModel } from 'src/shared/models/base.model';
 import { ApiProperty } from '@nestjs/swagger';
+import { BatchAdjustmentDto } from '../dto';
 
 export enum StockAdjustmentType {
   REDUCTION = 'REDUCTION',
@@ -79,21 +79,8 @@ export class StockAdjustment extends BaseModel {
   @Column
   createdBy: string;
 
-  @ApiProperty({
-    example: 100,
-    description: 'The current stock quantity before adjustment',
-  })
-  @Column
-  @IsNumber()
-  currentStock: number;
-
-  @ApiProperty({
-    example: 90,
-    description: 'The actual stock quantity after adjustment',
-  })
-  @Column
-  @IsNumber()
-  actualStock: number;
+  @Column({ type: DataType.JSONB, allowNull: true })
+  affected: BatchAdjustmentDto[];
 
   @ApiProperty({
     example: '2023-05-15T10:30:00Z',

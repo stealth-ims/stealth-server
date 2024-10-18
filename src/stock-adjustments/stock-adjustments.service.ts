@@ -1,11 +1,20 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateStockAdjustmentDto } from './dto/create-stock-adjustment.dto';
-import { StockAdjustment, StockAdjustmentStatus } from './model';
+import {
+  StockAdjustment,
+  StockAdjustmentStatus,
+  StockAdjustmentType,
+} from './model';
 import { ApiSuccessResponseNoData } from 'src/utils/responses/success.response';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
 import { StockAdjustmentPaginationDto } from './dto';
-import { DrugsService } from 'src/inventory/drugs/drugs.service';
+import { BatchService } from 'src/inventory/drugs/batch.service';
 
 @Injectable()
 export class StockAdjustmentsService {
@@ -13,7 +22,7 @@ export class StockAdjustmentsService {
   constructor(
     @InjectModel(StockAdjustment)
     private readonly stockAdjustmentRepo: typeof StockAdjustment,
-    private readonly drugService: DrugsService,
+    private readonly batchService: BatchService,
   ) {
     this.logger = new Logger(StockAdjustmentsService.name);
   }
@@ -26,18 +35,38 @@ export class StockAdjustmentsService {
    * @throws {BadRequestException} If there is a unique constraint error.
    * @throws {InternalServerErrorException} If there is an internal server error.
    */
-  async create(
-    createStockAdjustmentDto: CreateStockAdjustmentDto,
-  ): Promise<StockAdjustment> {
-    try {
-      const adjustment = await this.stockAdjustmentRepo.create({
-        ...createStockAdjustmentDto,
-      });
-      this.logger.log(`Created stock adjustment with ID: ${adjustment.id}`);
-      return adjustment;
-    } catch (error) {
-      throw error;
+  async create(dto: CreateStockAdjustmentDto): Promise<StockAdjustment> {
+    switch (dto.type) {
+      case StockAdjustmentType.INCREMENT:
+        if (dto.batch === undefined)
+          throw new BadRequestException(
+            'Batch field is required for increment type',
+          );
+        const batch = await this.batchService.create(dto.batch);
+        dto.affected = [
+          {
+            batchId: batch.id,
+            currentStock: batch.quantity,
+            actualStock: batch.quantity,
+          },
+        ];
+        break;
+      case StockAdjustmentType.REDUCTION:
+        if (dto.affected === undefined)
+          throw new BadRequestException(
+            'Affected field is required for reduction type',
+          );
+        break;
     }
+    const adjustment = await this.stockAdjustmentRepo.create({
+      ...dto,
+      status:
+        dto.type == StockAdjustmentType.INCREMENT
+          ? StockAdjustmentStatus.ADJUSTED
+          : StockAdjustmentStatus.SUBMITTED,
+    });
+    this.logger.log(`Created stock adjustment with ID: ${adjustment.id}`);
+    return adjustment;
   }
 
   /**
@@ -80,7 +109,7 @@ export class StockAdjustmentsService {
    * Updates a stock adjustment.
    *
    * @param id - The ID of the stock adjustment.
-   * @param updateStockAdjustmentDto - The DTO containing the updated stock adjustment data.
+   * @param status - The new status of the stock adjustment.
    * @returns A Promise that resolves to void.
    * @throws NotFoundException if the stock adjustment is not found.
    * @throws InternalServerErrorException if an error occurs during the update process.
@@ -91,11 +120,16 @@ export class StockAdjustmentsService {
   ): Promise<ApiSuccessResponseNoData> {
     const adjustment = await this.findOne(id);
     if (status == StockAdjustmentStatus.ADJUSTED) {
-      // const drug = await this.drugService.findOne(adjustment.drugId);
+      adjustment.affected.forEach(async (batch) => {
+        await this.batchService.removeStock(
+          batch.batchId,
+          batch.currentStock - batch.actualStock,
+        );
+      });
     }
     adjustment.status = status;
     await adjustment.save();
-    this.logger.log(`Updated stock adjustment with ID: ${id}`);
+    this.logger.log(`Updated status of stock adjustment with ID: ${id}`);
     return;
   }
 

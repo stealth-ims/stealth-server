@@ -29,9 +29,21 @@ module.exports = {
 
     // Generate 3 stock adjustments for each drug
     for (const drug of drugs) {
+      // Get batches for the current drug
+      const batches = await queryInterface.sequelize.query(
+        'SELECT id FROM batches WHERE drug_id = :drugId;',
+        {
+          replacements: { drugId: drug.id },
+          type: queryInterface.sequelize.QueryTypes.SELECT,
+        },
+      );
+
       for (let i = 1; i <= 3; i++) {
         const currentStock = Math.floor(Math.random() * 451) + 50; // 50 to 500
         const actualStock = Math.floor(Math.random() * (currentStock + 1)); // 0 to currentStock
+
+        // Select a random batch for the current drug
+        const randomBatch = batches[Math.floor(Math.random() * batches.length)];
 
         stockAdjustments.push({
           id: uuidv4(),
@@ -42,8 +54,13 @@ module.exports = {
           ],
           type: Math.random() > 0.5 ? 'REDUCTION' : 'INCREMENT',
           created_by: 'System',
-          current_stock: currentStock,
-          actual_stock: actualStock,
+          affected: JSON.stringify([
+            {
+              batchId: randomBatch.id,
+              currentStock: currentStock,
+              actualStock: actualStock,
+            },
+          ]),
           date_added: new Date(
             new Date().setDate(
               new Date().getDate() - Math.floor(Math.random() * 30),

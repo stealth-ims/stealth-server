@@ -29,15 +29,9 @@ module.exports = {
         allowNull: false,
         field: 'created_by',
       },
-      currentStock: {
-        type: Sequelize.INTEGER,
+      affected: {
+        type: Sequelize.JSONB,
         allowNull: false,
-        field: 'current_stock',
-      },
-      actualStock: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        field: 'actual_stock',
       },
       dateAdded: {
         type: Sequelize.DATE,
