@@ -1,12 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { StockAdjustment } from '../model';
-import {
-  IsInstance,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsUUID,
-} from 'class-validator';
+import { IsNumber, IsOptional, IsPositive, IsUUID } from 'class-validator';
 import { CreateBatchDto } from 'src/inventory/drugs/dto';
 
 export class BatchAdjustmentDto {
@@ -39,6 +33,7 @@ export class CreateStockAdjustmentDto extends PickType(StockAdjustment, [
   'notes',
   'type',
   'drugId',
+  'dateAdded',
   'createdBy',
   'facilityId',
   'departmentId',
@@ -49,7 +44,6 @@ export class CreateStockAdjustmentDto extends PickType(StockAdjustment, [
     isArray: true,
     required: false,
   })
-  @IsInstance(BatchAdjustmentDto, { each: true })
   @IsOptional()
   affected: BatchAdjustmentDto[];
 
@@ -58,7 +52,6 @@ export class CreateStockAdjustmentDto extends PickType(StockAdjustment, [
     type: () => CreateBatchDto,
     required: false,
   })
-  @IsInstance(CreateBatchDto)
   @IsOptional()
   batch: CreateBatchDto;
 }

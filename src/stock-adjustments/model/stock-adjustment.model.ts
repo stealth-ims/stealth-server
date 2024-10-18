@@ -1,4 +1,5 @@
 import {
+  IsDateString,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -76,6 +77,7 @@ export class StockAdjustment extends BaseModel {
     example: 'Kratos Godson',
     description: 'The user who created the stock adjustment',
   })
+  @IsString()
   @Column
   createdBy: string;
 
@@ -86,6 +88,7 @@ export class StockAdjustment extends BaseModel {
     example: '2023-05-15T10:30:00Z',
     description: 'The date when the stock adjustment was added',
   })
+  @IsDateString()
   @Column(DataType.DATE)
   dateAdded: Date;
 
@@ -99,6 +102,7 @@ export class StockAdjustment extends BaseModel {
     type: DataType.UUID,
     allowNull: false,
   })
+  @IsUUID()
   drugId: string;
 
   @ApiProperty({

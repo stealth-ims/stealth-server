@@ -36,6 +36,10 @@ export class StockAdjustmentsService {
    * @throws {InternalServerErrorException} If there is an internal server error.
    */
   async create(dto: CreateStockAdjustmentDto): Promise<StockAdjustment> {
+    if (!dto.facilityId && !dto.departmentId)
+      throw new BadRequestException(
+        'facilityId or departmentId must be specified',
+      );
     switch (dto.type) {
       case StockAdjustmentType.INCREMENT:
         if (dto.batch === undefined)
@@ -58,6 +62,7 @@ export class StockAdjustmentsService {
           );
         break;
     }
+    console.log(dto.affected);
     const adjustment = await this.stockAdjustmentRepo.create({
       ...dto,
       status:
@@ -120,12 +125,12 @@ export class StockAdjustmentsService {
   ): Promise<ApiSuccessResponseNoData> {
     const adjustment = await this.findOne(id);
     if (status == StockAdjustmentStatus.ADJUSTED) {
-      adjustment.affected.forEach(async (batch) => {
+      for (const batch of adjustment.affected) {
         await this.batchService.removeStock(
           batch.batchId,
           batch.currentStock - batch.actualStock,
         );
-      });
+      }
     }
     adjustment.status = status;
     await adjustment.save();
