@@ -90,8 +90,7 @@ export class SuppliersController {
     }
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
-    type: String,
+  @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Supplier updated successfully',
   })
   @Patch(':id')
@@ -102,8 +101,7 @@ export class SuppliersController {
     return await this.suppliersService.update(id, updateSupplierDto);
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
-    type: String,
+  @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Supplier deleted successfully',
   })
   @Delete(':id')
