@@ -1,14 +1,28 @@
-import { IsString, IsNumber, IsEnum, IsDate } from 'class-validator';
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
-import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
+import {
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsUUID,
+  Matches,
+  IsOptional,
+} from 'class-validator';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { DosageForm } from '../models/drug.model';
 
-export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
+export class CreateDrugDto {
   @ApiProperty({
     example: 'Drug Name',
     description: 'The name of the drug',
   })
   @IsString()
   name: string;
+
+  @ApiProperty({
+    example: 'Brand Name',
+    description: 'The brand name of the drug',
+  })
+  @IsString()
+  brandName: string;
 
   @ApiProperty({
     example: 10.99,
@@ -25,12 +39,12 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   sellingPrice: number;
 
   @ApiProperty({
-    example: 'SOLIDS',
-    enum: ['SOLIDS', 'LIQUIDS'],
+    example: DosageForm.LIQUIDS,
+    enum: DosageForm,
     description: 'The dosage form of the drug',
   })
-  @IsEnum(['SOLIDS', 'LIQUIDS'])
-  dosageForm: string;
+  @IsEnum(DosageForm)
+  dosageForm: DosageForm;
 
   @ApiProperty({
     example: 'ABC-DGU-123',
@@ -43,7 +57,7 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
     example: '2022-12-31',
     description: 'The validity of the drug',
   })
-  @IsDate()
+  @Matches(/\d{4}-\d{2}-\d{2}/, { message: 'Invalid date format: YYYY-MM-DD' })
   validity: Date;
 
   @ApiProperty({
@@ -65,14 +79,14 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
     description: 'The batch number of the drug',
   })
   @IsString()
-  batch: string;
+  batchNumber: string;
 
   @ApiProperty({
     example: 100,
     description: 'The stock quantity of the drug',
   })
   @IsNumber()
-  stock: number;
+  quantity: number;
 
   @ApiProperty({
     example: 10,
@@ -82,19 +96,25 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   reorderPoint: number;
 
   @ApiProperty({
+    example: 'strength',
+    description: 'The strength of the drug',
+  })
+  @IsString()
+  strength: string;
+
+  @ApiProperty({
+    example: 'gramms',
+    description: 'The unit of measurement of the drug',
+  })
+  @IsString()
+  unitOfMeasurement: string;
+
+  @ApiProperty({
     example: 'Manufacturer Name',
     description: 'The manufacturer of the drug',
   })
   @IsString()
   manufacturer: string;
-
-  @ApiProperty({
-    example: 'STOCKED',
-    enum: ['LOW', 'STOCKED', 'OUT_OF_STOCK'],
-    description: 'The status of the drug',
-  })
-  @IsEnum(['LOW', 'STOCKED', 'OUT_OF_STOCK'])
-  status: string;
 
   @ApiProperty({
     example: 'Store in a cool, dry place',
@@ -104,9 +124,53 @@ export class CreateDrugDto extends IntersectionType(GenericResponseDto) {
   storageReq: string;
 
   @ApiProperty({
-    example: 'Category ID',
-    description: 'The category ID of the drug',
+    example: 'Kratos',
+    description: 'The name of the user',
   })
   @IsString()
+  createdBy: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The category ID of the drug',
+  })
+  @IsUUID()
   categoryId: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The supplier ID of the drug',
+  })
+  @IsUUID()
+  supplierId: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: "Add facility ID if it's a facility drug",
+  })
+  @IsUUID()
+  facilityId: string;
+
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'Add department ID if it is a department drug',
+  })
+  @IsUUID()
+  @IsOptional()
+  departmentId: string;
+}
+
+export class CreateBatchDto extends PickType(CreateDrugDto, [
+  'batchNumber',
+  'validity',
+  'quantity',
+  'supplierId',
+  'createdBy',
+]) {
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The drug ID',
+  })
+  @IsUUID()
+  drugId: string;
 }
