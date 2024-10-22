@@ -5,6 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 // import { Drug } from '../../../inventory/drugs/models/drug.model';
 import { Department } from '../../department/models/department.model';
+import { StockAdjustment } from 'src/stock-adjustments/model/stock-adjustment.model';
 
 @Table({
   tableName: 'facilities',
@@ -47,6 +48,9 @@ export class Facility extends BaseModel {
 
   @Column({ field: 'updated_by', allowNull: true })
   updatedBy: string;
+
+  @HasMany(() => StockAdjustment)
+  stockAdjustments: StockAdjustment[];
 
   // @ApiProperty({
   //   example: [],

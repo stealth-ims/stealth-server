@@ -86,7 +86,7 @@ export function CustomApiResponse(
   return applyDecorators(...docs);
 }
 
-type CustomResponses =
+export type CustomResponses =
   | 'success'
   | 'successNull'
   | 'authorize'

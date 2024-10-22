@@ -12,6 +12,7 @@ import { User } from '../../../auth/models/user.model';
 // import { Drug } from '../../../inventory/drugs/models/drug.model';
 import { Facility } from '../../facility/models/facility.model';
 import { DepartmentRequest } from 'src/department-requests/models/department-requests.model';
+import { StockAdjustment } from 'src/stock-adjustments/model/stock-adjustment.model';
 
 @Table({
   tableName: 'departments',
@@ -43,14 +44,16 @@ export class Department extends BaseModel {
   @HasMany(() => User)
   workers: User[];
 
+  @HasMany(() => StockAdjustment)
+  stockAdjustments: StockAdjustment[];
+  @HasMany(() => DepartmentRequest)
+  departmentRequests: DepartmentRequest[];
+
   @Column({ field: 'created_by', allowNull: true })
   createdBy: string;
 
   @Column({ field: 'updated_by', allowNull: true })
   updatedBy: string;
-
-  @HasMany(() => DepartmentRequest)
-  departmentRequests: DepartmentRequest[];
 
   // @ApiProperty({
   //   example: [],

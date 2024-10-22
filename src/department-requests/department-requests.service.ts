@@ -23,7 +23,7 @@ export class DepartmentRequestsService {
 
   async create(dto: CreateDepartmentRequestDto, departmentId: string) {
     await this.departmentService.findOne(departmentId);
-    await this.drugService.findOne(+dto.drugId);
+    await this.drugService.findOne(dto.drugId);
 
     dto.requestNumber = `R-${new Date().getTime()}`;
     dto.status = 'PENDING';

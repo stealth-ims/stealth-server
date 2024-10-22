@@ -15,6 +15,7 @@ import { BaseModel } from 'src/shared/models/base.model';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Batch } from '.';
+import { StockAdjustment } from 'src/stock-adjustments/model';
 
 export enum DosageForm {
   SOLIDS = 'SOLIDS',
@@ -26,7 +27,6 @@ export enum DrugStatus {
   STOCKED = 'STOCKED',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
 }
-
 @Table({
   tableName: 'drugs',
   underscored: true,
@@ -185,6 +185,12 @@ export class Drug extends BaseModel {
   @HasMany(() => Batch)
   batches: Batch[];
 
+  @HasMany(() => StockAdjustment)
+  stockAdjustments: StockAdjustment[];
+
+  @HasMany(() => DepartmentRequest)
+  departmentRequests: DepartmentRequest[];
+
   @BeforeCreate
   static async validate(drug: Drug) {
     const facility = await Facility.findByPk(drug.dataValues.facilityId);
@@ -213,7 +219,4 @@ export class Drug extends BaseModel {
       );
     }
   }
-
-  @HasMany(() => DepartmentRequest)
-  departmentRequests: DepartmentRequest[];
 }

@@ -12,10 +12,10 @@ export class PaginationRequestDto {
   @IsInt()
   page: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ default: 10 })
   @IsOptional()
   @IsInt()
-  pageSize: number;
+  pageSize: number = 10;
 
   @ApiPropertyOptional()
   @IsOptional()

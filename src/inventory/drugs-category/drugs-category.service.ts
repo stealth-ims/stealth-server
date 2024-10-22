@@ -35,15 +35,11 @@ export class DrugsCategoryService {
   async create(
     createDrugsCategoryDto: CreateDrugsCategoryDto,
   ): Promise<DrugsCategoryResponse> {
-    try {
-      const category = await this.drugCategoryRepo.create({
-        ...createDrugsCategoryDto,
-      });
-      this.logger.log(`Created drugs category with ID: ${category.id}`);
-      return category;
-    } catch (error) {
-      throw error;
-    }
+    const category = await this.drugCategoryRepo.create({
+      ...createDrugsCategoryDto,
+    });
+    this.logger.log(`Created drugs category with ID: ${category.id}`);
+    return category;
   }
 
   /**
