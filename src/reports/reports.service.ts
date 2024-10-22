@@ -6,8 +6,10 @@ import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { UpdateReportDto } from './dto/edit.dto';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
+import { StockAdjustmentsService } from 'src/stock-adjustments/stock-adjustments.service';
+import { StockAdjustmentPaginationDto } from 'src/stock-adjustments/dto';
+import { plainToInstance } from 'class-transformer';
 import { DrugsService } from 'src/inventory/drugs/drugs.service';
-import { DrugPaginationDto } from 'src/inventory/drugs/dto';
 
 @Injectable()
 export class ReportsService {
@@ -15,6 +17,7 @@ export class ReportsService {
     @InjectModel(Report)
     private reportRepository: typeof Report,
 
+    private stockAdjustmentService: StockAdjustmentsService,
     private drugService: DrugsService,
   ) {}
 
@@ -75,17 +78,37 @@ export class ReportsService {
   }
 
   async export(id: string) {
-    const [rows] = await this.drugService.findAll(new DrugPaginationDto());
+    const { reportName, startDate, endDate } = await this.fetchOne(id);
 
-    const { reportName } = await this.fetchOne(id);
+    const [rows] = await this.stockAdjustmentService.findAll(
+      plainToInstance(StockAdjustmentPaginationDto, { startDate, endDate }),
+    );
+
+    const drugs = await Promise.all(
+      rows.map(({ drugId }) => this.drugService.findOne(drugId)),
+    );
+
+    const rowsWithDrugs = rows.map(({ type, reason }, index) => ({
+      type,
+      reason,
+      name: drugs[index].name,
+      brand: drugs[index].brandName,
+      costPrice: drugs[index].costPrice,
+      sellingPrice: drugs[index].sellingPrice,
+      code: drugs[index].code,
+    }));
 
     const headerLabels = {
+      type: 'Type',
+      reason: 'Reason',
       name: 'Drug Name',
+      brand: 'Brand',
       costPrice: 'Cost Price',
       sellingPrice: 'Selling Price',
+      code: 'Code',
     };
 
-    const csv = this.dataToCSV(headerLabels, rows);
+    const csv = this.dataToCSV(headerLabels, rowsWithDrugs);
 
     return { reportName, csv };
   }

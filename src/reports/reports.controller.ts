@@ -76,8 +76,7 @@ export class ReportsController {
   }
 
   @Get(':id/export')
-  @CustomApiResponse([...generalResponses], {
-    type: null,
+  @CustomApiResponse(['authorize', 'successNull'], {
     message: 'Report exported successfully',
   })
   @HttpCode(HttpStatus.OK)
