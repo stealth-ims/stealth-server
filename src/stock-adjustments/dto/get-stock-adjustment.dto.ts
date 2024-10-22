@@ -49,16 +49,18 @@ export class StockAdjustmentPaginationDto extends IntersectionType(
   })
   status?: StockAdjustmentStatus;
 
-  @IsUUID()
-  @IsOptional()
-  @ApiPropertyOptional()
-  createdBy: string;
-
-  @ApiPropertyOptional({ type: Date, description: 'Start date for filtering' })
+  @ApiPropertyOptional({
+    type: Date,
+    example: new Date(),
+    description: 'Start date for filtering',
+  })
   @IsOptional()
   startDate?: Date;
 
-  @ApiPropertyOptional({ type: Date, description: 'End date for filtering' })
-  @IsOptional()
+  @ApiPropertyOptional({
+    type: Date,
+    example: new Date(),
+    description: 'End date for filtering',
+  })
   endDate?: Date;
 }

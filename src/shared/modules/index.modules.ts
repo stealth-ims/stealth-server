@@ -12,7 +12,7 @@ import { OrdersModule } from 'src/reports/orders/orders.module';
 export const IndexModules = [
   NotificationModule,
   CloudinaryModule,
-  CloudinaryModule,
+
   AuthModule,
   UserModule,
   AdminModule,

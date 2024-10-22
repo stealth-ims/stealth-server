@@ -12,7 +12,7 @@ export class BatchAdjustmentDto {
   batchId: string;
 
   @ApiProperty({
-    example: '5',
+    example: 5,
     description: 'The quantity to adjust',
   })
   @IsNumber()
@@ -20,7 +20,7 @@ export class BatchAdjustmentDto {
   currentStock: number;
 
   @ApiProperty({
-    example: '5',
+    example: 5,
     description: 'The quantity to adjust',
   })
   @IsNumber()
