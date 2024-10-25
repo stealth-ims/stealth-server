@@ -4,13 +4,22 @@ import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
-import { instanceToPlain } from 'class-transformer';
 import { UpdateReportDto } from './dto/edit.dto';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
+import { StockAdjustmentsService } from 'src/stock-adjustments/stock-adjustments.service';
+import { StockAdjustmentPaginationDto } from 'src/stock-adjustments/dto';
+import { plainToInstance } from 'class-transformer';
+import { DrugsService } from 'src/inventory/drugs/drugs.service';
 
 @Injectable()
 export class ReportsService {
-  constructor(@InjectModel(Report) private reportRepository: typeof Report) {}
+  constructor(
+    @InjectModel(Report)
+    private reportRepository: typeof Report,
+
+    private stockAdjustmentService: StockAdjustmentsService,
+    private drugService: DrugsService,
+  ) {}
 
   private dataToCSV(headerLabels: Record<string, string>, rowsJson: any[]) {
     const csvRows = [];
@@ -68,30 +77,40 @@ export class ReportsService {
     return response;
   }
 
-  async export({ query, id }: { query?: GetReportPaginationDto; id?: string }) {
+  async export(id: string) {
+    const { reportName, startDate, endDate } = await this.fetchOne(id);
+
+    const [rows] = await this.stockAdjustmentService.findAll(
+      plainToInstance(StockAdjustmentPaginationDto, { startDate, endDate }),
+    );
+
+    const drugs = await Promise.all(
+      rows.map(({ drugId }) => this.drugService.findOne(drugId)),
+    );
+
+    const rowsWithDrugs = rows.map(({ type, reason }, index) => ({
+      type,
+      reason,
+      name: drugs[index].name,
+      brand: drugs[index].brandName,
+      costPrice: drugs[index].costPrice,
+      sellingPrice: drugs[index].sellingPrice,
+      code: drugs[index].code,
+    }));
+
     const headerLabels = {
-      '#': '#',
-      id: 'Report ID',
-      reportName: 'Report Name',
-      nameInExport: 'Name in Export',
-      startDate: 'Start Date',
-      endDate: 'End Date',
-      reportLayout: 'Report Layout',
+      type: 'Type',
+      reason: 'Reason',
+      name: 'Drug Name',
+      brand: 'Brand',
+      costPrice: 'Cost Price',
+      sellingPrice: 'Selling Price',
+      code: 'Code',
     };
 
-    let rowsJson = [];
+    const csv = this.dataToCSV(headerLabels, rowsWithDrugs);
 
-    if (query) {
-      const { rows } = await this.fetchAll(query);
-
-      rowsJson = rows.map((report) => instanceToPlain(report));
-    }
-
-    if (id) {
-      //TODO: Get inventory
-    }
-
-    return this.dataToCSV(headerLabels, rowsJson);
+    return { reportName, csv };
   }
 
   async create(dto: CreateReportDto) {

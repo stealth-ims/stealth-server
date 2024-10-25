@@ -63,4 +63,9 @@ export class StockAdjustmentPaginationDto extends IntersectionType(
     description: 'End date for filtering',
   })
   endDate?: Date;
+
+  @IsUUID()
+  @IsOptional()
+  @ApiPropertyOptional()
+  createdBy: string;
 }

@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "db:create": "dotenv -e $YARN_ENV -- yarn sequelize-cli db:create",
     "db:drop": "dotenv -e $YARN_ENV -- yarn sequelize-cli db:drop",
+    "migrate:reset": "yarn migrate:undo:all && yarn migrate:up && yarn seed:all",
     "migrate:gen": "yarn sequelize-cli migration:generate --name ",
     "migrate:up": "yarn sequelize-cli db:migrate",
     "migrate:undo": "yarn sequelize-cli db:migrate:undo",

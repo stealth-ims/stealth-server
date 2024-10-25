@@ -9,5 +9,6 @@ import { DrugsModule } from 'src/inventory/drugs/drugs.module';
   imports: [DrugsModule, SequelizeModule.forFeature([StockAdjustment])],
   controllers: [StockAdjustmentsController],
   providers: [StockAdjustmentsService],
+  exports: [StockAdjustmentsService],
 })
 export class StockAdjustmentsModule {}
