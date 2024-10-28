@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Patch, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto, UpdateSalesDto } from './dto/create.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -43,5 +51,13 @@ export class SalesController {
   @Get('/:id')
   getSale(@Param('id') id: string) {
     this.salesService.fetchOne(id);
+  }
+
+  @CustomApiResponse(['authorize', 'successNull'], {
+    message: 'Sale deleted successfully',
+  })
+  @Delete('/:id')
+  deleteSale(@Param('id') id: string) {
+    this.salesService.removeOne(id);
   }
 }
