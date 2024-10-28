@@ -8,11 +8,11 @@ import { NotificationModule } from '../../notification/notification.module';
 import { ReportsModule } from '../../reports/reports.module';
 import { UserModule } from '../../user/user.module';
 import { OrdersModule } from 'src/reports/orders/orders.module';
+import { SalesModule } from 'src/sales/sales.module';
 
 export const IndexModules = [
   NotificationModule,
   CloudinaryModule,
-
   AuthModule,
   UserModule,
   AdminModule,
@@ -21,4 +21,5 @@ export const IndexModules = [
   ReportsModule,
   DepartmentRequestsModule,
   StockAdjustmentsModule,
+  SalesModule,
 ];
