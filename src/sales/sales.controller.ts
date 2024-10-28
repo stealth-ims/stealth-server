@@ -35,4 +35,13 @@ export class SalesController {
   updateSale(@Body() dto: UpdateSalesDto, @Param('id') id: string) {
     this.salesService.update(id, dto);
   }
+
+  @CustomApiResponse(['authorize', 'success'], {
+    type: GetSalesDto,
+    message: 'Sale fetched successfully',
+  })
+  @Get('/:id')
+  getSale(@Param('id') id: string) {
+    this.salesService.fetchOne(id);
+  }
 }

@@ -12,4 +12,6 @@ export class SalesService {
   }
 
   update(__: string, _: UpdateSalesDto) {}
+
+  fetchOne(_: string) {}
 }
