@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSaleDto, UpdateSalesDto } from './dto/create.dto';
+import { GetSalesPaginationDto } from './dto/get.dto';
 
 @Injectable()
 export class SalesService {
@@ -7,7 +8,7 @@ export class SalesService {
     return 'This action adds a new sale';
   }
 
-  fetchAll() {
+  fetchAll(_: GetSalesPaginationDto) {
     return [];
   }
 

@@ -6,12 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto, UpdateSalesDto } from './dto/create.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators';
-import { GetSalesDto } from './dto/get.dto';
+import { GetSalesDto, GetSalesPaginationDto } from './dto/get.dto';
 
 @ApiTags('Sales')
 @Controller('sales')
@@ -32,8 +33,8 @@ export class SalesController {
     message: 'Sales retrieved successfully',
   })
   @Get()
-  getSales() {
-    return this.salesService.fetchAll();
+  getSales(@Query() query: GetSalesPaginationDto) {
+    return this.salesService.fetchAll(query);
   }
 
   @CustomApiResponse(['authorize', 'successNull'], {
