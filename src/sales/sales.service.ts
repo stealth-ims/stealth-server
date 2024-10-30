@@ -87,5 +87,15 @@ export class SalesService {
     return sale;
   }
 
-  removeOne(_: string) {}
+  async removeOne(id: string) {
+    const destroyedRows = await this.saleRepository.destroy({
+      where: { id },
+    });
+
+    if (destroyedRows == 0) {
+      throw new NotFoundException(`Sale not found`);
+    }
+
+    return;
+  }
 }
