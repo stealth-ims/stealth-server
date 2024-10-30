@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { GetSalesPaginationDto, CreateSaleDto, UpdateSalesDto } from './dto/';
+import {
+  GetSalesPaginationDto,
+  CreateSaleDto,
+  UpdateSalesDto,
+  GetSalesDto,
+} from './dto/';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sale } from './models/sales.models';
 import { DrugsService } from 'src/inventory/drugs/drugs.service';
+import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
+import { FindAndCountOptions } from 'sequelize';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SalesService {
@@ -25,8 +33,34 @@ export class SalesService {
     return sale;
   }
 
-  fetchAll(_: GetSalesPaginationDto) {
-    return [];
+  async fetchAll(query: GetSalesPaginationDto) {
+    const whereConditions: Record<string, Record<any, any>> = {};
+
+    if (query.search) {
+      whereConditions.patientName = { [Op.like]: `%${query.search}%` };
+    }
+
+    if (query.status) {
+      whereConditions.status = { [Op.eq]: query.status };
+    }
+
+    const filter: FindAndCountOptions<Sale> = {
+      where: whereConditions,
+      limit: query.pageSize || 10,
+      offset: query.pageSize * (query.page - 1) || 0,
+      order: query.orderBy && [[query.orderBy, 'ASC']],
+    };
+
+    const { rows, count } = await this.saleRepository.findAndCountAll(filter);
+
+    const response = new PaginatedDataResponseDto<GetSalesDto[]>(
+      rows,
+      query.page || 1,
+      query.pageSize,
+      count,
+    );
+
+    return response;
   }
 
   update(__: string, _: UpdateSalesDto) {}
