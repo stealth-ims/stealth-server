@@ -78,7 +78,14 @@ export class SalesService {
     return rowsUpdated;
   }
 
-  fetchOne(_: string) {}
+  async fetchOne(id: string) {
+    const sale = await this.saleRepository.findByPk(id);
+    if (!sale) {
+      throw new NotFoundException('Sale not found');
+    }
+
+    return sale;
+  }
 
   removeOne(_: string) {}
 }

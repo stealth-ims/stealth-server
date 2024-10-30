@@ -62,7 +62,7 @@ export class SalesController {
   })
   @Patch('/:id')
   updateSale(@Body() dto: UpdateSalesDto, @Param('id') id: string) {
-    this.salesService.update(id, dto);
+    return this.salesService.update(id, dto);
   }
 
   @CustomApiResponse(['authorize', 'success'], {
@@ -71,7 +71,7 @@ export class SalesController {
   })
   @Get('/:id')
   getSale(@Param('id') id: string) {
-    this.salesService.fetchOne(id);
+    return this.salesService.fetchOne(id);
   }
 
   @CustomApiResponse(['authorize', 'successNull'], {
