@@ -8,7 +8,7 @@ import {
 import {
   CreateItemDto,
   ItemPaginationDto,
-  ManyItem as ManyDrug,
+  ManyItem as ManyItem,
   OneItem,
   UpdateItemDto,
 } from './dto';
@@ -18,44 +18,44 @@ import { Batch, Item, ItemStatus } from './models';
 import { BatchService } from './batch.service';
 
 @Injectable()
-export class DrugsService {
+export class ItemService {
   private readonly logger: Logger;
   constructor(
-    @InjectModel(Item) private readonly drugRepo: typeof Item,
+    @InjectModel(Item) private readonly itemRepo: typeof Item,
     private readonly batchService: BatchService,
   ) {
-    this.logger = new Logger(DrugsService.name);
+    this.logger = new Logger(ItemService.name);
   }
 
   /**
-   * Creates a new drug.
+   * Creates a new item.
    *
-   * @param createDrugDto - The DTO containing the drug information.
-   * @returns A promise that resolves to the created drug.
+   * @param createItemDto - The DTO containing the item information.
+   * @returns A promise that resolves to the created item.
    * @throws If any error occurs during the creation process.
    */
-  async create(createDrugDto: CreateItemDto): Promise<OneItem> {
+  async create(createItemDto: CreateItemDto): Promise<OneItem> {
     try {
-      const createdDrug = await this.drugRepo.create({
-        ...createDrugDto,
+      const createdItem = await this.itemRepo.create({
+        ...createItemDto,
         status: ItemStatus.STOCKED,
       });
 
       const batch = await this.batchService.create({
-        ...createDrugDto,
-        drugId: createdDrug.id,
+        ...createItemDto,
+        itemId: createdItem.id,
       });
-      const oneDrug = createdDrug.toJSON() as OneItem;
-      oneDrug.batches = [batch];
-      this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
-      return oneDrug;
+      const oneItem = createdItem.toJSON() as OneItem;
+      oneItem.batches = [batch];
+      this.logger.log(`Item added successfully. id: ${createdItem.id}`);
+      return oneItem;
     } catch (error) {
       if (error instanceof ConflictException) {
         const id = JSON.parse(error.message).id;
-        this.logger.log(`Drug already existed. ID: ${id}`);
+        this.logger.log(`Item already existed. ID: ${id}`);
         await this.batchService.create({
-          ...createDrugDto,
-          drugId: id,
+          ...createItemDto,
+          itemId: id,
         });
         return await this.findOne(id);
       }
@@ -63,82 +63,82 @@ export class DrugsService {
   }
 
   /**
-   * Retrieves all drugs based on the provided query parameters.
+   * Retrieves all items based on the provided query parameters.
    *
-   * @param query - The query parameters for filtering drugs.
-   * @returns A promise that resolves to an array of OneDrug and the total count of drugs.
-   * @throws Throws an error if there was an issue retrieving the drugs.
+   * @param query - The query parameters for filtering items.
+   * @returns A promise that resolves to an array of OneItem and the total count of items.
+   * @throws Throws an error if there was an issue retrieving the items.
    */
-  async findAll(query: ItemPaginationDto): Promise<[ManyDrug[], number]> {
+  async findAll(query: ItemPaginationDto): Promise<[ManyItem[], number]> {
     const filter = this.applyFilter(query);
-    const drugs = await this.drugRepo.findAndCountAll(filter);
+    const items = await this.itemRepo.findAndCountAll(filter);
 
-    const drugList = [];
+    const itemList = [];
 
-    drugs.rows.forEach((drug) => {
-      drug.batches.forEach((batch) => {
-        delete drug.dataValues.batches;
-        const drugData = drug.toJSON() as ManyDrug;
-        drugData.batch = batch;
-        drugList.push(drugData);
+    items.rows.forEach((item) => {
+      item.batches.forEach((batch) => {
+        delete item.dataValues.batches;
+        const itemData = item.toJSON() as ManyItem;
+        itemData.batch = batch;
+        itemList.push(itemData);
       });
     });
 
-    this.logger.log(`Retrieved ${drugs.count} drugs`);
-    return [drugList, drugs.count];
+    this.logger.log(`Retrieved ${items.count} items`);
+    return [itemList, items.count];
   }
 
   /**
-   * Finds a drug by its ID.
+   * Finds a item by its ID.
    *
-   * @param id - The ID of the drug to find.
-   * @returns A promise that resolves to the found drug.
-   * @throws {NotFoundException} If the drug with the given ID is not found.
+   * @param id - The ID of the item to find.
+   * @returns A promise that resolves to the found item.
+   * @throws {NotFoundException} If the item with the given ID is not found.
    */
   async findOne(id: string): Promise<OneItem> {
-    this.logger.log(`finding drug with id: ${id}`);
-    const drug = await this.drugRepo.findByPk(id, { include: [Batch] });
-    if (!drug) {
-      throw new NotFoundException(`drug with id: ${id} not found`);
+    this.logger.log(`finding item with id: ${id}`);
+    const item = await this.itemRepo.findByPk(id, { include: [Batch] });
+    if (!item) {
+      throw new NotFoundException(`item with id: ${id} not found`);
     }
 
-    this.logger.log(`Found drugs category with ID: ${id}`);
-    return drug;
+    this.logger.log(`Found items category with ID: ${id}`);
+    return item;
   }
 
   /**
-   * Updates a drug with the specified ID.
+   * Updates a item with the specified ID.
    *
-   * @param id - The ID of the drug to update.
-   * @param updateDrugDto - The data to update the drug with.
-   * @throws {NotFoundException} If the drug with the specified ID is not found.
+   * @param id - The ID of the item to update.
+   * @param updateItemDto - The data to update the item with.
+   * @throws {NotFoundException} If the item with the specified ID is not found.
    * @returns A Promise that resolves to void.
    */
-  async update(id: string, updateDrugDto: UpdateItemDto): Promise<void> {
-    const result = await this.drugRepo.update(
-      { ...updateDrugDto },
+  async update(id: string, updateItemDto: UpdateItemDto): Promise<void> {
+    const result = await this.itemRepo.update(
+      { ...updateItemDto },
       { where: { id: id } },
     );
     if (result[0] == 0) {
-      throw new NotFoundException(`drug with id ${id} not found`);
+      throw new NotFoundException(`item with id ${id} not found`);
     }
-    this.logger.log(`Updated drug with ID: ${id}`);
+    this.logger.log(`Updated item with ID: ${id}`);
     return;
   }
 
   /**
-   * Removes a drug from the inventory.
+   * Removes a item from the inventory.
    *
-   * @param id - The ID of the drug to be removed.
-   * @throws {NotFoundException} If the drug with the given ID is not found.
+   * @param id - The ID of the item to be removed.
+   * @throws {NotFoundException} If the item with the given ID is not found.
    */
   async remove(id: string): Promise<void> {
     try {
-      const res = await this.drugRepo.destroy({ where: { id: id } });
+      const res = await this.itemRepo.destroy({ where: { id: id } });
       if (res == 0) {
-        throw new NotFoundException(`drug with id ${id} not found`);
+        throw new NotFoundException(`item with id ${id} not found`);
       }
-      this.logger.log(`Deleted Drug with id: ${id}`);
+      this.logger.log(`Deleted Item with id: ${id}`);
       return;
     } catch (error) {
       throw error;
@@ -150,9 +150,9 @@ export class DrugsService {
   }
 
   /**
-   * Applies the filter options to construct the FindAndCountOptions object for querying drugs.
+   * Applies the filter options to construct the FindAndCountOptions object for querying items.
    *
-   * @param query - The DrugPaginationDto object containing the filter options.
+   * @param query - The ItemPaginationDto object containing the filter options.
    * @returns The FindAndCountOptions object with the applied filter options.
    */
   private applyFilter(query: ItemPaginationDto): FindAndCountOptions<Item> {

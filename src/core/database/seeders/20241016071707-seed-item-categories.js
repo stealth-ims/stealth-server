@@ -7,7 +7,7 @@ const baseModelColumns = require('../seed-base.js');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const drugCategories = [
+    const itemCategories = [
       'Analgesics',
       'Antibiotics',
       'Antidepressants',
@@ -20,17 +20,17 @@ module.exports = {
       'Gastrointestinal',
     ];
 
-    const seedData = drugCategories.map((category) => ({
+    const seedData = itemCategories.map((category) => ({
       id: uuidv4(),
       name: category,
       status: 'ACTIVE',
       ...baseModelColumns,
     }));
 
-    await queryInterface.bulkInsert('drug_categories', seedData, {});
+    await queryInterface.bulkInsert('item_categories', seedData, {});
   },
 
   async down(queryInterface) {
-    await queryInterface.bulkDelete('drug_categories', null, {});
+    await queryInterface.bulkDelete('item_categories', null, {});
   },
 };

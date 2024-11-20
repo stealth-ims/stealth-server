@@ -7,9 +7,9 @@ const baseModelColumns = require('../seed-base.js');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    // Get all drug categories
+    // Get all item categories
     const categories = await queryInterface.sequelize.query(
-      'SELECT id, name FROM drug_categories;',
+      'SELECT id, name FROM item_categories;',
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
@@ -25,19 +25,19 @@ module.exports = {
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
-    const drugs = [];
+    const items = [];
     const batches = [];
 
-    // Generate 5 drugs for each category
+    // Generate 5 items for each category
     for (const category of categories) {
       for (let i = 1; i <= 5; i++) {
-        const drugId = uuidv4();
+        const itemId = uuidv4();
         const randomIndex = Math.floor(Math.random() * facilities.length);
         const facilityId = facilities[randomIndex].id;
 
-        drugs.push({
-          id: drugId,
-          name: `${category.name} Drug ${i}`,
+        items.push({
+          id: itemId,
+          name: `${category.name} Item ${i}`,
           brand_name: `Brand ${category.name} ${i}`,
           dosage_form: Math.random() > 0.5 ? 'SOLIDS' : 'LIQUIDS',
           cost_price: parseFloat((Math.random() * 100 + 1).toFixed(2)),
@@ -59,17 +59,17 @@ module.exports = {
           ...baseModelColumns,
         });
 
-        // Generate 3 batches for each drug
+        // Generate 3 batches for each item
         for (let j = 1; j <= 3; j++) {
           batches.push({
             id: uuidv4(),
-            drug_id: drugId,
+            item_id: itemId,
             validity: new Date(
               new Date().setFullYear(
                 new Date().getFullYear() + Math.floor(Math.random() * 5) + 1,
               ),
             ),
-            batch_number: `BATCH${drugId.substring(0, 4)}${j}`,
+            batch_number: `BATCH${itemId.substring(0, 4)}${j}`,
             quantity: Math.floor(Math.random() * 1000) + 100,
             created_by: 'System',
             supplier_id:
@@ -80,8 +80,8 @@ module.exports = {
       }
     }
 
-    // Insert drugs
-    await queryInterface.bulkInsert('drugs', drugs, {});
+    // Insert items
+    await queryInterface.bulkInsert('items', items, {});
 
     // Insert batches
     await queryInterface.bulkInsert('batches', batches, {});
@@ -90,7 +90,7 @@ module.exports = {
   async down(queryInterface) {
     // Delete batches first due to foreign key constraint
     await queryInterface.bulkDelete('batches', null, {});
-    // Then delete drugs
-    await queryInterface.bulkDelete('drugs', null, {});
+    // Then delete items
+    await queryInterface.bulkDelete('items', null, {});
   },
 };

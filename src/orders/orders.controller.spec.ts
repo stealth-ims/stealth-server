@@ -1,4 +1,4 @@
-describe('DrugOrdersController', () => {
+describe('ItemOrdersController', () => {
   it('should pass a dummy test', () => {
     expect(true).toBe(true);
   });
@@ -6,19 +6,19 @@ describe('DrugOrdersController', () => {
 
 /* 
 import { Test, TestingModule } from '@nestjs/testing';
-import { DrugOrdersController } from './orders.controller';
-import { DrugOrdersService } from './orders.service';
+import { ItemOrdersController } from './orders.controller';
+import { ItemOrdersService } from './orders.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { todo } from 'node:test';
-let controller: DrugOrdersController;
+let controller: ItemOrdersController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [DrugOrdersController],
-      providers: [AuthGuard, DrugOrdersService],
+      controllers: [ItemOrdersController],
+      providers: [AuthGuard, ItemOrdersService],
     }).compile();
 
-    controller = module.get<DrugOrdersController>(DrugOrdersController);
+    controller = module.get<ItemOrdersController>(ItemOrdersController);
   });
 
   it('should be defined', () => {

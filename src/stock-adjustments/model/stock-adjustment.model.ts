@@ -95,7 +95,7 @@ export class StockAdjustment extends BaseModel {
   // relationships
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
-    description: 'The ID of the drug being adjusted',
+    description: 'The ID of the item being adjusted',
   })
   @ForeignKey(() => Item)
   @Column({
@@ -103,14 +103,14 @@ export class StockAdjustment extends BaseModel {
     allowNull: false,
   })
   @IsUUID()
-  drugId: string;
+  itemId: string;
 
   @ApiProperty({
     type: () => Item,
-    description: 'The drug associated with this stock adjustment',
+    description: 'The item associated with this stock adjustment',
   })
   @BelongsTo(() => Item)
-  drug: Item;
+  item: Item;
 
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',

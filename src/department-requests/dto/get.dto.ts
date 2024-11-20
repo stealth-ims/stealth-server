@@ -15,11 +15,11 @@ import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 export class GetDepartmentRequestDto extends GenericResponseDto {
   @ApiProperty({
     example: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-    description: 'The Id of the selected drug',
+    description: 'The Id of the selected item',
   })
   @IsUUID(4)
   @IsNotEmpty()
-  drugId: string;
+  itemId: string;
 
   @ApiProperty({
     example: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
@@ -31,7 +31,7 @@ export class GetDepartmentRequestDto extends GenericResponseDto {
 
   @ApiProperty({
     example: '4',
-    description: 'The quantity of the selected drug',
+    description: 'The quantity of the selected item',
   })
   @IsNotEmpty()
   @IsNumber()
@@ -39,7 +39,7 @@ export class GetDepartmentRequestDto extends GenericResponseDto {
   quantity: number;
 
   @ApiProperty({
-    example: 'The recent drugs had expired',
+    example: 'The recent items had expired',
     description: 'The additional notes for the request',
   })
   @IsNotEmpty()

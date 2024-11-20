@@ -93,10 +93,10 @@ module.exports = {
           department_id: null,
           role: 'hospital_admin',
           permissions: [
-            'drugs:READ_WRITE_DELETE',
-            'drug_categories:READ_WRITE_DELETE',
+            'items:READ_WRITE_DELETE',
+            'item_categories:READ_WRITE_DELETE',
             'stock_adjustment:READ_WRITE_DELETE',
-            'drug_orders:READ_WRITE_DELETE',
+            'item_orders:READ_WRITE_DELETE',
             'reports:READ_WRITE_DELETE',
             'suppliers:READ_WRITE_DELETE',
             'sales:READ_WRITE_DELETE',

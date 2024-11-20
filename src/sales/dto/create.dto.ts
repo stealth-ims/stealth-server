@@ -6,11 +6,11 @@ import { PaymentStatus, PaymentStatusType } from '../models/sales.models';
 export class CreateSaleDto extends GenericResponseDto {
   @ApiProperty({
     example: 'f7b1a1a9-7f0e-4f0e-9f0e-7f0e7f0e7f0e',
-    description: 'The Id of the selected drug',
+    description: 'The Id of the selected item',
   })
   @IsUUID(4)
   @IsNotEmpty()
-  drugId: string;
+  itemId: string;
 
   @ApiProperty({
     example: 'John Doe',
@@ -22,7 +22,7 @@ export class CreateSaleDto extends GenericResponseDto {
 
   @ApiProperty({
     example: 4,
-    description: 'The quantity of the sold drug',
+    description: 'The quantity of the sold item',
   })
   @IsNotEmpty()
   @IsNumber()

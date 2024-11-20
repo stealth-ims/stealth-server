@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DrugsController } from './items.controller';
-import { DrugsService } from './items.service';
+import { ItemController } from './items.controller';
+import { ItemService } from './items.service';
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { Supplier } from '../suppliers/models/supplier.model';
 import { Item } from './models/item.model';
@@ -9,9 +9,9 @@ import { configuration } from 'src/shared/config/config';
 import { BatchService } from './batch.service';
 import { Batch } from './models';
 
-describe('DrugsController', () => {
-  let controller: DrugsController;
-  // let testDrug: DrugResponse;
+describe('ItemsController', () => {
+  let controller: ItemController;
+  // let testItem: ItemResponse;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,11 +20,11 @@ describe('DrugsController', () => {
 
         SequelizeModule.forFeature([Item, Batch, Supplier]),
       ],
-      controllers: [DrugsController],
-      providers: [DrugsService, SuppliersService, BatchService],
+      controllers: [ItemController],
+      providers: [ItemService, SuppliersService, BatchService],
     }).compile();
 
-    controller = module.get<DrugsController>(DrugsController);
+    controller = module.get<ItemController>(ItemController);
   });
 
   it('should be defined', () => {
@@ -32,8 +32,8 @@ describe('DrugsController', () => {
   });
 
   // describe('create', () => {
-  //   const createDrugDto: CreateDrugDto = {
-  //     name: 'testDrug',
+  //   const createItemDto: CreateItemDto = {
+  //     name: 'testItem',
   //     brandName: 'P2',
   //     stock: 100,
   //     costPrice: 34.23,
@@ -54,19 +54,19 @@ describe('DrugsController', () => {
   //     facilityId: '6e242fa9-dbbf-4599-9c04-97285c710144',
   //     departmentId: 'f8db9c0e-0df7-4c78-886d-665f8482a20e',
   //   };
-  //   it('should create a new drug', async () => {
-  //     const result = await controller.create(createDrugDto);
+  //   it('should create a new item', async () => {
+  //     const result = await controller.create(createItemDto);
 
-  //     testDrug = result.data;
+  //     testItem = result.data;
   //     expect(result.statusCode).toBe(HttpStatus.CREATED);
   //     expect(result).toBeDefined();
-  //     expect(testDrug.id).toBeDefined();
-  //     expect(testDrug.name).toEqual(createDrugDto.name);
+  //     expect(testItem.id).toBeDefined();
+  //     expect(testItem.name).toEqual(createItemDto.name);
   //   });
 
   //   it('should throw a unique name error', async () => {
   //     try {
-  //       await controller.create(createDrugDto);
+  //       await controller.create(createItemDto);
   //     } catch (error) {
   //       expect(error).toBeDefined();
   //       expect((error as ConflictException).getStatus()).toBe(
@@ -78,8 +78,8 @@ describe('DrugsController', () => {
   // });
 
   // describe('findAll', () => {
-  //   it('should retrieve all drugs', async () => {
-  //     const query = new DrugPaginationDto();
+  //   it('should retrieve all items', async () => {
+  //     const query = new ItemPaginationDto();
   //     query.pageSize = 4;
 
   //     const result = await controller.findAll(query);
@@ -91,7 +91,7 @@ describe('DrugsController', () => {
 
   // // Not implemented
   // // describe('analytics', () => {
-  // //   it('should retrieve drug analytics', async () => {
+  // //   it('should retrieve item analytics', async () => {
   // //     const result = await controller.analytics();
 
   // //     expect(result).toBeDefined();
@@ -99,12 +99,12 @@ describe('DrugsController', () => {
   // //   });
   // // });
   // describe('update', () => {
-  //   it('should update a specific drug', async () => {
-  //     testDrug.brandName = 'p8';
-  //     testDrug.costPrice = 40;
-  //     const result = await controller.update(testDrug.id, {
-  //       brandName: testDrug.brandName,
-  //       costPrice: testDrug.costPrice,
+  //   it('should update a specific item', async () => {
+  //     testItem.brandName = 'p8';
+  //     testItem.costPrice = 40;
+  //     const result = await controller.update(testItem.id, {
+  //       brandName: testItem.brandName,
+  //       costPrice: testItem.costPrice,
   //     });
 
   //     expect(result).toBeDefined();
@@ -113,15 +113,15 @@ describe('DrugsController', () => {
   // });
 
   // describe('findOne', () => {
-  //   it('should retrieve a specific drug', async () => {
-  //     const result = await controller.findOne(testDrug.id);
+  //   it('should retrieve a specific item', async () => {
+  //     const result = await controller.findOne(testItem.id);
 
   //     expect(result).toBeDefined();
-  //     expect(result.data.brandName).toEqual(testDrug.brandName);
-  //     expect(result.data.costPrice).toEqual(testDrug.costPrice);
+  //     expect(result.data.brandName).toEqual(testItem.brandName);
+  //     expect(result.data.costPrice).toEqual(testItem.costPrice);
   //   });
 
-  //   it('should fail to get a non-existent drug', async () => {
+  //   it('should fail to get a non-existent item', async () => {
   //     try {
   //       await controller.findOne('edb91c5a-9594-4301-898f-e6e55ede5f84');
   //     } catch (error) {
@@ -132,16 +132,16 @@ describe('DrugsController', () => {
   // });
 
   // describe('remove', () => {
-  //   it('should delete a specific drug', async () => {
-  //     const result = await controller.remove(testDrug.id);
+  //   it('should delete a specific item', async () => {
+  //     const result = await controller.remove(testItem.id);
 
   //     expect(result).toBeDefined();
   //     expect(result.statusCode).toBe(HttpStatus.ACCEPTED);
   //   });
 
-  //   it('should fail to get a deleted drug', async () => {
+  //   it('should fail to get a deleted item', async () => {
   //     try {
-  //       await controller.remove(testDrug.id);
+  //       await controller.remove(testItem.id);
   //     } catch (error) {
   //       expect(error).toBeDefined();
   //       expect(error).toBeInstanceOf(NotFoundException);

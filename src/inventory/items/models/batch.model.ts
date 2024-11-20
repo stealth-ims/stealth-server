@@ -18,15 +18,15 @@ import { Item } from '.';
 })
 export class Batch extends BaseModel {
   @ApiProperty({
-    description: 'Drug Id of the batch',
+    description: 'Item Id of the batch',
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
   @ForeignKey(() => Item)
   @Column
-  drugId: string;
+  itemId: string;
 
   @BelongsTo(() => Item)
-  drug: Item;
+  item: Item;
 
   @ApiProperty({
     example: '2024-12-31',
@@ -44,7 +44,7 @@ export class Batch extends BaseModel {
 
   @ApiProperty({
     example: 100,
-    description: 'The quantity of drugs in this batch',
+    description: 'The quantity of items in this batch',
   })
   @Column({ type: DataType.INTEGER, allowNull: false })
   quantity: number;
@@ -55,7 +55,7 @@ export class Batch extends BaseModel {
   @ForeignKey(() => Supplier)
   @Column
   @ApiProperty({
-    description: 'Drug Id of the batch',
+    description: 'Item Id of the batch',
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
   supplierId: string;

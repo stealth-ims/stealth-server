@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DrugsCategoryController } from './items-category.controller';
-import { DrugsCategoryService } from './items-category.service';
+import { ItemCategoryController } from './items-category.controller';
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { ItemCategory } from './models/items-category.model';
 import { Item } from '../items/models/item.model';
 import { Supplier } from '../suppliers/models/supplier.model';
 import { configuration } from 'src/shared/config/config';
+import { ItemCategoryService } from './items-category.service';
 
-describe('DrugsCategoryController', () => {
-  let controller: DrugsCategoryController;
+describe('ItemsCategoryController', () => {
+  let controller: ItemCategoryController;
 
-  // let testCategory: DrugsCategory;
+  // let testCategory: ItemsCategory;
 
   // formalities
   beforeAll(async () => {
@@ -21,22 +21,22 @@ describe('DrugsCategoryController', () => {
         // ConfigModule.forFeature(jwtConfig),
         // JwtModule.registerAsync(jwtConfig.asProvider()),
       ],
-      controllers: [DrugsCategoryController],
-      providers: [DrugsCategoryService],
+      controllers: [ItemCategoryController],
+      providers: [ItemCategoryService],
     }).compile();
-    controller = module.get<DrugsCategoryController>(DrugsCategoryController);
+    controller = module.get<ItemCategoryController>(ItemCategoryController);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-  // it('should create a new drug category', async () => {
+  // it('should create a new item category', async () => {
   //   const res = await controller.create({ name: 'test' });
   //   testCategory = res.data;
   //   expect(res.statusCode).toEqual(HttpStatus.CREATED);
   //   expect(testCategory.name).toEqual('test');
-  //   expect(testCategory.status).toBe(DrugsCategoryStatus.ACTIVE);
+  //   expect(testCategory.status).toBe(ItemsCategoryStatus.ACTIVE);
   // });
 
   // it('should throw unique name error', async () => {
@@ -50,7 +50,7 @@ describe('DrugsCategoryController', () => {
   //   }
   // });
 
-  // it('should retrieve drug categories', async () => {
+  // it('should retrieve item categories', async () => {
   //   const filter = new PaginationRequestDto();
   //   filter.pageSize = 4;
   //   const res = await controller.findAll(filter);
@@ -58,9 +58,9 @@ describe('DrugsCategoryController', () => {
   //   expect(res.data.pageSize).toEqual(filter.pageSize);
   // });
 
-  // it('should update the created drug category', async () => {
+  // it('should update the created item category', async () => {
   //   testCategory.name = 'changed';
-  //   testCategory.status = DrugsCategoryStatus.DEACTIVATED;
+  //   testCategory.status = ItemsCategoryStatus.DEACTIVATED;
   //   const res = await controller.update(testCategory.id, {
   //     name: testCategory.name,
   //     status: testCategory.status,
@@ -68,19 +68,19 @@ describe('DrugsCategoryController', () => {
   //   expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
   // });
 
-  // it('should find a drug category and test updated values', async () => {
+  // it('should find a item category and test updated values', async () => {
   //   const res = await controller.findOne(testCategory.id);
   //   expect(res.statusCode).toBe(HttpStatus.FOUND);
   //   expect(res.data.status).toBe(testCategory.status);
   //   expect(res.data.name).toBe(testCategory.name);
   // });
 
-  // it('should delete a drug category', async () => {
+  // it('should delete a item category', async () => {
   //   const res = await controller.remove(testCategory.id);
   //   expect(res.statusCode).toBe(HttpStatus.ACCEPTED);
   // });
 
-  // it('should fail getting a deleted drug', async () => {
+  // it('should fail getting a deleted item', async () => {
   //   try {
   //     await controller.remove(testCategory.id);
   //   } catch (error) {

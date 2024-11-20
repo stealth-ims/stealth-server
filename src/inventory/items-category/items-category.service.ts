@@ -19,7 +19,7 @@ export class ItemCategoryService {
   private readonly logger: Logger;
   constructor(
     @InjectModel(ItemCategory)
-    private readonly drugCategoryRepo: typeof ItemCategory,
+    private readonly itemCategoryRepo: typeof ItemCategory,
   ) {
     this.logger = new Logger(ItemCategoryService.name);
   }
@@ -35,7 +35,7 @@ export class ItemCategoryService {
   async create(
     createitemsCategoryDto: CreateItemsCategoryDto,
   ): Promise<ItemCategoryResponse> {
-    const category = await this.drugCategoryRepo.create({
+    const category = await this.itemCategoryRepo.create({
       ...createitemsCategoryDto,
     });
     this.logger.log(`Created items category with ID: ${category.id}`);
@@ -60,7 +60,7 @@ export class ItemCategoryService {
       order: query.orderBy && [[query.orderBy, 'ASC']],
       include: [Item],
     };
-    const categories = await this.drugCategoryRepo.findAndCountAll(filter);
+    const categories = await this.itemCategoryRepo.findAndCountAll(filter);
 
     this.logger.log(`Retrieved ${categories.count} items categories`);
     return [categories.rows, categories.count];
@@ -75,7 +75,7 @@ export class ItemCategoryService {
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
   async findOne(id: string): Promise<ItemCategoryResponse> {
-    const category = await this.drugCategoryRepo.findByPk(id, {
+    const category = await this.itemCategoryRepo.findByPk(id, {
       include: [{ all: true }],
     });
 
@@ -98,7 +98,7 @@ export class ItemCategoryService {
     id: string,
     changeNameDto: UpdateItemCategoryDto,
   ): Promise<ApiSuccessResponseNoData> {
-    const result = await this.drugCategoryRepo.update(
+    const result = await this.itemCategoryRepo.update(
       { ...changeNameDto },
       { where: { id } },
     );
@@ -122,15 +122,15 @@ export class ItemCategoryService {
   }
 
   /**
-   * Removes a drug category by its ID.
+   * Removes a item category by its ID.
    *
-   * @param id - The ID of the drug category to remove.
+   * @param id - The ID of the item category to remove.
    * @returns A promise that resolves to the result of the removal operation.
    * @throws {InternalServerErrorException} If an error occurs during the removal operation.
    */
   async remove(id: string): Promise<void> {
     this.logger.log(`Removing items category with ID: ${id}`);
-    const res = await this.drugCategoryRepo.destroy({ where: { id: id } });
+    const res = await this.itemCategoryRepo.destroy({ where: { id: id } });
 
     if (res == 0) {
       throw new NotFoundException(`Category with id ${id} not found`);

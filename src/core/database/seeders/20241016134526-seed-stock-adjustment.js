@@ -7,9 +7,9 @@ const baseModelColumns = require('../seed-base.js');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    // Get all drugs
-    const drugs = await queryInterface.sequelize.query(
-      'SELECT id FROM drugs;',
+    // Get all items
+    const items = await queryInterface.sequelize.query(
+      'SELECT id FROM items;',
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
@@ -27,13 +27,13 @@ module.exports = {
 
     const stockAdjustments = [];
 
-    // Generate 3 stock adjustments for each drug
-    for (const drug of drugs) {
-      // Get batches for the current drug
+    // Generate 3 stock adjustments for each item
+    for (const item of items) {
+      // Get batches for the current item
       const batches = await queryInterface.sequelize.query(
-        'SELECT id FROM batches WHERE drug_id = :drugId;',
+        'SELECT id FROM batches WHERE item_id = :itemId;',
         {
-          replacements: { drugId: drug.id },
+          replacements: { itemId: item.id },
           type: queryInterface.sequelize.QueryTypes.SELECT,
         },
       );
@@ -42,7 +42,7 @@ module.exports = {
         const currentStock = Math.floor(Math.random() * 451) + 50; // 50 to 500
         const actualStock = Math.floor(Math.random() * (currentStock + 1)); // 0 to currentStock
 
-        // Select a random batch for the current drug
+        // Select a random batch for the current item
         const randomBatch = batches[Math.floor(Math.random() * batches.length)];
 
         stockAdjustments.push({
@@ -66,7 +66,7 @@ module.exports = {
               new Date().getDate() - Math.floor(Math.random() * 30),
             ),
           ),
-          drug_id: drug.id,
+          item_id: item.id,
           facility_id:
             facilities[Math.floor(Math.random() * facilities.length)].id,
           department_id:

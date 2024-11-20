@@ -32,7 +32,7 @@ export class CreateStockAdjustmentDto extends PickType(StockAdjustment, [
   'reason',
   'notes',
   'type',
-  'drugId',
+  'itemId',
   'dateAdded',
   'createdBy',
   'facilityId',

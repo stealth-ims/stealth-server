@@ -31,17 +31,17 @@ import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
 
 @ApiTags('Item Category')
 @Controller('item-categories')
-export class DrugsCategoryController {
+export class ItemCategoryController {
   private readonly logger: Logger;
   constructor(private readonly itemCategoryService: ItemCategoryService) {
-    this.logger = new Logger(DrugsCategoryController.name);
+    this.logger = new Logger(ItemCategoryController.name);
   }
 
   @CustomApiResponse(['success', 'authorize'], {
     type: ItemCategoryResponse,
     message: 'Item category created successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE)
   @Post()
   async create(@Body() dto: CreateItemsCategoryDto) {
     try {
@@ -60,7 +60,7 @@ export class DrugsCategoryController {
     type: ItemCategoryResponse,
     message: 'Item categories retrieved successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ)
   @Get()
   async findAll(@Query() query?: PaginationRequestDto) {
     try {
@@ -84,7 +84,7 @@ export class DrugsCategoryController {
     type: ItemCategoryResponse,
     message: 'Item category retrieved successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
@@ -102,7 +102,7 @@ export class DrugsCategoryController {
   @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Item category updated successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE)
   @Patch(':id')
   async changeName(
     @Param('id', ParseUUIDPipe) id: string,
@@ -122,7 +122,7 @@ export class DrugsCategoryController {
   @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Item category status updated successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE)
   @Patch(':id')
   async toggleStatus(@Param('id', ParseUUIDPipe) id: string) {
     try {
@@ -139,7 +139,7 @@ export class DrugsCategoryController {
   @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Item category deleted successfully',
   })
-  @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ_WRITE_DELETE)
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     try {

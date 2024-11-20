@@ -33,46 +33,46 @@ export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
 export class ItemAnalytics {
   @ApiProperty({
     example: 100,
-    description: 'The total number of drugs in the system',
+    description: 'The total number of items in the system',
   })
-  totalDrugs: number;
+  totalItems: number;
 
-  @ApiProperty({ example: 10, description: 'The number of drug requests' })
-  drugRequests: number;
+  @ApiProperty({ example: 10, description: 'The number of item requests' })
+  itemRequests: number;
 
   @ApiProperty({
     example: 5,
-    description: 'The percentage increment of drug requests',
+    description: 'The percentage increment of item requests',
   })
-  drugIncrement: number;
+  itemIncrement: number;
 
   @ApiProperty({
     example: 10,
-    description: 'The number of drug request increments',
+    description: 'The number of item request increments',
   })
   requestIncrement: number;
 
   @ApiProperty({
     example: 20,
-    description: 'The number of drugs that are out of stock',
+    description: 'The number of items that are out of stock',
   })
   outOfStock: number;
 
   @ApiProperty({
     example: 50,
-    description: 'The number of drugs that are in stock',
+    description: 'The number of items that are in stock',
   })
   stocked: number;
 
   @ApiProperty({
     example: 80,
-    description: 'The number of drugs that are low in stock',
+    description: 'The number of items that are low in stock',
   })
   lowStocked: number;
 }
 
 export class OneItem extends IntersectionType(Item, GenericResponseDto) {
-  @ApiProperty({ description: 'The batches of the drug', type: () => Batch })
+  @ApiProperty({ description: 'The batches of the item', type: () => Batch })
   batches: Batch[];
 }
 
@@ -80,6 +80,6 @@ export class ManyItem extends IntersectionType(
   OmitType(Item, ['batches']),
   GenericResponseDto,
 ) {
-  @ApiProperty({ description: 'The batch of the drug', type: () => Batch })
+  @ApiProperty({ description: 'The batch of the item', type: () => Batch })
   batch: Batch;
 }

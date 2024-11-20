@@ -15,126 +15,126 @@ import {
   PaginatedDataResponseDto,
 } from '../utils/responses/success.response';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { UpdateDrugOrderDto, CreateDrugOrderDto, GetOrdersDto } from './dto';
-import { DrugOrdersService } from './orders.service';
-import { DrugOrder } from './models/drugOrder.model';
+import { UpdateItemOrderDto, CreateItemOrderDto, GetOrdersDto } from './dto';
+import { ItemOrdersService } from './orders.service';
+import { ItemOrder } from './models/itemOrder.model';
 import { Authorize, Permission } from 'src/auth/decorator';
 import { CustomApiResponse } from 'src/shared/docs/decorators';
 import { throwError } from '../utils/responses/error.response';
 import { Features, PermissionLevel } from '../shared/enums/permissions.enum';
 
-@ApiTags('Drug Orders')
-@Controller('drug-orders')
+@ApiTags('Item Orders')
+@Controller('item-orders')
 @ApiBearerAuth('access-token')
 @Authorize()
-export class DrugOrdersController {
-  private readonly logger = new Logger(DrugOrdersController.name);
-  constructor(private readonly orderService: DrugOrdersService) {}
+export class ItemOrdersController {
+  private readonly logger = new Logger(ItemOrdersController.name);
+  constructor(private readonly orderService: ItemOrdersService) {}
 
-  @ApiOperation({ summary: 'Create a new drug order' })
+  @ApiOperation({ summary: 'Create a new item order' })
   @CustomApiResponse(['authorize', 'success'], {
-    type: DrugOrder,
-    message: 'Drug order created successfully',
+    type: ItemOrder,
+    message: 'Item order created successfully',
   })
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ_WRITE)
   @Post()
   async create(
-    @Body() dto: CreateDrugOrderDto,
-  ): Promise<ApiSuccessResponseDto<DrugOrder>> {
+    @Body() dto: CreateItemOrderDto,
+  ): Promise<ApiSuccessResponseDto<ItemOrder>> {
     try {
-      const result = await this.orderService.createDrugOrder(dto);
-      return new ApiSuccessResponseDto<DrugOrder>(
+      const result = await this.orderService.createItemOrder(dto);
+      return new ApiSuccessResponseDto<ItemOrder>(
         result,
         HttpStatus.CREATED,
-        'Drug order created successfully',
+        'Item order created successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  @ApiOperation({ summary: 'Retrieve multiple drug orders' })
+  @ApiOperation({ summary: 'Retrieve multiple item orders' })
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: DrugOrder,
-    message: 'Multiple drug orders retrieved successfully',
+    type: ItemOrder,
+    message: 'Multiple item orders retrieved successfully',
   })
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ)
   @Get()
-  async getDrugOrders(
+  async getItemOrders(
     @Query() query: GetOrdersDto,
-  ): Promise<ApiSuccessResponseDto<PaginatedDataResponseDto<DrugOrder[]>>> {
+  ): Promise<ApiSuccessResponseDto<PaginatedDataResponseDto<ItemOrder[]>>> {
     try {
-      const result = await this.orderService.findDrugOrders(query);
+      const result = await this.orderService.findItemOrders(query);
       return new ApiSuccessResponseDto(
         result,
         HttpStatus.OK,
-        'Drug orders retrieved successfully',
+        'Item orders retrieved successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  @ApiOperation({ summary: 'Get a specific drug order by ID' })
+  @ApiOperation({ summary: 'Get a specific item order by ID' })
   @CustomApiResponse(['success', 'notfound', 'authorize'], {
-    type: DrugOrder,
-    message: 'Drug order retrieved successfully',
+    type: ItemOrder,
+    message: 'Item order retrieved successfully',
   })
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ)
   @Get(':id')
-  async getDrugOrder(
+  async getItemOrder(
     @Param('id') id: string,
-  ): Promise<ApiSuccessResponseDto<DrugOrder>> {
+  ): Promise<ApiSuccessResponseDto<ItemOrder>> {
     try {
-      const result = await this.orderService.findDrugOrder(id);
+      const result = await this.orderService.findItemOrder(id);
 
-      return new ApiSuccessResponseDto<DrugOrder>(
+      return new ApiSuccessResponseDto<ItemOrder>(
         result,
         HttpStatus.OK,
-        'Drug order retrieved successfully',
+        'Item order retrieved successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  @ApiOperation({ summary: 'Update a drug order by ID' })
+  @ApiOperation({ summary: 'Update a item order by ID' })
   @CustomApiResponse(['success', 'notfound', 'authorize'], {
-    type: DrugOrder,
-    message: 'Drug order updated successfully',
+    type: ItemOrder,
+    message: 'Item order updated successfully',
   })
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ_WRITE)
   @Patch(':id')
-  async updateDrugOrder(
+  async updateItemOrder(
     @Param('id') id: string,
-    @Body() dto: UpdateDrugOrderDto,
-  ): Promise<ApiSuccessResponseDto<DrugOrder>> {
+    @Body() dto: UpdateItemOrderDto,
+  ): Promise<ApiSuccessResponseDto<ItemOrder>> {
     try {
-      const result = await this.orderService.updateDrugOrder(id, dto);
-      return new ApiSuccessResponseDto<DrugOrder>(
+      const result = await this.orderService.updateItemOrder(id, dto);
+      return new ApiSuccessResponseDto<ItemOrder>(
         result,
         HttpStatus.ACCEPTED,
-        'Drug order updated successfully',
+        'Item order updated successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
     }
   }
 
-  @ApiOperation({ summary: 'Delete a drug order by ID' })
+  @ApiOperation({ summary: 'Delete a item order by ID' })
   @CustomApiResponse(['success', 'notfound', 'authorize'], {
-    type: DrugOrder,
-    message: 'Multiple drug orders retrieved successfully',
+    type: ItemOrder,
+    message: 'Multiple item orders retrieved successfully',
   })
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
-  async deleteDrugOrder(@Param('id') id: string) {
+  async deleteItemOrder(@Param('id') id: string) {
     try {
-      const msg = await this.orderService.deleteDrugOrder(id);
+      const msg = await this.orderService.deleteItemOrder(id);
       return new ApiSuccessResponseDto(
         msg,
         HttpStatus.OK,
-        'Drug order deleted successfully',
+        'Item order deleted successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);

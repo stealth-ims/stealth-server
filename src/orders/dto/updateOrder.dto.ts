@@ -1,9 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { OrderStatus } from '../../shared/enums/drugOrder.enum';
+import { OrderStatus } from '../../shared/enums/itemOrder.enum';
 import { IsDateString, IsEnum, IsOptional, MinDate } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class UpdateDrugOrderDto {
+export class UpdateItemOrderDto {
   @ApiPropertyOptional({
     description: 'The expected delivery date of the order',
     example: new Date().toISOString(),

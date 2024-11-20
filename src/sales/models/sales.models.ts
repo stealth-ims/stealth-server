@@ -22,11 +22,11 @@ export type PaymentStatusType = keyof typeof PaymentStatus;
 })
 export class Sale extends BaseModel {
   @ForeignKey(() => Item)
-  @Column({ type: DataType.UUID, field: 'drug_id' })
-  drugId: string;
+  @Column({ type: DataType.UUID, field: 'item_id' })
+  itemId: string;
 
-  @BelongsTo(() => Item, 'drug_id')
-  drug: Item;
+  @BelongsTo(() => Item, 'item_id')
+  item: Item;
 
   @Column({ type: DataType.STRING, field: 'patient_name' })
   patientName: string;

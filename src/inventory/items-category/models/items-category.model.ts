@@ -16,14 +16,14 @@ export enum ItemCategoryStatus {
 }
 
 @Table({
-  tableName: 'drug_categories',
+  tableName: 'item_categories',
   underscored: true,
 })
 export class ItemCategory extends BaseModel {
   @Column
   @ApiProperty({
     example: 'laxatives',
-    description: 'drug category name',
+    description: 'item category name',
   })
   @IsNotEmpty()
   @IsString()
@@ -35,27 +35,27 @@ export class ItemCategory extends BaseModel {
   })
   @ApiProperty({
     example: ItemCategoryStatus.ACTIVE,
-    description: 'drug category status',
+    description: 'item category status',
     enum: ItemCategoryStatus,
   })
   status: ItemCategoryStatus;
 
   @ApiProperty({
     example: 100,
-    description: 'Number of drugs under category',
+    description: 'Number of items under category',
   })
-  get drugCount(): number {
-    return this.drugs?.length || 0;
+  get itemCount(): number {
+    return this.items?.length || 0;
   }
 
   @HasMany(() => Item)
-  drugs: Item[];
+  items: Item[];
 
   @AfterFind
-  static async calculateDrugCount(instance: ItemCategory[] | ItemCategory) {
+  static async calculateItemCount(instance: ItemCategory[] | ItemCategory) {
     if (instance instanceof Array) {
       for (const inst of instance) {
-        delete inst.dataValues.drugs;
+        delete inst.dataValues.items;
       }
     }
   }

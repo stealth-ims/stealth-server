@@ -6,8 +6,8 @@ const baseModelColumns = require('../migration-base');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Create 'drug_categories' table
-    await queryInterface.createTable('drug_categories', {
+    // Create 'item_categories' table
+    await queryInterface.createTable('item_categories', {
       ...baseModelColumns,
       name: {
         type: Sequelize.STRING,
@@ -21,7 +21,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    // Drop 'drug_categories'
-    await queryInterface.dropTable('drug_categories');
+    // Drop 'item_categories'
+    await queryInterface.dropTable('item_categories');
   },
 };

@@ -11,7 +11,7 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { DrugsService } from './items.service';
+import { ItemService } from './items.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
@@ -32,27 +32,27 @@ import {
 import { throwError } from 'src/utils/responses/error.response';
 import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
 
-@ApiTags('Drugs')
-@Controller('drugs')
-export class DrugsController {
+@ApiTags('Items')
+@Controller('items')
+export class ItemController {
   private readonly logger: Logger;
-  constructor(private readonly drugsService: DrugsService) {
-    this.logger = new Logger(DrugsController.name);
+  constructor(private readonly itemsService: ItemService) {
+    this.logger = new Logger(ItemController.name);
   }
 
   @CustomApiResponse(['success', 'authorize'], {
     type: OneItem,
-    message: 'Drug created successfully',
+    message: 'Item created successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() createDrugDto: CreateItemDto) {
+  async create(@Body() createItemDto: CreateItemDto) {
     try {
-      const createdDrug = await this.drugsService.create(createDrugDto);
+      const createdItem = await this.itemsService.create(createItemDto);
       return new ApiSuccessResponseDto(
-        createdDrug,
+        createdItem,
         HttpStatus.CREATED,
-        'Drug category created successfully',
+        'Item category created successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -62,22 +62,22 @@ export class DrugsController {
   @CustomApiResponse(['paginated', 'authorize'], {
     type: ManyItem,
     isArray: true,
-    message: 'Drugs retrieved successfully',
+    message: 'Items retrieved successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ)
+  @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get()
   async findAll(@Query() query: ItemPaginationDto) {
     try {
-      const drugs = await this.drugsService.findAll(query);
+      const items = await this.itemsService.findAll(query);
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto(
-          drugs[0],
+          items[0],
           query.page || 1,
           query.pageSize,
-          drugs[1],
+          items[1],
         ),
         HttpStatus.OK,
-        'Drugs retrieved successfully',
+        'Items retrieved successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -86,27 +86,27 @@ export class DrugsController {
 
   @CustomApiResponse(['success', 'authorize'], {
     type: ItemAnalytics,
-    message: 'Drug analytics retrieved successfully',
+    message: 'Item analytics retrieved successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ)
+  @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('/analytics')
   async analytics() {
-    return await this.drugsService.getAnalytics();
+    return await this.itemsService.getAnalytics();
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: OneItem,
-    message: 'Drug retrieved successfully',
+    message: 'Item retrieved successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ)
+  @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      const drug = await this.drugsService.findOne(id);
+      const item = await this.itemsService.findOne(id);
       return new ApiSuccessResponseDto(
-        drug,
+        item,
         HttpStatus.OK,
-        'Drug retrieved successfully',
+        'Item retrieved successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -114,19 +114,19 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['successNull', 'authorize'], {
-    message: 'Drug updated successfully',
+    message: 'Item updated successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateDrugDto: UpdateItemDto,
+    @Body() updateItemDto: UpdateItemDto,
   ) {
     try {
-      await this.drugsService.update(id, updateDrugDto);
+      await this.itemsService.update(id, updateItemDto);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Drug updated successfully',
+        'Item updated successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -134,19 +134,19 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['successNull', 'authorize'], {
-    message: 'Drug prices adjusted successfully',
+    message: 'Item prices adjusted successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ_WRITE)
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
   @Patch('/adjust-prices/:id')
   async adjustPrice(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AdjustPriceDto,
   ) {
     try {
-      await this.drugsService.update(id, dto);
+      await this.itemsService.update(id, dto);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Drug prices adjusted successfully',
+        'Item prices adjusted successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);
@@ -154,16 +154,16 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['successNull', 'authorize'], {
-    message: 'Drug deleted successfully',
+    message: 'Item deleted successfully',
   })
-  @Permission(Features.DRUGS, PermissionLevel.READ_WRITE_DELETE)
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      await this.drugsService.remove(id);
+      await this.itemsService.remove(id);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Drug deleted successfully',
+        'Item deleted successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);

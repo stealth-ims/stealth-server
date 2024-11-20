@@ -45,12 +45,12 @@ module.exports = {
       },
 
       // relationships
-      drugId: {
+      itemId: {
         type: Sequelize.UUID,
         allowNull: false,
-        field: 'drug_id',
+        field: 'item_id',
         references: {
-          model: 'drugs',
+          model: 'items',
           key: 'id',
         },
         onUpdate: 'CASCADE',

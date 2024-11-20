@@ -31,7 +31,7 @@ export class BatchService {
       );
     }
 
-    this.logger.log(`Creating batch for drugId: ${createBatchDto.drugId}...`);
+    this.logger.log(`Creating batch for itemId: ${createBatchDto.itemId}...`);
     const batch = await this.batchRepo.create({ ...createBatchDto });
     this.logger.log(`Batch created successfully. ID: ${batch.id}`);
     return batch;

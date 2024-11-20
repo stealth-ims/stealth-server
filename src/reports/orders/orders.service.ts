@@ -1,27 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { DrugOrder } from './models/drugOrder.model';
+import { ItemOrder } from './models/itemOrder.model';
 import { Op } from 'sequelize'; // Sequelize operators for filtering
 import { generateOrderNumber } from 'src/orders/utils/orders.utils';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import {
-  CreateDrugOrderDto,
+  CreateItemOrderDto,
   GetOrdersDto,
-  UpdateDrugOrderDto,
+  UpdateItemOrderDto,
 } from 'src/orders/dto';
 
 @Injectable()
-export class DrugOrdersService {
+export class ItemOrdersService {
   constructor(
-    @InjectModel(DrugOrder)
-    private drugOrderModel: typeof DrugOrder,
+    @InjectModel(ItemOrder)
+    private itemOrderModel: typeof ItemOrder,
   ) {}
 
-  // Create a new drug order
-  public async createDrugOrder(dto: CreateDrugOrderDto): Promise<DrugOrder> {
+  // Create a new item order
+  public async createItemOrder(dto: CreateItemOrderDto): Promise<ItemOrder> {
     // Convert DTO to a plain object to match the Sequelize model format
     const orderData: any = {
-      drugName: dto.drugName,
+      itemName: dto.itemName,
       orderNumber: generateOrderNumber(),
       supplier: dto.supplier,
       date: dto.dateCreated,
@@ -35,13 +35,13 @@ export class DrugOrdersService {
     }
 
     // Use the plain object to create a new order
-    return this.drugOrderModel.create(orderData);
+    return this.itemOrderModel.create(orderData);
   }
 
-  // Fetch multiple drug orders with optional filters
-  public async findDrugOrders(
+  // Fetch multiple item orders with optional filters
+  public async findItemOrders(
     dto: GetOrdersDto,
-  ): Promise<PaginatedDataResponseDto<DrugOrder[]>> {
+  ): Promise<PaginatedDataResponseDto<ItemOrder[]>> {
     const {
       page = 1,
       pageSize = 10,
@@ -49,7 +49,7 @@ export class DrugOrdersService {
       orderDirection = 'DESC',
       status,
       supplier,
-      drugName,
+      itemName,
     } = dto;
 
     // Define query options
@@ -72,14 +72,14 @@ export class DrugOrdersService {
       };
     }
 
-    // Apply drug name filter if provided
-    if (drugName) {
-      queryOptions.where.drugName = {
-        [Op.like]: `%${drugName}%`,
+    // Apply item name filter if provided
+    if (itemName) {
+      queryOptions.where.itemName = {
+        [Op.like]: `%${itemName}%`,
       };
     }
 
-    const orders = await this.drugOrderModel.findAndCountAll(queryOptions);
+    const orders = await this.itemOrderModel.findAndCountAll(queryOptions);
     return new PaginatedDataResponseDto(
       orders.rows,
       page,
@@ -88,36 +88,36 @@ export class DrugOrdersService {
     );
   }
 
-  // Fetch a specific drug order by ID
-  public async findDrugOrder(id: string): Promise<DrugOrder> {
-    const res = await this.drugOrderModel.findOne({
+  // Fetch a specific item order by ID
+  public async findItemOrder(id: string): Promise<ItemOrder> {
+    const res = await this.itemOrderModel.findOne({
       where: { id },
     });
 
     if (!res) {
-      throw new NotFoundException('Drug order not found');
+      throw new NotFoundException('Item order not found');
     }
     return res;
   }
 
-  // Update a specific drug order by ID
-  public async updateDrugOrder(
+  // Update a specific item order by ID
+  public async updateItemOrder(
     id: string,
-    dto: UpdateDrugOrderDto,
-  ): Promise<DrugOrder> {
-    const drugOrder = await this.drugOrderModel.findOne({ where: { id } });
-    if (!drugOrder) {
+    dto: UpdateItemOrderDto,
+  ): Promise<ItemOrder> {
+    const itemOrder = await this.itemOrderModel.findOne({ where: { id } });
+    if (!itemOrder) {
       throw new NotFoundException('User not found');
     }
-    return drugOrder.update(dto);
+    return itemOrder.update(dto);
   }
 
-  // Delete a specific drug order by ID
-  public async deleteDrugOrder(id: string) {
-    const rows = await this.drugOrderModel.destroy({ where: { id } });
+  // Delete a specific item order by ID
+  public async deleteItemOrder(id: string) {
+    const rows = await this.itemOrderModel.destroy({ where: { id } });
     if (rows == 0) {
       throw new NotFoundException('User not found');
     }
-    return { message: 'drug order deleted successfully' };
+    return { message: 'item order deleted successfully' };
   }
 }

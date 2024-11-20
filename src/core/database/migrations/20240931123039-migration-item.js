@@ -6,8 +6,8 @@ const baseModelColumns = require('../migration-base');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Create 'drugs' table
-    await queryInterface.createTable('drugs', {
+    // Create 'items' table
+    await queryInterface.createTable('items', {
       ...baseModelColumns,
       name: {
         type: Sequelize.STRING,
@@ -77,7 +77,7 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'drug_categories',
+          model: 'item_categories',
           key: 'id',
         },
         onUpdate: 'CASCADE',
@@ -109,14 +109,14 @@ module.exports = {
     // Create 'batches' table
     await queryInterface.createTable('batches', {
       ...baseModelColumns,
-      drugId: {
+      itemId: {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: 'drugs',
+          model: 'items',
           key: 'id',
         },
-        field: 'drug_id',
+        field: 'item_id',
       },
       validity: {
         type: Sequelize.DATE,
@@ -152,9 +152,9 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    // Drop 'batches' first because it has a foreign key reference to 'drugs'
+    // Drop 'batches' first because it has a foreign key reference to 'items'
     await queryInterface.dropTable('batches');
-    // Then drop 'drugs'
-    await queryInterface.dropTable('drugs');
+    // Then drop 'items'
+    await queryInterface.dropTable('items');
   },
 };

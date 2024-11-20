@@ -9,7 +9,7 @@ import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { StockAdjustmentsService } from 'src/stock-adjustments/stock-adjustments.service';
 import { StockAdjustmentPaginationDto } from 'src/stock-adjustments/dto';
 import { plainToInstance } from 'class-transformer';
-import { DrugsService } from 'src/inventory/items/items.service';
+import { ItemService } from 'src/inventory/items/items.service';
 
 @Injectable()
 export class ReportsService {
@@ -18,7 +18,7 @@ export class ReportsService {
     private reportRepository: typeof Report,
 
     private stockAdjustmentService: StockAdjustmentsService,
-    private drugService: DrugsService,
+    private itemService: ItemService,
   ) {}
 
   private dataToCSV(headerLabels: Record<string, string>, rowsJson: any[]) {
@@ -84,31 +84,31 @@ export class ReportsService {
       plainToInstance(StockAdjustmentPaginationDto, { startDate, endDate }),
     );
 
-    const drugs = await Promise.all(
-      rows.map(({ drugId }) => this.drugService.findOne(drugId)),
+    const items = await Promise.all(
+      rows.map(({ itemId }) => this.itemService.findOne(itemId)),
     );
 
-    const rowsWithDrugs = rows.map(({ type, reason }, index) => ({
+    const rowsWithItems = rows.map(({ type, reason }, index) => ({
       type,
       reason,
-      name: drugs[index].name,
-      brand: drugs[index].brandName,
-      costPrice: drugs[index].costPrice,
-      sellingPrice: drugs[index].sellingPrice,
-      code: drugs[index].code,
+      name: items[index].name,
+      brand: items[index].brandName,
+      costPrice: items[index].costPrice,
+      sellingPrice: items[index].sellingPrice,
+      code: items[index].code,
     }));
 
     const headerLabels = {
       type: 'Type',
       reason: 'Reason',
-      name: 'Drug Name',
+      name: 'Item Name',
       brand: 'Brand',
       costPrice: 'Cost Price',
       sellingPrice: 'Selling Price',
       code: 'Code',
     };
 
-    const csv = this.dataToCSV(headerLabels, rowsWithDrugs);
+    const csv = this.dataToCSV(headerLabels, rowsWithItems);
 
     return { reportName, csv };
   }

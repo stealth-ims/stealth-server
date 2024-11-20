@@ -6,17 +6,17 @@ const baseModelColumns = require('../migration-base.js');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('drug_orders', {
+    await queryInterface.createTable('item_orders', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      drugName: {
+      itemName: {
         type: Sequelize.STRING,
         allowNull: false,
-        field: 'drug_name',
+        field: 'item_name',
       },
       orderNumber: {
         type: Sequelize.STRING,
@@ -51,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('drug_orders');
+    await queryInterface.dropTable('item_orders');
   },
 };
