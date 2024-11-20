@@ -8,7 +8,7 @@ import {
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/shared/models/base.model';
 import { ApiProperty } from '@nestjs/swagger';
-import { Drug } from '.';
+import { Item } from '.';
 
 @Table({
   tableName: 'batches',
@@ -21,12 +21,12 @@ export class Batch extends BaseModel {
     description: 'Drug Id of the batch',
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
-  @ForeignKey(() => Drug)
+  @ForeignKey(() => Item)
   @Column
   drugId: string;
 
-  @BelongsTo(() => Drug)
-  drug: Drug;
+  @BelongsTo(() => Item)
+  drug: Item;
 
   @ApiProperty({
     example: '2024-12-31',

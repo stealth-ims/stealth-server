@@ -7,10 +7,10 @@ import {
   HasMany,
   Table,
 } from 'sequelize-typescript';
-import { Drug } from 'src/inventory/drugs/models/drug.model';
+import { Item } from 'src/inventory/items/models/item.model';
 import { BaseModel } from 'src/shared/models/base.model';
 
-export enum DrugsCategoryStatus {
+export enum ItemCategoryStatus {
   ACTIVE = 'ACTIVE',
   DEACTIVATED = 'DEACTIVATED',
 }
@@ -19,7 +19,7 @@ export enum DrugsCategoryStatus {
   tableName: 'drug_categories',
   underscored: true,
 })
-export class DrugsCategory extends BaseModel {
+export class ItemCategory extends BaseModel {
   @Column
   @ApiProperty({
     example: 'laxatives',
@@ -34,11 +34,11 @@ export class DrugsCategory extends BaseModel {
     defaultValue: 'ACTIVE',
   })
   @ApiProperty({
-    example: DrugsCategoryStatus.ACTIVE,
+    example: ItemCategoryStatus.ACTIVE,
     description: 'drug category status',
-    enum: DrugsCategoryStatus,
+    enum: ItemCategoryStatus,
   })
-  status: DrugsCategoryStatus;
+  status: ItemCategoryStatus;
 
   @ApiProperty({
     example: 100,
@@ -48,11 +48,11 @@ export class DrugsCategory extends BaseModel {
     return this.drugs?.length || 0;
   }
 
-  @HasMany(() => Drug)
-  drugs: Drug[];
+  @HasMany(() => Item)
+  drugs: Item[];
 
   @AfterFind
-  static async calculateDrugCount(instance: DrugsCategory[] | DrugsCategory) {
+  static async calculateDrugCount(instance: ItemCategory[] | ItemCategory) {
     if (instance instanceof Array) {
       for (const inst of instance) {
         delete inst.dataValues.drugs;

@@ -9,7 +9,7 @@ import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { StockAdjustmentsService } from 'src/stock-adjustments/stock-adjustments.service';
 import { StockAdjustmentPaginationDto } from 'src/stock-adjustments/dto';
 import { plainToInstance } from 'class-transformer';
-import { DrugsService } from 'src/inventory/drugs/drugs.service';
+import { DrugsService } from 'src/inventory/items/items.service';
 
 @Injectable()
 export class ReportsService {

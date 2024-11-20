@@ -7,7 +7,7 @@ import {
   DeletedAt,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../shared/models/base.model';
-import { Drug } from 'src/inventory/drugs/models/drug.model';
+import { Item } from 'src/inventory/items/models/item.model';
 import { Department } from 'src/admin/department/models/department.model';
 
 export enum DepartmentRequestStatus {
@@ -24,12 +24,12 @@ export type DepartmentRequestStatusType = keyof typeof DepartmentRequestStatus;
   underscored: true,
 })
 export class DepartmentRequest extends BaseModel {
-  @ForeignKey(() => Drug)
+  @ForeignKey(() => Item)
   @Column({ type: DataType.UUID, field: 'drug_id' })
   drugId: string;
 
-  @BelongsTo(() => Drug, 'drug_id')
-  drug: Drug;
+  @BelongsTo(() => Item, 'drug_id')
+  drug: Item;
 
   @ForeignKey(() => Department)
   @Column({ type: DataType.STRING, field: 'department_id' })

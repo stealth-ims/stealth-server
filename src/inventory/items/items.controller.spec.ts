@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DrugsController } from './drugs.controller';
-import { DrugsService } from './drugs.service';
+import { DrugsController } from './items.controller';
+import { DrugsService } from './items.service';
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { Supplier } from '../suppliers/models/supplier.model';
-import { Drug } from './models/drug.model';
+import { Item } from './models/item.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import { configuration } from 'src/shared/config/config';
 import { BatchService } from './batch.service';
@@ -18,7 +18,7 @@ describe('DrugsController', () => {
       imports: [
         SequelizeModule.forRoot(configuration.test as SequelizeModuleOptions),
 
-        SequelizeModule.forFeature([Drug, Batch, Supplier]),
+        SequelizeModule.forFeature([Item, Batch, Supplier]),
       ],
       controllers: [DrugsController],
       providers: [DrugsService, SuppliersService, BatchService],

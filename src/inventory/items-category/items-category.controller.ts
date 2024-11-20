@@ -11,11 +11,11 @@ import {
   Query,
   HttpStatus,
 } from '@nestjs/common';
-import { DrugsCategoryService } from './drugs-category.service';
+import { DrugsCategoryService } from './items-category.service';
 import {
-  CreateDrugsCategoryDto,
-  DrugsCategoryResponse,
-  UpdateDrugsCategoryDto,
+  CreateItemsCategoryDto,
+  ItemCategoryResponse,
+  UpdateItemCategoryDto,
 } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
@@ -38,12 +38,12 @@ export class DrugsCategoryController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: DrugsCategoryResponse,
+    type: ItemCategoryResponse,
     message: 'Drug category created successfully',
   })
   @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() createDrugsCategoryDto: CreateDrugsCategoryDto) {
+  async create(@Body() createDrugsCategoryDto: CreateItemsCategoryDto) {
     try {
       const createdCategory = await this.drugsCategoryService.create(
         createDrugsCategoryDto,
@@ -59,7 +59,7 @@ export class DrugsCategoryController {
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: DrugsCategoryResponse,
+    type: ItemCategoryResponse,
     message: 'Drug categories retrieved successfully',
   })
   @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ)
@@ -83,7 +83,7 @@ export class DrugsCategoryController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: DrugsCategoryResponse,
+    type: ItemCategoryResponse,
     message: 'Drug category retrieved successfully',
   })
   @Permission(Features.DRUGS_CATEGORIES, PermissionLevel.READ)
@@ -108,7 +108,7 @@ export class DrugsCategoryController {
   @Patch(':id')
   async changeName(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateDrugsCategoryDto: UpdateDrugsCategoryDto,
+    @Body() updateDrugsCategoryDto: UpdateItemCategoryDto,
   ) {
     try {
       await this.drugsCategoryService.changeName(id, updateDrugsCategoryDto);

@@ -1,7 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { StockAdjustment } from '../model';
 import { IsNumber, IsOptional, IsPositive, IsUUID } from 'class-validator';
-import { CreateBatchDto } from 'src/inventory/drugs/dto';
+import { CreateBatchDto } from 'src/inventory/items/dto';
 
 export class BatchAdjustmentDto {
   @ApiProperty({

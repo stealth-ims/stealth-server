@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DrugsCategoryController } from './drugs-category.controller';
-import { DrugsCategoryService } from './drugs-category.service';
+import { DrugsCategoryController } from './items-category.controller';
+import { DrugsCategoryService } from './items-category.service';
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
-import { DrugsCategory } from './models/drugs-category.model';
-import { Drug } from '../drugs/models/drug.model';
+import { ItemCategory } from './models/items-category.model';
+import { Item } from '../items/models/item.model';
 import { Supplier } from '../suppliers/models/supplier.model';
 import { configuration } from 'src/shared/config/config';
 
@@ -17,7 +17,7 @@ describe('DrugsCategoryController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         SequelizeModule.forRoot(configuration.test as SequelizeModuleOptions),
-        SequelizeModule.forFeature([DrugsCategory, Drug, Supplier]),
+        SequelizeModule.forFeature([ItemCategory, Item, Supplier]),
         // ConfigModule.forFeature(jwtConfig),
         // JwtModule.registerAsync(jwtConfig.asProvider()),
       ],

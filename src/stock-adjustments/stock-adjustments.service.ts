@@ -14,7 +14,7 @@ import {
 import { ApiSuccessResponseNoData } from 'src/utils/responses/success.response';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
 import { StockAdjustmentPaginationDto } from './dto';
-import { BatchService } from 'src/inventory/drugs/batch.service';
+import { BatchService } from 'src/inventory/items/batch.service';
 
 @Injectable()
 export class StockAdjustmentsService {

@@ -7,9 +7,9 @@ import {
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
-import { Batch, Drug } from '../models';
+import { Batch, Item } from '../models';
 
-export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
+export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
   @IsOptional()
   @ApiPropertyOptional()
@@ -30,7 +30,7 @@ export class DrugPaginationDto extends IntersectionType(PaginationRequestDto) {
   departmentId: string;
 }
 
-export class DrugAnalytics {
+export class ItemAnalytics {
   @ApiProperty({
     example: 100,
     description: 'The total number of drugs in the system',
@@ -71,13 +71,13 @@ export class DrugAnalytics {
   lowStocked: number;
 }
 
-export class OneDrug extends IntersectionType(Drug, GenericResponseDto) {
+export class OneItem extends IntersectionType(Item, GenericResponseDto) {
   @ApiProperty({ description: 'The batches of the drug', type: () => Batch })
   batches: Batch[];
 }
 
-export class ManyDrugs extends IntersectionType(
-  OmitType(Drug, ['batches']),
+export class ManyItem extends IntersectionType(
+  OmitType(Item, ['batches']),
   GenericResponseDto,
 ) {
   @ApiProperty({ description: 'The batch of the drug', type: () => Batch })

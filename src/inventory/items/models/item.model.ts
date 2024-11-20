@@ -10,7 +10,7 @@ import {
 import { Department } from 'src/admin/department/models/department.model';
 import { Facility } from 'src/admin/facility/models/facility.model';
 import { DepartmentRequest } from 'src/department-requests/models/department-requests.model';
-import { DrugsCategory } from 'src/inventory/drugs-category/models/drugs-category.model';
+import { ItemCategory } from 'src/inventory/items-category/models/items-category.model';
 import { BaseModel } from 'src/shared/models/base.model';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
@@ -22,7 +22,7 @@ export enum DosageForm {
   LIQUIDS = 'LIQUIDS',
 }
 
-export enum DrugStatus {
+export enum ItemStatus {
   LOW = 'LOW',
   STOCKED = 'STOCKED',
   OUT_OF_STOCK = 'OUT_OF_STOCK',
@@ -31,7 +31,7 @@ export enum DrugStatus {
   tableName: 'drugs',
   underscored: true,
 })
-export class Drug extends BaseModel {
+export class Item extends BaseModel {
   @ApiProperty({
     example: 'Drug Name',
     description: 'The name of the drug',
@@ -126,14 +126,14 @@ export class Drug extends BaseModel {
 
   @ApiProperty({
     example: 'STOCKED',
-    enum: DrugStatus,
+    enum: ItemStatus,
     description: 'The status of the drug',
   })
   @Column({
     type: DataType.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'),
     allowNull: false,
   })
-  status: DrugStatus;
+  status: ItemStatus;
 
   @Column({ field: 'created_by', allowNull: true })
   createdBy: string;
@@ -144,7 +144,7 @@ export class Drug extends BaseModel {
     example: '44220956-0962-4dd0-9e65-1564c585563c',
     description: 'The category ID of the drug',
   })
-  @ForeignKey(() => DrugsCategory)
+  @ForeignKey(() => ItemCategory)
   @Column({
     type: DataType.UUID,
     onUpdate: 'CASCADE',
@@ -153,8 +153,8 @@ export class Drug extends BaseModel {
   })
   categoryId: string;
 
-  @BelongsTo(() => DrugsCategory)
-  category: DrugsCategory;
+  @BelongsTo(() => ItemCategory)
+  category: ItemCategory;
 
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
@@ -192,7 +192,7 @@ export class Drug extends BaseModel {
   departmentRequests: DepartmentRequest[];
 
   @BeforeCreate
-  static async validate(drug: Drug) {
+  static async validate(drug: Item) {
     const facility = await Facility.findByPk(drug.dataValues.facilityId);
     if (!facility) throw new NotFoundException('Facility not found');
     const department =
@@ -200,12 +200,12 @@ export class Drug extends BaseModel {
         ? await Department.findByPk(drug.dataValues.departmentId)
         : true;
     if (!department) throw new NotFoundException('Department not found');
-    const category = await DrugsCategory.findByPk(drug.dataValues.categoryId);
+    const category = await ItemCategory.findByPk(drug.dataValues.categoryId);
     if (!category)
       throw new NotFoundException(
         `Category with Id ${drug.dataValues.categoryId} Not found`,
       );
-    const exists = await Drug.findOne({ where: { name: drug.name } });
+    const exists = await Item.findOne({ where: { name: drug.name } });
     if (
       exists &&
       (exists.facilityId == facility.id ||

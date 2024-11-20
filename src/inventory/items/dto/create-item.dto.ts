@@ -7,9 +7,9 @@ import {
   IsOptional,
 } from 'class-validator';
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { DosageForm } from '../models/drug.model';
+import { DosageForm } from '../models/item.model';
 
-export class CreateDrugDto {
+export class CreateItemDto {
   @ApiProperty({
     example: 'Drug Name',
     description: 'The name of the drug',
@@ -160,7 +160,7 @@ export class CreateDrugDto {
   departmentId: string;
 }
 
-export class CreateBatchDto extends PickType(CreateDrugDto, [
+export class CreateBatchDto extends PickType(CreateItemDto, [
   'batchNumber',
   'validity',
   'quantity',

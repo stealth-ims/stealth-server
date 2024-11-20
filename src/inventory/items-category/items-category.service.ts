@@ -1,25 +1,25 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
-  DrugsCategory,
-  DrugsCategoryStatus,
-} from './models/drugs-category.model';
+  ItemCategory,
+  ItemCategoryStatus,
+} from './models/items-category.model';
 import { InjectModel } from '@nestjs/sequelize';
 import {
-  CreateDrugsCategoryDto,
-  DrugsCategoryResponse,
-  UpdateDrugsCategoryDto,
+  CreateItemsCategoryDto,
+  ItemCategoryResponse,
+  UpdateItemCategoryDto,
 } from './dto';
 import { ApiSuccessResponseNoData } from 'src/utils/responses/success.response';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
-import { Drug } from '../drugs/models/drug.model';
+import { Item } from '../items/models/item.model';
 
 @Injectable()
 export class DrugsCategoryService {
   private readonly logger: Logger;
   constructor(
-    @InjectModel(DrugsCategory)
-    private readonly drugCategoryRepo: typeof DrugsCategory,
+    @InjectModel(ItemCategory)
+    private readonly drugCategoryRepo: typeof ItemCategory,
   ) {
     this.logger = new Logger(DrugsCategoryService.name);
   }
@@ -33,8 +33,8 @@ export class DrugsCategoryService {
    * @throws {InternalServerErrorException} If there is an internal server error.
    */
   async create(
-    createDrugsCategoryDto: CreateDrugsCategoryDto,
-  ): Promise<DrugsCategoryResponse> {
+    createDrugsCategoryDto: CreateItemsCategoryDto,
+  ): Promise<ItemCategoryResponse> {
     const category = await this.drugCategoryRepo.create({
       ...createDrugsCategoryDto,
     });
@@ -51,14 +51,14 @@ export class DrugsCategoryService {
    */
   async findAll(
     query: PaginationRequestDto,
-  ): Promise<[DrugsCategoryResponse[], number]> {
-    const filter: FindAndCountOptions<DrugsCategory> = {
+  ): Promise<[ItemCategoryResponse[], number]> {
+    const filter: FindAndCountOptions<ItemCategory> = {
       where:
         (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
       limit: query.pageSize || 10,
       offset: query.pageSize * (query.page - 1) || 0,
       order: query.orderBy && [[query.orderBy, 'ASC']],
-      include: [Drug],
+      include: [Item],
     };
     const categories = await this.drugCategoryRepo.findAndCountAll(filter);
 
@@ -74,7 +74,7 @@ export class DrugsCategoryService {
    * @throws {NotFoundException} If the drugs category with the given ID is not found.
    * @throws {InternalServerErrorException} If an internal server error occurs.
    */
-  async findOne(id: string): Promise<DrugsCategoryResponse> {
+  async findOne(id: string): Promise<ItemCategoryResponse> {
     const category = await this.drugCategoryRepo.findByPk(id, {
       include: [{ all: true }],
     });
@@ -96,7 +96,7 @@ export class DrugsCategoryService {
    */
   async changeName(
     id: string,
-    changeNameDto: UpdateDrugsCategoryDto,
+    changeNameDto: UpdateItemCategoryDto,
   ): Promise<ApiSuccessResponseNoData> {
     const result = await this.drugCategoryRepo.update(
       { ...changeNameDto },
@@ -113,9 +113,9 @@ export class DrugsCategoryService {
   async toggleStatus(id: string): Promise<void> {
     const category = await this.findOne(id);
     category.status =
-      category.status == DrugsCategoryStatus.ACTIVE
-        ? DrugsCategoryStatus.DEACTIVATED
-        : DrugsCategoryStatus.ACTIVE;
+      category.status == ItemCategoryStatus.ACTIVE
+        ? ItemCategoryStatus.DEACTIVATED
+        : ItemCategoryStatus.ACTIVE;
     await category.save();
     this.logger.log(`Updated drugs category with ID: ${id}`);
     return;

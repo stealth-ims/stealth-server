@@ -1,8 +1,8 @@
 import { IntersectionType } from '@nestjs/swagger';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
-import { DrugsCategory } from '../models/drugs-category.model';
+import { ItemCategory } from '../models/items-category.model';
 
-export class DrugsCategoryResponse extends IntersectionType(
-  DrugsCategory,
+export class ItemCategoryResponse extends IntersectionType(
+  ItemCategory,
   GenericResponseDto,
 ) {}

@@ -11,17 +11,17 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { DrugsService } from './drugs.service';
+import { DrugsService } from './items.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
   AdjustPriceDto,
-  CreateDrugDto,
-  DrugAnalytics,
-  DrugPaginationDto,
-  ManyDrugs,
-  OneDrug,
-  UpdateDrugDto,
+  CreateItemDto,
+  ItemAnalytics,
+  ItemPaginationDto,
+  ManyItem,
+  OneItem,
+  UpdateItemDto,
 } from './dto';
 import { Permission } from 'src/auth/decorator';
 import {
@@ -41,12 +41,12 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: OneDrug,
+    type: OneItem,
     message: 'Drug created successfully',
   })
   @Permission(Features.DRUGS, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() createDrugDto: CreateDrugDto) {
+  async create(@Body() createDrugDto: CreateItemDto) {
     try {
       const createdDrug = await this.drugsService.create(createDrugDto);
       return new ApiSuccessResponseDto(
@@ -60,13 +60,13 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['paginated', 'authorize'], {
-    type: ManyDrugs,
+    type: ManyItem,
     isArray: true,
     message: 'Drugs retrieved successfully',
   })
   @Permission(Features.DRUGS, PermissionLevel.READ)
   @Get()
-  async findAll(@Query() query: DrugPaginationDto) {
+  async findAll(@Query() query: ItemPaginationDto) {
     try {
       const drugs = await this.drugsService.findAll(query);
       return new ApiSuccessResponseDto(
@@ -85,7 +85,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: DrugAnalytics,
+    type: ItemAnalytics,
     message: 'Drug analytics retrieved successfully',
   })
   @Permission(Features.DRUGS, PermissionLevel.READ)
@@ -95,7 +95,7 @@ export class DrugsController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: OneDrug,
+    type: OneItem,
     message: 'Drug retrieved successfully',
   })
   @Permission(Features.DRUGS, PermissionLevel.READ)
@@ -120,7 +120,7 @@ export class DrugsController {
   @Patch(':id')
   async update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateDrugDto: UpdateDrugDto,
+    @Body() updateDrugDto: UpdateItemDto,
   ) {
     try {
       await this.drugsService.update(id, updateDrugDto);

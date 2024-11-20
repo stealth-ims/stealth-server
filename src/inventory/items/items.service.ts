@@ -6,22 +6,22 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import {
-  CreateDrugDto,
-  DrugPaginationDto,
-  ManyDrugs as ManyDrug,
-  OneDrug,
-  UpdateDrugDto,
+  CreateItemDto,
+  ItemPaginationDto,
+  ManyItem as ManyDrug,
+  OneItem,
+  UpdateItemDto,
 } from './dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
-import { Batch, Drug, DrugStatus } from './models';
+import { Batch, Item, ItemStatus } from './models';
 import { BatchService } from './batch.service';
 
 @Injectable()
 export class DrugsService {
   private readonly logger: Logger;
   constructor(
-    @InjectModel(Drug) private readonly drugRepo: typeof Drug,
+    @InjectModel(Item) private readonly drugRepo: typeof Item,
     private readonly batchService: BatchService,
   ) {
     this.logger = new Logger(DrugsService.name);
@@ -34,18 +34,18 @@ export class DrugsService {
    * @returns A promise that resolves to the created drug.
    * @throws If any error occurs during the creation process.
    */
-  async create(createDrugDto: CreateDrugDto): Promise<OneDrug> {
+  async create(createDrugDto: CreateItemDto): Promise<OneItem> {
     try {
       const createdDrug = await this.drugRepo.create({
         ...createDrugDto,
-        status: DrugStatus.STOCKED,
+        status: ItemStatus.STOCKED,
       });
 
       const batch = await this.batchService.create({
         ...createDrugDto,
         drugId: createdDrug.id,
       });
-      const oneDrug = createdDrug.toJSON() as OneDrug;
+      const oneDrug = createdDrug.toJSON() as OneItem;
       oneDrug.batches = [batch];
       this.logger.log(`Drug added successfully. id: ${createdDrug.id}`);
       return oneDrug;
@@ -69,7 +69,7 @@ export class DrugsService {
    * @returns A promise that resolves to an array of OneDrug and the total count of drugs.
    * @throws Throws an error if there was an issue retrieving the drugs.
    */
-  async findAll(query: DrugPaginationDto): Promise<[ManyDrug[], number]> {
+  async findAll(query: ItemPaginationDto): Promise<[ManyDrug[], number]> {
     const filter = this.applyFilter(query);
     const drugs = await this.drugRepo.findAndCountAll(filter);
 
@@ -95,7 +95,7 @@ export class DrugsService {
    * @returns A promise that resolves to the found drug.
    * @throws {NotFoundException} If the drug with the given ID is not found.
    */
-  async findOne(id: string): Promise<OneDrug> {
+  async findOne(id: string): Promise<OneItem> {
     this.logger.log(`finding drug with id: ${id}`);
     const drug = await this.drugRepo.findByPk(id, { include: [Batch] });
     if (!drug) {
@@ -114,7 +114,7 @@ export class DrugsService {
    * @throws {NotFoundException} If the drug with the specified ID is not found.
    * @returns A Promise that resolves to void.
    */
-  async update(id: string, updateDrugDto: UpdateDrugDto): Promise<void> {
+  async update(id: string, updateDrugDto: UpdateItemDto): Promise<void> {
     const result = await this.drugRepo.update(
       { ...updateDrugDto },
       { where: { id: id } },
@@ -155,8 +155,8 @@ export class DrugsService {
    * @param query - The DrugPaginationDto object containing the filter options.
    * @returns The FindAndCountOptions object with the applied filter options.
    */
-  private applyFilter(query: DrugPaginationDto): FindAndCountOptions<Drug> {
-    const whereOptions: WhereOptions<Drug> = {
+  private applyFilter(query: ItemPaginationDto): FindAndCountOptions<Item> {
+    const whereOptions: WhereOptions<Item> = {
       [Op.and]: [
         query.facilityId && { facilityId: query.facilityId },
         query.departmentId && { departmentId: query.departmentId },
