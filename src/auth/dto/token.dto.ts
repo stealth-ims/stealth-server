@@ -31,6 +31,7 @@ export class LoginTokenDto {
     this.phoneNumber = user.phoneNumber;
     this.facilityId = user.facilityId;
     this.departmentId = user.departmentId;
+    this.permissions = user.permissions;
     this.role = user.role as Role;
     this.tokens = tokens;
   }
@@ -69,6 +70,16 @@ export class LoginTokenDto {
     enum: Role,
   })
   role: Role;
+
+  @ApiResponseProperty({
+    example: [
+      'drugs:READ',
+      'drug_categories:READ_WRITE',
+      'stock_adjustment:READ_WRITE_DELETE',
+      'drug_orders:READ_WRITE_DELETE',
+    ],
+  })
+  permissions: string[];
 
   @ApiResponseProperty({
     type: TokenDto,

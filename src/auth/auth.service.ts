@@ -21,7 +21,6 @@ import { IUserPayload } from './interface/payload.interface';
 import { MailService } from '../notification/mail/mail.service';
 import { randomInt } from 'crypto';
 import { add, isAfter } from 'date-fns';
-import axios from 'axios';
 import {
   ChangePasswordDto,
   CheckCodeDto,
@@ -390,9 +389,10 @@ export class AuthService {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
 
     try {
-      const response = await axios.get(url);
-      if (response.data.address) {
-        const address = `${response.data.address.town}, ${response.data.address.city}, ${response.data.address.country_code.toUpperCase()}`;
+      const request = await fetch(url);
+      const response = await request.json();
+      if (response.address) {
+        const address = `${response.address.town}, ${response.address.city}, ${response.address.country_code.toUpperCase()}`;
         return address;
       } else {
         throw new InternalServerErrorException('No results found');
