@@ -1,3 +1,3 @@
-import { DrugOrder } from './drugOrder.model';
+import { ItemOrder } from './itemOrder.model';
 
-export const DrugOrderModels = [DrugOrder];
+export const ItemOrderModels = [ItemOrder];

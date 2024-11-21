@@ -73,10 +73,10 @@ export class LoginTokenDto {
 
   @ApiResponseProperty({
     example: [
-      'drugs:READ',
-      'drug_categories:READ_WRITE',
+      'items:READ',
+      'item_categories:READ_WRITE',
       'stock_adjustment:READ_WRITE_DELETE',
-      'drug_orders:READ_WRITE_DELETE',
+      'item_orders:READ_WRITE_DELETE',
     ],
   })
   permissions: string[];

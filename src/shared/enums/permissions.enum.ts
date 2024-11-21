@@ -1,8 +1,8 @@
 export enum Features {
-  DRUGS = 'drugs',
-  DRUGS_CATEGORIES = 'drug_catgories',
+  ITEMS = 'items',
+  ITEMS_CATEGORIES = 'item_catgories',
   STOCK_ADJUSTMENT = 'stock_adjustment',
-  DRUG_ORDERS = 'drug_orders',
+  DRUG_ORDERS = 'item_orders',
   REPORTS = 'reports',
   SUPPLIERS = 'suppliers',
   SALES = 'sales',

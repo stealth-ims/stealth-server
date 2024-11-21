@@ -9,12 +9,12 @@ module.exports = {
     await queryInterface.createTable('department_requests', {
       ...baseModelColumns,
 
-      drugId: {
+      itemId: {
         type: Sequelize.UUID,
-        field: 'drug_id',
+        field: 'item_id',
         allowNull: false,
         references: {
-          model: 'drugs',
+          model: 'items',
           key: 'id',
         },
       },
@@ -76,7 +76,7 @@ module.exports = {
 
       await queryInterface.removeConstraint(
         'department_requests',
-        'department_requests_drug_id_fkey',
+        'department_requests_item_id_fkey',
       ),
     ]);
 

@@ -6,7 +6,7 @@ import {
   HasMany,
   Table,
 } from 'sequelize-typescript';
-import { Batch } from 'src/inventory/drugs/models';
+import { Batch } from 'src/inventory/items/models';
 import { BaseModel } from 'src/shared/models/base.model';
 
 export enum StatusType {

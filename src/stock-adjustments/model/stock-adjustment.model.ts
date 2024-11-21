@@ -15,7 +15,7 @@ import {
 } from 'sequelize-typescript';
 import { Department } from 'src/admin/department/models/department.model';
 import { Facility } from 'src/admin/facility/models/facility.model';
-import { Drug } from 'src/inventory/drugs/models';
+import { Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/shared/models/base.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { BatchAdjustmentDto } from '../dto';
@@ -95,22 +95,22 @@ export class StockAdjustment extends BaseModel {
   // relationships
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
-    description: 'The ID of the drug being adjusted',
+    description: 'The ID of the item being adjusted',
   })
-  @ForeignKey(() => Drug)
+  @ForeignKey(() => Item)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
   @IsUUID()
-  drugId: string;
+  itemId: string;
 
   @ApiProperty({
-    type: () => Drug,
-    description: 'The drug associated with this stock adjustment',
+    type: () => Item,
+    description: 'The item associated with this stock adjustment',
   })
-  @BelongsTo(() => Drug)
-  drug: Drug;
+  @BelongsTo(() => Item)
+  item: Item;
 
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',

@@ -10,12 +10,12 @@ module.exports = {
     await queryInterface.createTable('sales', {
       ...baseModelColumns,
 
-      drugId: {
+      itemId: {
         type: Sequelize.UUID,
         allowNull: false,
-        field: 'drug_id',
+        field: 'item_id',
         references: {
-          model: 'drugs',
+          model: 'items',
           key: 'id',
         },
       },
@@ -59,7 +59,7 @@ module.exports = {
   },
 
   async down(queryInterface, _) {
-    await queryInterface.removeConstraint('sales', 'sales_drug_id_fkey');
+    await queryInterface.removeConstraint('sales', 'sales_item_id_fkey');
     await queryInterface.dropTable('sales');
   },
 };

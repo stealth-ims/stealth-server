@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
-import { OrderStatus } from 'src/shared/enums/drugOrder.enum';
+import { OrderStatus } from 'src/shared/enums/itemOrder.enum';
 
 export class GetOrdersDto extends PaginationRequestDto {
   @ApiPropertyOptional({
@@ -23,10 +23,10 @@ export class GetOrdersDto extends PaginationRequestDto {
   supplier?: string;
 
   @ApiPropertyOptional({
-    description: 'The name of the drug',
+    description: 'The name of the item',
     example: 'Tramadol',
   })
   @IsString()
   @IsOptional()
-  drugName?: string;
+  itemName?: string;
 }

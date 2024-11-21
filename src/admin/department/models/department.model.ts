@@ -9,7 +9,7 @@ import {
 } from 'sequelize-typescript';
 import { BaseModel } from '../../../shared/models/base.model';
 import { User } from '../../../auth/models/user.model';
-// import { Drug } from '../../../inventory/drugs/models/drug.model';
+// import { Item } from '../../../inventory/items/models/item.model';
 import { Facility } from '../../facility/models/facility.model';
 import { DepartmentRequest } from 'src/department-requests/models/department-requests.model';
 import { StockAdjustment } from 'src/stock-adjustments/model/stock-adjustment.model';
@@ -57,8 +57,8 @@ export class Department extends BaseModel {
 
   // @ApiProperty({
   //   example: [],
-  //   description: 'List of drugs available in the department',
+  //   description: 'List of items available in the department',
   // })
-  // @HasMany(() => Drug)
-  // drugs: Drug[];
+  // @HasMany(() => Item)
+  // items: Item[];
 }

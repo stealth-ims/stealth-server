@@ -3,7 +3,7 @@ import { BaseModel } from 'src/shared/models/base.model';
 import { User } from 'src/auth/models/user.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-// import { Drug } from '../../../inventory/drugs/models/drug.model';
+// import { Item } from '../../../inventory/items/models/item.model';
 import { Department } from '../../department/models/department.model';
 import { StockAdjustment } from 'src/stock-adjustments/model/stock-adjustment.model';
 
@@ -54,8 +54,8 @@ export class Facility extends BaseModel {
 
   // @ApiProperty({
   //   example: [],
-  //   description: 'List of drugs available in the hospital',
+  //   description: 'List of items available in the hospital',
   // })
-  // @HasMany(() => Drug)
-  // drugs: Drug[];
+  // @HasMany(() => Item)
+  // items: Item[];
 }

@@ -6,7 +6,7 @@ import {
   ForeignKey,
   Table,
 } from 'sequelize-typescript';
-import { Drug } from 'src/inventory/drugs/models';
+import { Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/shared/models/base.model';
 
 export enum PaymentStatus {
@@ -21,12 +21,12 @@ export type PaymentStatusType = keyof typeof PaymentStatus;
   underscored: true,
 })
 export class Sale extends BaseModel {
-  @ForeignKey(() => Drug)
-  @Column({ type: DataType.UUID, field: 'drug_id' })
-  drugId: string;
+  @ForeignKey(() => Item)
+  @Column({ type: DataType.UUID, field: 'item_id' })
+  itemId: string;
 
-  @BelongsTo(() => Drug, 'drug_id')
-  drug: Drug;
+  @BelongsTo(() => Item, 'item_id')
+  item: Item;
 
   @Column({ type: DataType.STRING, field: 'patient_name' })
   patientName: string;
