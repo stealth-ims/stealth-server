@@ -1,5 +1,12 @@
 import { ApiProperty, ApiResponseProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsUUID, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaymentStatus, PaymentStatusType } from '../models/sales.models';
 
@@ -33,6 +40,8 @@ export class CreateSaleDto extends GenericResponseDto {
     example: 'UNPAID',
     enum: PaymentStatus,
   })
+  @IsNotEmpty()
+  @IsEnum(PaymentStatus)
   status: PaymentStatusType;
 
   @ApiResponseProperty({

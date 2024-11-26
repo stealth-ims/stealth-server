@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Query,
+  HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import {
@@ -17,19 +19,33 @@ import {
 } from './dto/';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators';
+import { ApiSuccessResponseDto } from 'src/utils/responses/success.response';
+import { throwError } from 'src/utils/responses/error.response';
 
 @ApiTags('Sales')
 @Controller('sales')
 export class SalesController {
+  private logger = new Logger(SalesController.name);
+
   constructor(private readonly salesService: SalesService) {}
 
   @CustomApiResponse(['authorize', 'success'], {
-    type: CreateSaleDto,
+    type: GetSalesDto,
     message: 'Sales created successfully',
   })
   @Post()
-  create(@Body() createSaleDto: CreateSaleDto) {
-    return this.salesService.create(createSaleDto);
+  async create(@Body() createSaleDto: CreateSaleDto) {
+    try {
+      const response = await this.salesService.create(createSaleDto);
+
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.CREATED,
+        'sale created successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['authorize', 'paginated'], {
@@ -38,7 +54,11 @@ export class SalesController {
   })
   @Get()
   getSales(@Query() query: GetSalesPaginationDto) {
-    return this.salesService.fetchAll(query);
+    try {
+      return this.salesService.fetchAll(query);
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['authorize', 'successNull'], {
@@ -46,7 +66,11 @@ export class SalesController {
   })
   @Patch('/:id')
   updateSale(@Body() dto: UpdateSalesDto, @Param('id') id: string) {
-    this.salesService.update(id, dto);
+    try {
+      return this.salesService.update(id, dto);
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['authorize', 'success'], {
@@ -55,7 +79,11 @@ export class SalesController {
   })
   @Get('/:id')
   getSale(@Param('id') id: string) {
-    this.salesService.fetchOne(id);
+    try {
+      return this.salesService.fetchOne(id);
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 
   @CustomApiResponse(['authorize', 'successNull'], {
@@ -63,6 +91,10 @@ export class SalesController {
   })
   @Delete('/:id')
   deleteSale(@Param('id') id: string) {
-    this.salesService.removeOne(id);
+    try {
+      this.salesService.removeOne(id);
+    } catch (error) {
+      throwError(this.logger, error);
+    }
   }
 }

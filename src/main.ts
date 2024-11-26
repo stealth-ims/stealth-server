@@ -36,7 +36,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      tagsSorter: 'alpha',
+    },
+  });
 
   await app.listen(PORT);
   console.info(`APP IS LISTENING ON PORT ${process.env.PORT}`);
