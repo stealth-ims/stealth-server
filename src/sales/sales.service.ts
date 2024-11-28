@@ -7,10 +7,10 @@ import {
 } from './dto/';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sale } from './models/sales.models';
-import { DrugsService } from 'src/inventory/drugs/drugs.service';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { FindAndCountOptions } from 'sequelize';
 import { Op } from 'sequelize';
+import { ItemService } from '../inventory/items/items.service';
 
 @Injectable()
 export class SalesService {
@@ -18,11 +18,11 @@ export class SalesService {
     @InjectModel(Sale)
     private saleRepository: typeof Sale,
 
-    private drugService: DrugsService,
+    private itemService: ItemService,
   ) {}
 
   async create(dto: CreateSaleDto) {
-    await this.drugService.findOne(dto.drugId);
+    await this.itemService.findOne(dto.itemId);
 
     dto.saleNumber = `S-${new Date().getTime()}`;
 
