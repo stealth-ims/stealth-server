@@ -123,6 +123,30 @@ export class CreateSupplierDto extends GenericResponseDto {
   @IsString()
   mailingAddress?: string;
 
+  @ApiPropertyOptional({
+    description: "The emergency contact's name",
+    example: 'James Ofori',
+  })
+  @IsOptional()
+  @IsString()
+  emergencyContactName?: string;
+
+  @ApiPropertyOptional({
+    description: "The emergency contact's title",
+    example: 'Sales Manager',
+  })
+  @IsOptional()
+  @IsString()
+  emergencyContactTitle?: string;
+
+  @ApiPropertyOptional({
+    description: "The emergency contact's contact number",
+    example: '+23355677835',
+  })
+  @IsOptional()
+  @IsString()
+  emergencyContactNumber?: string;
+
   // Payment Type
   @ApiProperty({
     description: 'The provider through which payments is made',

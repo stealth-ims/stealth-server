@@ -105,8 +105,8 @@ export class AuthService {
     if (!authorized) {
       throw new UnauthorizedException('Account is not authorized');
     }
-    if (!user.accountApproved) {
-      throw new ForbiddenException('User has not been approved by admin');
+    if (!user.accountActivated) {
+      throw new ForbiddenException('Account Deactivated');
     }
     const sessionData = await this.getSessionDetails(dto, user.id);
     const token = await this.generateTokens(user, sessionData.id);
@@ -131,7 +131,8 @@ export class AuthService {
         'facilityId',
         'departmentId',
         'role',
-        'accountApproved',
+        'permissions',
+        'accountActivated',
         'status',
       ],
     });
@@ -324,6 +325,16 @@ export class AuthService {
     user.password = newHashedPassword;
     await user.save();
     this.sendchangePasswordEmail(user.email);
+    return;
+  }
+
+  async removeSession(id: string) {
+    const session = await this.loginSessionRepository.destroy({
+      where: { id },
+    });
+    if (session == 0) {
+      throw new NotFoundException('Session not found');
+    }
     return;
   }
 

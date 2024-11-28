@@ -24,3 +24,18 @@ export class GetSuppliersResponse extends PickType(SupplierResponse, [
   'city',
   'physicalAddress',
 ]) {}
+export class GetSupplierResponse extends PickType(SupplierResponse, [
+  'id',
+  'name',
+  'primaryContactName',
+  'jobTitle',
+  'phoneNumber',
+  'supplierType',
+  'minimumOrderQuantity',
+  'leadTime',
+  'emergencyContactName',
+  'emergencyContactTitle',
+  'emergencyContactNumber',
+  'physicalAddress',
+  'city',
+]) {}

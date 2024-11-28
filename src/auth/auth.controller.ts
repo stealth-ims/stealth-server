@@ -1,12 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
   HttpStatus,
   InternalServerErrorException,
   Logger,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -50,6 +53,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { CreateLoginSessionDto } from './dto/login-session.dto';
+import { CustomApiResponse } from '../shared/docs/decorators';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -467,6 +471,30 @@ export class AuthController {
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'user password changed successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize'], {
+    message: 'Session deleted successfully',
+  })
+  @Delete('/session/:id')
+  async deleteSession(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.authService.removeSession(id);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'session deleted successfully',
       );
     } catch (error) {
       if (error instanceof HttpException) {

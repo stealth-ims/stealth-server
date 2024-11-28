@@ -4,7 +4,6 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { IndexModels } from './shared/models/index.models';
 import { IndexModules } from './shared/modules/index.modules';
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -15,10 +14,10 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      ssl: NODE_ENV === 'development' ? false : true,
+      ssl: process.env.NODE_ENV === 'development' ? false : true,
       dialectOptions: {
         ssl:
-          NODE_ENV === 'development'
+          process.env.NODE_ENV === 'development'
             ? false
             : {
                 require: false,

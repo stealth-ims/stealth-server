@@ -14,7 +14,6 @@ import {
 import { DepartmentService } from './department.service';
 import {
   CreateDepartmentDto,
-  DepartmentPaginationRequestDto,
   DepartmentResponse,
   UpdateDepartmentDto,
 } from './dto';
@@ -23,12 +22,13 @@ import {
   ApiSuccessResponseNoData,
   PaginatedDataResponseDto,
 } from '../../utils/responses/success.response';
-import { GetUser, Roles } from '../../auth/decorator';
+import { GetUser, Permission } from '../../auth/decorator';
 import { ApiTags } from '@nestjs/swagger';
-import { Role } from '../../auth/interface/roles.enum';
 import { CustomApiResponse } from '../../shared/docs/decorators';
 import { Department } from './models/department.model';
 import { throwError } from '../../utils/responses/error.response';
+import { PaginationRequestDto } from '../../shared/docs/dto/pagination.dto';
+import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
 
 @ApiTags('Department')
 @Controller('departments')
@@ -38,12 +38,12 @@ export class DepartmentController {
     this.logger = new Logger(DepartmentController.name);
   }
 
-  @Post()
   @CustomApiResponse(['success', 'authorize'], {
     type: DepartmentResponse,
     message: 'Department created successfully',
   })
-  @Roles(Role.HospitalAdmin)
+  @Permission(Features.DEPARTMENTS, PermissionLevel.READ_WRITE)
+  @Post()
   async addDepartment(
     @Body() dto: CreateDepartmentDto,
     @GetUser('facility') facilityId: string,
@@ -65,16 +65,20 @@ export class DepartmentController {
     }
   }
 
-  @Get()
-  @CustomApiResponse(['paginated'], {
+  @CustomApiResponse(['paginated', 'authorize'], {
     type: DepartmentResponse,
     message: 'Departments retrieved successfully',
   })
-  async getDepartments(@Query() query: DepartmentPaginationRequestDto) {
+  @Permission(Features.DEPARTMENTS, PermissionLevel.READ)
+  @Get()
+  async getDepartments(
+    @Query() query: PaginationRequestDto,
+    @GetUser('facility') facilityId: string,
+  ) {
     try {
       const { rows, count } = await this.departmentService.findAll(
         query,
-        query.facilityId,
+        facilityId,
       );
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto<Department[]>(
@@ -91,11 +95,12 @@ export class DepartmentController {
     }
   }
 
-  @Get(':id')
-  @CustomApiResponse(['success', 'notfound'], {
+  @CustomApiResponse(['success', 'notfound', 'authorize'], {
     type: DepartmentResponse,
     message: 'Department retrieved successfully',
   })
+  @Permission(Features.DEPARTMENTS, PermissionLevel.READ)
+  @Get(':id')
   async getDepartment(@Param('id') id: string) {
     try {
       const response = await this.departmentService.findOne(id);
@@ -109,11 +114,11 @@ export class DepartmentController {
     }
   }
 
-  @Patch(':id')
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Department updated successfully',
   })
-  @Roles(Role.HospitalAdmin)
+  @Permission(Features.DEPARTMENTS, PermissionLevel.READ_WRITE)
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async editDepartment(
     @Body() dto: UpdateDepartmentDto,
@@ -121,7 +126,7 @@ export class DepartmentController {
     @GetUser('sub') adminId: string,
   ) {
     try {
-      const _response = await this.departmentService.update(id, dto, adminId);
+      await this.departmentService.update(id, dto, adminId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Department updated successfully',
@@ -131,11 +136,11 @@ export class DepartmentController {
     }
   }
 
-  @Delete(':id')
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Department deleted successfully',
   })
-  @Roles(Role.HospitalAdmin)
+  @Permission(Features.DEPARTMENTS, PermissionLevel.READ_WRITE_DELETE)
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deleteDepartment(@Param('id') id: string) {
     try {

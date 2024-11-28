@@ -11,12 +11,17 @@ import jwtConfig from '../interface/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { AUTHORIZE_KEY, IS_PUBLIC_KEY } from '../decorator';
+import { InjectModel } from '@nestjs/sequelize';
+import { LoginSession } from '../models/login-session.model';
+import { IUserPayload } from '../interface/payload.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
+    @InjectModel(LoginSession)
+    private loginSessionRepository: typeof LoginSession,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
@@ -41,12 +46,18 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload: IUserPayload = await this.jwtService.verifyAsync(token, {
         secret: this.jwtConfiguration.secret,
       });
       request['user'] = payload;
+      const session = await this.loginSessionRepository.findByPk(
+        payload.session,
+      );
+      if (!session) {
+        throw new UnauthorizedException();
+      }
     } catch {
-      throw new UnauthorizedException('unauthenticated user');
+      throw new UnauthorizedException();
     }
     return true;
   }

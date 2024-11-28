@@ -1,0 +1,25 @@
+{
+  "roles": [
+    {
+      "role": "Pharmacist",
+      "permissions": [
+        "items:READ_WRITE",
+        "item_categories:READ",
+        "stock_adjustment:READ_WRITE",
+        "drug_orders:READ_WRITE",
+        "reports:READ",
+        "suppliers:READ_WRITE",
+        "sales:READ_WRITE"
+      ]
+    },
+    {
+      "role": "Department Admin",
+      "permissions": [
+        "department_requests:READ_WRITE_DELETE",
+        "departments:READ_WRITE_DELETE",
+        "users:READ_WRITE",
+        "reports:READ"
+      ]
+    }
+  ]
+}

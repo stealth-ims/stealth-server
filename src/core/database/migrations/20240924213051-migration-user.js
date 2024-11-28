@@ -20,7 +20,7 @@ module.exports = {
 
       password: Sequelize.STRING,
 
-      accountApproved: { type: Sequelize.BOOLEAN, field: 'account_approved' },
+      accountActivated: { type: Sequelize.BOOLEAN, field: 'account_activated' },
 
       status: Sequelize.STRING,
 

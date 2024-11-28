@@ -7,6 +7,8 @@ export enum Features {
   SUPPLIERS = 'suppliers',
   SALES = 'sales',
   DEPARTMENT_REQUESTS = 'department_requests',
+  DEPARTMENTS = 'departments',
+  USERS = 'users',
 }
 
 export enum PermissionLevel {

@@ -59,8 +59,8 @@ export class User extends BaseModel {
   @Column
   password: string;
 
-  @Column({ defaultValue: false })
-  accountApproved: boolean;
+  @Column({ defaultValue: true })
+  accountActivated: boolean;
 
   @Column({ defaultValue: AccountState.PENDING })
   status: string; //Pending | Accepted | Declined

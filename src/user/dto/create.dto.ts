@@ -1,19 +1,39 @@
 import {
   ApiProperty,
+  ApiPropertyOptional,
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, Matches } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+} from 'class-validator';
 import { GenericResponseDto } from '../../shared/docs/dto/base.dto';
-import { Role } from '../../auth/interface/roles.enum';
 
 export class CreateUserDto extends IntersectionType(GenericResponseDto) {
+  @ApiProperty({
+    example: 'Healthcare Worker',
+    description: 'The role the user is being registered as',
+  })
+  @IsNotEmpty()
+  role: string;
+
   @ApiProperty({
     example: 'John Doe',
     description: 'The full name of the user',
   })
   @IsNotEmpty()
   fullName: string;
+
+  @ApiPropertyOptional({
+    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
+    description: 'The department id the user is registering to',
+  })
+  @IsOptional()
+  departmentId: string;
 
   @ApiProperty({
     example: 'example@email.com',
@@ -22,36 +42,6 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   @IsNotEmpty()
   @IsEmail()
   email: string;
-
-  @ApiProperty({
-    example: '0244335567',
-    description: 'The phone number of the user',
-  })
-  @IsNotEmpty()
-  phoneNumber: string;
-
-  @ApiProperty({
-    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
-    description: 'The facility id using the Inventory System',
-  })
-  @IsNotEmpty()
-  facilityId: string;
-
-  @ApiProperty({
-    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
-    description: 'The department id the user is registering to',
-  })
-  @IsNotEmpty()
-  departmentId: string;
-
-  @ApiProperty({
-    example: 'healthcare_worker',
-    enum: Role,
-    description: 'The role the user is being registered as',
-  })
-  @IsNotEmpty()
-  @IsEnum(Role)
-  role: string;
 
   @ApiProperty({
     example: 'XT(v2EiTqQZ',
@@ -67,10 +57,28 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   )
   password: string;
 
-  @ApiResponseProperty({
-    example: false,
+  @ApiProperty({
+    example: [
+      'items:READ',
+      'item_categories:READ_WRITE',
+      'stock_adjustment:READ_WRITE_DELETE',
+      'item_orders:READ_WRITE_DELETE',
+    ],
+    description: 'The permissions assigned to a user',
   })
-  accountApproved: boolean;
+  @IsNotEmpty()
+  @IsArray()
+  permissions: string[];
+
+  @ApiResponseProperty({
+    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
+  })
+  facilityId: string;
+
+  @ApiResponseProperty({
+    example: true,
+  })
+  accountActivated: boolean;
 
   @ApiResponseProperty({
     example: 'ACTIVE',

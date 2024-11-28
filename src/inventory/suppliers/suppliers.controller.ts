@@ -16,6 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
   CreateSupplierDto,
+  GetSupplierResponse,
   GetSuppliersResponse,
   SupplierResponse,
   UpdateSupplierDto,
@@ -85,7 +86,7 @@ export class SuppliersController {
   }
 
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: SupplierResponse,
+    type: GetSupplierResponse,
     message: 'Supplier retrieved successfully',
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ)

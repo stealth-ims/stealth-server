@@ -6,29 +6,28 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
-  Put,
+  Post,
   Query,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CustomApiResponse } from '../shared/docs/decorators';
-import { DepartmentResponse } from './department/dto';
 import { PaginationRequestDto } from '../shared/docs/dto/pagination.dto';
-import { GetUser, Roles } from '../auth/decorator';
+import { GetUser, Permission } from '../auth/decorator';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
   PaginatedDataResponseDto,
 } from '../utils/responses/success.response';
-import { Department } from './department/models/department.model';
 import { throwError } from '../utils/responses/error.response';
 import { User } from '../auth/models/user.model';
 import { ChangeRoleDto, GetAdminUserDto } from './dto';
-import { ApiTags } from '@nestjs/swagger';
-import { Role } from '../auth/interface/roles.enum';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Features, PermissionLevel } from '../shared/enums/permissions.enum';
+import { CreateUserDto, GetUserDto } from '../user/dto';
 
 @ApiTags('Admin')
-@Roles(Role.HospitalAdmin)
 @Controller('admin')
 export class AdminController {
   private readonly logger: Logger;
@@ -39,46 +38,44 @@ export class AdminController {
     this.logger = new Logger(AdminController.name);
   }
 
-  @Get('/departments')
-  @CustomApiResponse(['paginated', 'authorize'], {
-    type: DepartmentResponse,
-    message: 'Departments retrieved successfully',
+  @ApiOperation({ summary: 'For creating a new user. Done by admin' })
+  @CustomApiResponse(['created', 'authorize'], {
+    type: GetUserDto,
+    message: 'User created successfully',
   })
-  async getDepartments(
-    @Query() query: PaginationRequestDto,
+  @Permission(Features.USERS, PermissionLevel.READ_WRITE)
+  @Post('/user')
+  async createUser(
+    @Body() dto: CreateUserDto,
     @GetUser('facility') facilityId: string,
   ) {
     try {
-      const { rows, count } = await this.departmentService.findAll(
-        query,
-        facilityId,
-      );
+      const response = await this.adminService.createPersonnel(dto, facilityId);
       return new ApiSuccessResponseDto(
-        new PaginatedDataResponseDto<Department[]>(
-          rows,
-          query.page || 1,
-          query.pageSize,
-          count,
-        ),
-        HttpStatus.OK,
-        'Departments retrieved successfully',
+        response,
+        HttpStatus.CREATED,
+        'User created successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
     }
   }
 
-  @Get('/users/facility')
   @CustomApiResponse(['paginated', 'authorize'], {
     type: GetAdminUserDto,
-    message: 'Facility personnel retrieved successfully',
+    message: 'Personnels retrieved successfully',
   })
+  @Permission(Features.USERS, PermissionLevel.READ)
+  @Get('/users')
   async getFacilityPersonnel(
     @Query() query: PaginationRequestDto,
     @GetUser('facility') facilityId: string,
+    @GetUser('department') departmentId: string,
   ) {
-    const { rows, count } =
-      await this.adminService.findFaciltyPersonnel(facilityId);
+    const { rows, count } = await this.adminService.findFaciltyPersonnel(
+      facilityId,
+      departmentId,
+    );
     return new ApiSuccessResponseDto(
       new PaginatedDataResponseDto<User[]>(
         rows,
@@ -87,40 +84,33 @@ export class AdminController {
         count,
       ),
       HttpStatus.OK,
-      'facility personnel retrieved successfully',
+      'personnels retrieved successfully',
     );
   }
 
-  @Get('/users/department')
-  @CustomApiResponse(['paginated', 'authorize'], {
-    type: GetAdminUserDto,
-    message: 'Department personnel retrieved successfully',
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetUserDto,
+    message: 'Personnel retrieved successfully',
   })
-  async getDepartmentPersonnel(
-    @Query() query: PaginationRequestDto,
-    @GetUser('facility') facilityId: string,
-  ) {
-    const { rows, count } =
-      await this.adminService.findDepartmentPersonnel(facilityId);
+  @Permission(Features.USERS, PermissionLevel.READ)
+  @Get('users/:id')
+  async getUser(@Param('id', ParseUUIDPipe) id: string) {
+    const response = await this.adminService.retrieveUser(id);
     return new ApiSuccessResponseDto(
-      new PaginatedDataResponseDto<User[]>(
-        rows,
-        query.page || 1,
-        query.pageSize,
-        count,
-      ),
+      response,
       HttpStatus.OK,
-      'department personnel retrieved successfully',
+      'Personnel retrieved successfully',
     );
   }
 
-  @Put('/users/:id/role')
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     type: GetAdminUserDto,
     message: 'User role updated successfully',
   })
+  @Permission(Features.USERS, PermissionLevel.READ_WRITE)
+  @Patch('/users/:id/role')
   async changeRole(
-    @Param('id') personnelId: string,
+    @Param('id', ParseUUIDPipe) personnelId: string,
     @Body() dto: ChangeRoleDto,
     @GetUser('sub') adminId: string,
   ) {
@@ -131,35 +121,53 @@ export class AdminController {
     );
   }
 
-  @Patch('/users/:id/approve')
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     type: GetAdminUserDto,
-    message: 'User approved successfully',
+    message: 'User deactivated successfully',
   })
-  async approveUser(
-    @Param('id') personnelId: string,
+  @Permission(Features.USERS, PermissionLevel.READ_WRITE)
+  @Patch('/users/:id/deactivate')
+  async deactivateUser(
+    @Param('id', ParseUUIDPipe) userId: string,
     @GetUser('sub') adminId: string,
   ) {
-    await this.adminService.acceptUser(personnelId, adminId);
+    await this.adminService.deactivateUser(userId, adminId);
     return new ApiSuccessResponseNoData(
       HttpStatus.OK,
-      'user approved successfully',
+      'user deactivated successfully',
     );
   }
 
-  @Patch('/users/:id/reject')
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     type: GetAdminUserDto,
-    message: 'User rejected successfully',
+    message: 'User re-activated successfully',
   })
-  async declineUser(
-    @Param('id') personnelId: string,
+  @Permission(Features.USERS, PermissionLevel.READ_WRITE)
+  @Patch('/users/:id/activate')
+  async activateUser(
+    @Param('id', ParseUUIDPipe) userId: string,
     @GetUser('sub') adminId: string,
   ) {
-    await this.adminService.rejectUser(personnelId, adminId);
+    await this.adminService.activateUser(userId, adminId);
     return new ApiSuccessResponseNoData(
       HttpStatus.OK,
-      'user rejected successfully',
+      'user re-activated successfully',
+    );
+  }
+
+  @CustomApiResponse(['success', 'authorize', 'notfound'], {
+    type: ChangeRoleDto,
+    isArray: true,
+    message: 'Starter roles retrieved successfully',
+  })
+  @Permission(Features.USERS, PermissionLevel.READ_WRITE)
+  @Get('/roles')
+  getStarterRoles() {
+    const response = this.adminService.retrieveStarterRoles();
+    return new ApiSuccessResponseDto(
+      response,
+      HttpStatus.OK,
+      'starter roles retrieved successfully',
     );
   }
 }

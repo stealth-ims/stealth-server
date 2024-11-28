@@ -59,6 +59,18 @@ export class Supplier extends BaseModel {
   @Column
   mailingAddress: string;
 
+  @AllowNull
+  @Column
+  emergencyContactName: string;
+
+  @AllowNull
+  @Column
+  emergencyContactTitle: string;
+
+  @AllowNull
+  @Column
+  emergencyContactNumber: string;
+
   @Column({ type: DataType.VIRTUAL })
   city: string;
 

@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  NotImplementedException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { StatusType, Supplier } from './models/supplier.model';
 import { CreateSupplierDto, UpdateSupplierDto } from './dto';
@@ -65,7 +60,22 @@ export class SuppliersService {
 
   async findOne(id: string): Promise<Supplier> {
     this.logger.log(`Finding supplier with ID: ${id}`);
-    const supplier = await this.supplierRepo.findByPk(id, {});
+    const supplier = await this.supplierRepo.findByPk(id, {
+      attributes: [
+        'id',
+        'name',
+        'primaryContactName',
+        'jobTitle',
+        'phoneNumber',
+        'supplierType',
+        'minimumOrderQuantity',
+        'leadTime',
+        'emergencyContactName',
+        'emergencyContactTitle',
+        'emergencyContactNumber',
+        'physicalAddress',
+      ],
+    });
 
     if (!supplier) {
       throw new NotFoundException(`supplier with id: ${id} not found`);
@@ -74,8 +84,16 @@ export class SuppliersService {
     return supplier;
   }
 
-  update(_id: string, _updateSupplierDto: UpdateSupplierDto) {
-    throw new NotImplementedException('Updating supplier not implemented');
+  async update(id: string, dto: UpdateSupplierDto) {
+    const updatedSupplier = await this.supplierRepo.update(
+      { ...dto },
+      { where: { id } },
+    );
+
+    if (updatedSupplier[0] == 0) {
+      throw new NotFoundException('Supplier Not found');
+    }
+    return;
   }
 
   async changeStatus(id: string, status: StatusType) {
@@ -90,8 +108,6 @@ export class SuppliersService {
     return;
   }
 
-  //TODO:: Implement delete and update for supplier feature.
-  //TODO:: `There should be a delete endpoint that accepts an array of ids to delete them
   async remove(id: string) {
     const supplier = await this.supplierRepo.destroy({
       where: { id },

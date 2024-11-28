@@ -70,6 +70,21 @@ module.exports = {
         allowNull: true,
         field: 'mailing_address',
       },
+      emergencyContactName: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: 'emergency_contact_name',
+      },
+      emergencyContactTitle: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: 'emergency_contact_title',
+      },
+      emergencyContactNumber: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        field: 'emergency_contact_number',
+      },
       paymentType: {
         type: Sequelize.STRING,
         allowNull: false,
