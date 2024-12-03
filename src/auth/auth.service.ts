@@ -115,10 +115,6 @@ export class AuthService {
     } else {
       token = await this.generateTokens(user, null);
     }
-    if (user.status != AccountState.ACTIVE) {
-      user.status = AccountState.ACTIVE;
-      await user.save();
-    }
 
     return new LoginTokenDto(user, token);
   }
@@ -332,7 +328,12 @@ export class AuthService {
       this.SALT_OR_ROUNDS,
     );
     user.password = newHashedPassword;
+
+    if (user.status != AccountState.ACTIVE) {
+      user.status = AccountState.ACTIVE;
+    }
     await user.save();
+
     this.sendchangePasswordEmail(user.email);
     return;
   }
