@@ -27,7 +27,7 @@ export class AdminSignUpDto extends IntersectionType(GenericResponseDto) {
   email: string;
 
   @ApiProperty({
-    example: 'Hospital',
+    example: 'hospital',
     enum: FacilityType,
     description:
       'The kind of facility whether it will be hospital or local pharmacy',
