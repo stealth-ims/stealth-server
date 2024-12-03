@@ -51,6 +51,7 @@ module.exports = {
     );
 
     let departmentId;
+    const createdBy = { id: adminId, name: 'Foster Asare' };
     if (!existingDepartment) {
       departmentId = uuidv4();
 
@@ -59,7 +60,7 @@ module.exports = {
           id: departmentId,
           name: 'Department A',
           facility_id: facilityId,
-          created_by: adminId,
+          created_by: JSON.stringify(createdBy),
           updated_by: null,
           ...baseModelColumns,
         },

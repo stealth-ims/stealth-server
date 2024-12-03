@@ -3,6 +3,7 @@ import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
   BelongsTo,
   Column,
+  DataType,
   ForeignKey,
   HasMany,
   Table,
@@ -49,16 +50,9 @@ export class Department extends BaseModel {
   @HasMany(() => DepartmentRequest)
   departmentRequests: DepartmentRequest[];
 
-  @Column({ field: 'created_by', allowNull: true })
-  createdBy: string;
+  @Column({ field: 'created_by', allowNull: true, type: DataType.JSON })
+  createdBy: User;
 
-  @Column({ field: 'updated_by', allowNull: true })
-  updatedBy: string;
-
-  // @ApiProperty({
-  //   example: [],
-  //   description: 'List of items available in the department',
-  // })
-  // @HasMany(() => Item)
-  // items: Item[];
+  @Column({ field: 'updated_by', allowNull: true, type: DataType.JSON })
+  updatedBy: User;
 }

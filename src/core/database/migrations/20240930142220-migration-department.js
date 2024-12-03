@@ -19,13 +19,13 @@ module.exports = {
       },
 
       createdBy: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
         allowNull: true,
         field: 'created_by',
       },
 
       updatedBy: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
         allowNull: true,
         field: 'updated_by',
       },
