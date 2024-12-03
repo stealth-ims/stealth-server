@@ -51,16 +51,19 @@ export class AuthGuard implements CanActivate {
       });
       request['user'] = payload;
       if (payload.session) {
-        try {
-          const _session = await this.loginSessionRepository.findByPk(
-            payload.session,
-          );
-        } catch {
-          throw new UnauthorizedException('NO_SESSION');
+        const session = await this.loginSessionRepository.findByPk(
+          payload.session,
+        );
+        if (!session) {
+          throw new UnauthorizedException('CLOSED_SESSION');
         }
       }
-    } catch {
-      throw new UnauthorizedException('TOKEN_EXPIRED');
+    } catch (error: any) {
+      if (error.message == 'CLOSED_SESSION') {
+        throw new UnauthorizedException(error.message);
+      } else {
+        throw new UnauthorizedException('TOKEN_EXPIRED');
+      }
     }
     return true;
   }
