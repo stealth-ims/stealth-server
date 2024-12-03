@@ -26,6 +26,7 @@ import { ChangeRoleDto, GetAdminUserDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Features, PermissionLevel } from '../shared/enums/permissions.enum';
 import { CreateUserDto, GetUserDto } from '../user/dto';
+import { IUserPayload } from '../auth/interface/payload.interface';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -69,12 +70,13 @@ export class AdminController {
   @Get('/users')
   async getFacilityPersonnel(
     @Query() query: PaginationRequestDto,
-    @GetUser('facility') facilityId: string,
-    @GetUser('department') departmentId: string,
+    @GetUser() user: IUserPayload,
   ) {
+    const { sub, facility, department } = user;
     const { rows, count } = await this.adminService.findFaciltyPersonnel(
-      facilityId,
-      departmentId,
+      facility,
+      department,
+      sub,
     );
     return new ApiSuccessResponseDto(
       new PaginatedDataResponseDto<User[]>(

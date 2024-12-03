@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
   BelongsTo,
@@ -50,9 +50,18 @@ export class Department extends BaseModel {
   @HasMany(() => DepartmentRequest)
   departmentRequests: DepartmentRequest[];
 
+  @ApiResponseProperty({
+    example: {
+      id: 'b7a3fb48-6b76-4998-9cd3-4de5b8a18837',
+      name: 'Some Admin',
+    },
+  })
   @Column({ field: 'created_by', allowNull: true, type: DataType.JSON })
   createdBy: User;
 
+  @ApiResponseProperty({
+    example: null,
+  })
   @Column({ field: 'updated_by', allowNull: true, type: DataType.JSON })
   updatedBy: User;
 }

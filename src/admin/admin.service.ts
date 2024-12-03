@@ -26,7 +26,14 @@ export class AdminService {
   }
 
   async createPersonnel(dto: CreateUserDto, facilityId: string) {
-    const user = await this.userRepository.create({ ...dto, facilityId });
+    dto.accountActivated = false;
+    dto.status = 'Pending';
+    const user = await this.userRepository.create({
+      ...dto,
+      status: dto.status,
+      accountActivated: dto.accountActivated,
+      facilityId,
+    });
     this.sendUserCreatedMail(user);
     return user;
   }
@@ -35,7 +42,11 @@ export class AdminService {
     return roles.roles;
   }
 
-  async findFaciltyPersonnel(facilityId: string, departmentId: string) {
+  async findFaciltyPersonnel(
+    facilityId: string,
+    departmentId: string,
+    userId: string,
+  ) {
     this.logger.log(`Retrieving facilities personnel`);
     const users = await this.userRepository.findAndCountAll({
       where: {
@@ -59,8 +70,9 @@ export class AdminService {
       include: [{ model: Department, attributes: ['id', 'name'] }],
       attributes: ['id', 'fullName', 'role', 'status'],
     });
-    console.log('Roles has been retrieved: ', JSON.stringify(roles));
-    return users;
+
+    const modifiedUsers = users.rows.filter((user) => user.id != userId);
+    return { rows: modifiedUsers, count: users.count };
   }
 
   async retrieveUser(userId: string) {

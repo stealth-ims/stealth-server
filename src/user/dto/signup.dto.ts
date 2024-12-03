@@ -1,39 +1,18 @@
 import {
   ApiProperty,
-  ApiPropertyOptional,
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  Matches,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
 import { GenericResponseDto } from '../../shared/docs/dto/base.dto';
 
-export class CreateUserDto extends IntersectionType(GenericResponseDto) {
-  @ApiProperty({
-    example: 'Healthcare Worker',
-    description: 'The role the user is being registered as',
-  })
-  @IsNotEmpty()
-  role: string;
-
+export class AdminSignUpDto extends IntersectionType(GenericResponseDto) {
   @ApiProperty({
     example: 'John Doe',
     description: 'The full name of the user',
   })
   @IsNotEmpty()
   fullName: string;
-
-  @ApiPropertyOptional({
-    example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
-    description: 'The department id the user is registering to',
-  })
-  @IsOptional()
-  departmentId: string;
 
   @ApiProperty({
     example: 'example@email.com',
@@ -58,16 +37,37 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   password: string;
 
   @ApiProperty({
+    example: 'L5NRjcTUQFt8zt2',
+    description: 'The password for the facility',
+  })
+  @IsNotEmpty()
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
+    {
+      message:
+        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
+    },
+  )
+  facillityPassword: string;
+
+  @ApiResponseProperty({
+    example: 'Central Admin',
+  })
+  role: string;
+
+  @ApiResponseProperty({
+    example: null,
+  })
+  departmentId: string;
+
+  @ApiResponseProperty({
     example: [
       'items:READ',
       'item_categories:READ_WRITE',
       'stock_adjustment:READ_WRITE_DELETE',
       'item_orders:READ_WRITE_DELETE',
     ],
-    description: 'The permissions assigned to a user',
   })
-  @IsNotEmpty()
-  @IsArray()
   permissions: string[];
 
   @ApiResponseProperty({

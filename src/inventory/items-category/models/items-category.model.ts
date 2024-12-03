@@ -40,23 +40,24 @@ export class ItemCategory extends BaseModel {
   })
   status: ItemCategoryStatus;
 
+  @HasMany(() => Item)
+  items: Item[];
+
   @ApiProperty({
     example: 100,
     description: 'Number of items under category',
   })
-  get itemCount(): number {
-    return this.items?.length || 0;
-  }
-
-  @HasMany(() => Item)
-  items: Item[];
+  @Column({ type: DataType.VIRTUAL })
+  itemCount: number;
 
   @AfterFind
   static async calculateItemCount(instance: ItemCategory[] | ItemCategory) {
-    if (instance instanceof Array) {
-      for (const inst of instance) {
-        delete inst.dataValues.items;
+    if (Array.isArray(instance)) {
+      for (const category of instance) {
+        category.itemCount = category.items ? category.items.length : 0;
       }
+    } else {
+      instance.itemCount = instance.items ? instance.items.length : 0;
     }
   }
 }
