@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AccountState, User } from '../auth/models/user.model';
 import { literal } from 'sequelize';
@@ -116,9 +111,7 @@ export class AdminService {
     if (!personnel) {
       throw new NotFoundException('personnel not found');
     }
-    if (personnel.role == dto.role) {
-      throw new BadRequestException('role already exists');
-    }
+
     personnel.role = dto.role;
     personnel.permissions = dto.permissions;
     personnel.updatedBy = adminId;
