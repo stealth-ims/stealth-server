@@ -114,6 +114,25 @@ export class ReportsService {
     return { reportName, csv };
   }
 
+  getReportCategories() {
+    const inventoryReports = [
+      { id: 'STOCK_LEVEL_REPORT', label: 'Stock Level Report' },
+      { id: 'STOCK_MOVEMENT_REPORT', label: 'Stock Movement Report' },
+      { id: 'LOW_STOCK_REORDER_REPORT', label: 'Low Stock and Reorder Report' },
+      { id: 'EXPIRY_REPORT', label: 'Expiry Report' },
+      { id: 'DAMAGE_LOSS_REPORT', label: 'Damage/Loss Report' },
+      { id: 'INVENTORY_VALUATION_REPORT', label: 'Inventory Valuation Report' },
+    ];
+
+    const salesReport = [
+      { id: 'PERIODIC_SALES_REPORT', label: 'Sales and Financial Reports' },
+    ];
+
+    const categories = { inventoryReports, salesReport };
+
+    return categories;
+  }
+
   async create(dto: CreateReportDto) {
     const report = await this.reportRepository.create({
       ...dto,

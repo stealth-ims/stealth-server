@@ -15,6 +15,19 @@ import {
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 
+type ReportCategory = {
+  id: string;
+  label: string;
+};
+
+export class GetReportCategoriesDto {
+  @ApiResponseProperty()
+  inventoryReports: ReportCategory[];
+
+  @ApiResponseProperty()
+  salesReports: ReportCategory[];
+}
+
 export class GetReportDto extends GenericResponseDto {
   @ApiResponseProperty()
   id: string;

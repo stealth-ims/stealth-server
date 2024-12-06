@@ -19,7 +19,11 @@ import {
   CustomApiResponse,
   CustomResponses,
 } from 'src/shared/docs/decorators/default.response.decorators';
-import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
+import {
+  GetReportCategoriesDto,
+  GetReportDto,
+  GetReportPaginationDto,
+} from './dto/get.dto';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
@@ -53,6 +57,26 @@ export class ReportsController {
         response,
         HttpStatus.OK,
         'Report created successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['authorize', 'success'], {
+    type: GetReportCategoriesDto,
+    message: 'Report categories fetched successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('/categories')
+  async getReportCategories() {
+    try {
+      const response = this.reportsService.getReportCategories();
+
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Report categories fetched successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
