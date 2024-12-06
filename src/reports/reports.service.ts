@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Report } from './models/reports.models';
 import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -134,6 +138,19 @@ export class ReportsService {
   }
 
   async create(dto: CreateReportDto) {
+    const { inventoryReports, salesReport } = this.getReportCategories();
+
+    const allowedCategories = [
+      ...inventoryReports.map((r) => r.id),
+      ...salesReport.map((r) => r.id),
+    ];
+
+    if (!allowedCategories.includes(dto.reportName)) {
+      throw new BadRequestException(
+        `Invalid report category ${dto.reportName}`,
+      );
+    }
+
     const report = await this.reportRepository.create({
       ...dto,
     });

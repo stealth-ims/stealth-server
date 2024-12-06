@@ -33,8 +33,7 @@ export class GetReportDto extends GenericResponseDto {
   id: string;
 
   @ApiProperty({
-    example: 'Monthly Report',
-    description: 'The name of the report',
+    description: 'The category of the report',
   })
   @IsNotEmpty()
   reportName: string;
