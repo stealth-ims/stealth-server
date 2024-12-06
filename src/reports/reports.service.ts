@@ -1,12 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Report } from './models/reports.models';
 import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
+import {
+  GetReportDto,
+  GetReportPaginationDto,
+  InventoryReportCategories,
+  SalesReportCategories,
+} from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { UpdateReportDto } from './dto/edit.dto';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
@@ -119,18 +120,14 @@ export class ReportsService {
   }
 
   getReportCategories() {
-    const inventoryReports = [
-      { id: 'STOCK_LEVEL_REPORT', label: 'Stock Level Report' },
-      { id: 'STOCK_MOVEMENT_REPORT', label: 'Stock Movement Report' },
-      { id: 'LOW_STOCK_REORDER_REPORT', label: 'Low Stock and Reorder Report' },
-      { id: 'EXPIRY_REPORT', label: 'Expiry Report' },
-      { id: 'DAMAGE_LOSS_REPORT', label: 'Damage/Loss Report' },
-      { id: 'INVENTORY_VALUATION_REPORT', label: 'Inventory Valuation Report' },
-    ];
+    const inventoryReports = Object.keys(InventoryReportCategories).map(
+      (key) => ({ id: key, label: InventoryReportCategories[key] as string }),
+    );
 
-    const salesReport = [
-      { id: 'PERIODIC_SALES_REPORT', label: 'Sales and Financial Reports' },
-    ];
+    const salesReport = Object.keys(SalesReportCategories).map((key) => ({
+      id: key,
+      label: SalesReportCategories[key] as string,
+    }));
 
     const categories = { inventoryReports, salesReport };
 
@@ -138,19 +135,6 @@ export class ReportsService {
   }
 
   async create(dto: CreateReportDto) {
-    const { inventoryReports, salesReport } = this.getReportCategories();
-
-    const allowedCategories = [
-      ...inventoryReports.map((r) => r.id),
-      ...salesReport.map((r) => r.id),
-    ];
-
-    if (!allowedCategories.includes(dto.reportName)) {
-      throw new BadRequestException(
-        `Invalid report category ${dto.reportName}`,
-      );
-    }
-
     const report = await this.reportRepository.create({
       ...dto,
     });

@@ -15,16 +15,38 @@ import {
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 
-type ReportCategory = {
-  id: string;
+export enum InventoryReportCategories {
+  STOCK_LEVEL_REPORT = 'Stock Level Report',
+  STOCK_MOVEMENT_REPORT = 'Stock Movement Report',
+  LOW_STOCK_REORDER_REPORT = 'Low Stock and Reorder Report',
+  EXPIRY_REPORT = 'Expiry Report',
+  DAMAGE_LOSS_REPORT = 'Damage/Loss Report',
+  INVENTORY_VALUATION_REPORT = 'Inventory Valuation Report',
+}
+
+export enum SalesReportCategories {
+  PERIODIC_SALES_REPORT = 'Sales and Financial Reports',
+}
+
+class ReportCategory {
+  @ApiResponseProperty({
+    enum: Object.keys(InventoryReportCategories),
+  })
+  id:
+    | keyof typeof InventoryReportCategories
+    | keyof typeof SalesReportCategories;
+
+  @ApiResponseProperty({
+    enum: Object.values(InventoryReportCategories),
+  })
   label: string;
-};
+}
 
 export class GetReportCategoriesDto {
-  @ApiResponseProperty()
+  @ApiResponseProperty({ type: ReportCategory })
   inventoryReports: ReportCategory[];
 
-  @ApiResponseProperty()
+  @ApiResponseProperty({ type: ReportCategory })
   salesReports: ReportCategory[];
 }
 
@@ -33,6 +55,10 @@ export class GetReportDto extends GenericResponseDto {
   id: string;
 
   @ApiProperty({
+    enum: [
+      ...Object.keys(InventoryReportCategories),
+      ...Object.keys(SalesReportCategories),
+    ],
     description: 'The category of the report',
   })
   @IsNotEmpty()
