@@ -72,13 +72,15 @@ export class SuppliersService {
     this.logger.log(`Finding supplier with ID: ${id}`);
     const supplier = await this.supplierRepo.findByPk(id, {
       attributes: { exclude: ['status'] },
+      include: { model: Batch, attributes: ['quantity'] },
     });
 
     if (!supplier) {
       throw new NotFoundException(`supplier with id: ${id} not found`);
     }
-    // const modifiedSupplier: Supplier = supplier.get({ plain: true });
+    const modifiedSupplier: Supplier = supplier.get({ plain: true });
     // delete modifiedSupplier.totalItems;
+    delete modifiedSupplier.batches;
     // if (modifiedSupplier.paymentType == 'Bank') {
     //   delete modifiedSupplier.provider;
     //   delete modifiedSupplier.mobileMoneyPhoneNumber;
@@ -88,7 +90,7 @@ export class SuppliersService {
     //   delete modifiedSupplier.accountNumber;
     // }
     this.logger.log(`Found suppliier with ID: ${id}`);
-    return supplier;
+    return modifiedSupplier;
   }
 
   async update(id: string, dto: UpdateSupplierDto) {
