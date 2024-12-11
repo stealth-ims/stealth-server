@@ -21,6 +21,7 @@ export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   categories: string[];
 
   @IsUUID()
+  @IsOptional()
   @ApiPropertyOptional()
   facilityId: string;
 

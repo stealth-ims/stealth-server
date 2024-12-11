@@ -149,6 +149,7 @@ export class CreateItemDto {
     description: "Add facility ID if it's a facility item",
   })
   @IsUUID()
+  @IsOptional()
   facilityId: string;
 
   @ApiProperty({

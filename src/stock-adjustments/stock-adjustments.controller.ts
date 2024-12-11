@@ -19,7 +19,7 @@ import {
 } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
-import { Roles } from 'src/auth/decorator';
+import { GetUser, Roles } from 'src/auth/decorator';
 import { Role } from 'src/auth/interface/roles.enum';
 import {
   ApiSuccessResponseDto,
@@ -28,6 +28,7 @@ import {
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
 import { StockAdjustmentStatus } from './model';
+import { IUserPayload } from 'src/auth/interface/payload.interface';
 
 @ApiTags('Stock Adjustments')
 @Controller('stock-adjustments')
@@ -52,11 +53,14 @@ export class StockAdjustmentsController {
     Role.RegionalSCM,
   )
   @Post()
-  async create(@Body() createStockAdjustmentDto: CreateStockAdjustmentDto) {
+  async create(
+    @Body() dto: CreateStockAdjustmentDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const createdAdjustment = await this.stockAdjustmentsService.create(
-        createStockAdjustmentDto,
-      );
+      !dto.facilityId && (dto.facilityId = user.facility);
+      !dto.departmentId && (dto.departmentId = user.department);
+      const createdAdjustment = await this.stockAdjustmentsService.create(dto);
       return new ApiSuccessResponseDto(
         createdAdjustment,
         HttpStatus.CREATED,
@@ -72,14 +76,19 @@ export class StockAdjustmentsController {
     message: 'Stock adjustments retrieved successfully',
   })
   @Get()
-  async findAll(@Query() query?: StockAdjustmentPaginationDto) {
+  async findAll(
+    @Query() dto: StockAdjustmentPaginationDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const adjustments = await this.stockAdjustmentsService.findAll(query);
+      !dto.facilityId && (dto.facilityId = user.facility);
+      !dto.departmentId && (dto.departmentId = user.department);
+      const adjustments = await this.stockAdjustmentsService.findAll(dto);
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto(
           adjustments[0],
-          query.page || 1,
-          query.pageSize,
+          dto.page || 1,
+          dto.pageSize,
           adjustments[1],
         ),
         HttpStatus.OK,

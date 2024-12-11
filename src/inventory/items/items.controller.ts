@@ -23,7 +23,7 @@ import {
   OneItem,
   UpdateItemDto,
 } from './dto';
-import { Permission } from 'src/auth/decorator';
+import { GetUser, Permission } from 'src/auth/decorator';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
@@ -31,6 +31,7 @@ import {
 } from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
 import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
+import { IUserPayload } from 'src/auth/interface/payload.interface';
 
 @ApiTags('Items')
 @Controller('items')
@@ -46,9 +47,11 @@ export class ItemController {
   })
   @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() createItemDto: CreateItemDto) {
+  async create(@Body() dto: CreateItemDto, @GetUser() user: IUserPayload) {
     try {
-      const createdItem = await this.itemsService.create(createItemDto);
+      !dto.facilityId && (dto.facilityId = user.facility);
+      !dto.departmentId && (dto.departmentId = user.department);
+      const createdItem = await this.itemsService.create(dto);
       return new ApiSuccessResponseDto(
         createdItem,
         HttpStatus.CREATED,
@@ -66,8 +69,13 @@ export class ItemController {
   })
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get()
-  async findAll(@Query() query: ItemPaginationDto) {
+  async findAll(
+    @Query() query: ItemPaginationDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
+      !query.facilityId && (query.facilityId = user.facility);
+      !query.departmentId && (query.departmentId = user.department);
       const items = await this.itemsService.findAll(query);
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto(
