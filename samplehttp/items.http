@@ -8,3 +8,7 @@ Authorization: Bearer {{accessToken}}
 ###
 GET {{baseUrl}}/items?pageSize=3&search=2
 Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/items/counts
+Authorization: Bearer {{accessToken}}

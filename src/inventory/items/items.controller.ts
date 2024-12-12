@@ -97,6 +97,20 @@ export class ItemController {
     return await this.itemsService.getAnalytics();
   }
 
+  @CustomApiResponse(['success', 'authorize'], {
+    type: ItemAnalytics,
+    message: 'Item counts retrieved successfully',
+  })
+  @Permission(Features.ITEMS, PermissionLevel.READ)
+  @Get('/counts')
+  async itemCounts() {
+    try {
+      const res = await this.itemsService.getItemCount();
+      return res;
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: OneItem,
     message: 'Item retrieved successfully',
