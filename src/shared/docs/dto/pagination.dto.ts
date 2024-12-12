@@ -18,7 +18,7 @@ export class PaginationRequestDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  pageSize: number;
+  pageSize: number = 10;
 
   @ApiPropertyOptional()
   @IsOptional()

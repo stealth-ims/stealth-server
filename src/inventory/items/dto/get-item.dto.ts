@@ -1,12 +1,12 @@
 import {
-  ApiProperty,
-  ApiPropertyOptional,
   IntersectionType,
+  ApiPropertyOptional,
+  ApiProperty,
 } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
-import { Batch, Item, ItemStatus } from '../models';
+import { Item, Batch, ItemStatus } from '../models';
 
 export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
@@ -78,19 +78,29 @@ export class OneItem extends IntersectionType(Item, GenericResponseDto) {
 
 export class ManyItem {
   @ApiProperty()
+  itemId: string;
+  @ApiProperty()
   name: string;
   @ApiProperty()
   brandName: string;
+  @ApiProperty({ description: 'Expiry date' })
+  validity: Date;
   @ApiProperty()
   batchNumber: string;
-  @ApiProperty()
-  stock: number;
+  @ApiProperty({ description: 'The quantity of the item in the batch' })
+  quantity: number;
   @ApiProperty()
   supplierName: string;
+  @ApiProperty()
+  supplierId: string;
   @ApiProperty()
   status: ItemStatus;
   @ApiProperty()
   reorderPoint: number;
   @ApiProperty()
   category: string;
+  @ApiProperty()
+  categoryId: string;
+  @ApiProperty()
+  createdAt: Date;
 }

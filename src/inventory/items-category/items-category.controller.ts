@@ -80,6 +80,26 @@ export class ItemCategoryController {
     }
   }
 
+  @CustomApiResponse(['success', 'authorize'], {
+    type: ItemCategoryResponse,
+    isArray: true,
+    message: 'Item categories retrieved successfully',
+  })
+  @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ)
+  @Get('no-paginate')
+  async findAllNoPaginate() {
+    try {
+      const categories = await this.itemCategoryService.findAll();
+      return new ApiSuccessResponseDto(
+        categories[0],
+        HttpStatus.OK,
+        'Item categories retrieved successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
   @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: ItemCategoryResponse,
     message: 'Item category retrieved successfully',

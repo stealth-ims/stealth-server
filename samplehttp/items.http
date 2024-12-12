@@ -6,5 +6,5 @@ GET {{baseUrl}}/items?facilityId={{facilityId}}
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/items
+GET {{baseUrl}}/items?pageSize=3&search=2
 Authorization: Bearer {{accessToken}}

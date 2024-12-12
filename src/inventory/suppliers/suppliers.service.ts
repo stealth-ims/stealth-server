@@ -21,24 +21,33 @@ export class SuppliersService {
     return supplier;
   }
 
-  async findAll(query: PaginationRequestDto): Promise<[Supplier[], number]> {
+  async findAll(query?: PaginationRequestDto): Promise<[Supplier[], number]> {
     // todo: refactor filter
+    const paginateObject = query
+      ? {
+          where:
+            (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) ||
+            {},
+          limit: query.pageSize || 10,
+          offset: query.pageSize * (query.page - 1) || 0,
+        }
+      : {};
+
     const filter: FindAndCountOptions<Supplier> = {
-      where:
-        (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: (query.orderBy && [[query.orderBy, 'ASC']]) || [
-        [
-          literal(`
+      ...paginateObject,
+      order: query
+        ? query.orderBy && [[query.orderBy, 'ASC']]
+        : [
+            [
+              literal(`
         CASE 
           WHEN status = 'Deactivated' THEN 1
           WHEN status = 'Active' THEN 2
         END
       `),
-          'ASC',
-        ],
-      ],
+              'ASC',
+            ],
+          ],
       attributes: [
         'id',
         'name',

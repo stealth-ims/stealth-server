@@ -92,9 +92,9 @@ export class SuppliersController {
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ)
   @Get('no-paginate')
-  async findAllNoPaginate(@Query() query: PaginationRequestDto) {
+  async findAllNoPaginate() {
     try {
-      const suppliers = await this.suppliersService.findAll(query);
+      const suppliers = await this.suppliersService.findAll();
       return new ApiSuccessResponseDto(
         suppliers[0],
         HttpStatus.OK,

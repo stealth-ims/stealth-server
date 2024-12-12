@@ -9,6 +9,7 @@ import { Batch } from './models';
 import { CreateBatchDto } from './dto';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
+import { FindAndCountOptions } from 'sequelize';
 
 @Injectable()
 export class BatchService {
@@ -39,6 +40,10 @@ export class BatchService {
 
   async findAll(): Promise<Batch[]> {
     return this.batchRepo.findAll({ include: [Supplier] });
+  }
+
+  async findBySpecs(options?: FindAndCountOptions<Batch>) {
+    return this.batchRepo.findAndCountAll(options);
   }
 
   async findOne(id: string): Promise<Batch> {

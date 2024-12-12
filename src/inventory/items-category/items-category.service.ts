@@ -50,14 +50,22 @@ export class ItemCategoryService {
    * @throws {InternalServerErrorException} if an error occurs while retrieving the categories.
    */
   async findAll(
-    query: PaginationRequestDto,
+    query?: PaginationRequestDto,
   ): Promise<[ItemCategory[], number]> {
+    const paginateObject = query
+      ? {
+          where:
+            (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) ||
+            {},
+          limit: query.pageSize || 10,
+          offset: query.pageSize * (query.page - 1) || 0,
+        }
+      : {};
     const filter: FindAndCountOptions<ItemCategory> = {
-      where:
-        (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {},
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy && [[query.orderBy, 'ASC']],
+      ...paginateObject,
+      order: query
+        ? query.orderBy && [[query.orderBy, 'ASC']]
+        : [['updatedAt', 'DESC']],
       include: [Item],
       distinct: true,
     };
