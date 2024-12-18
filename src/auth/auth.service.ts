@@ -455,7 +455,7 @@ export class AuthService {
         {
           email: user.email,
           facility: user.facilityId,
-          name: user.fullName,
+          stamp: user.fullName + ',' + user.id,
           department: user.departmentId,
           role: user.role,
           permissions: user.permissions,

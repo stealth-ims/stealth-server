@@ -1,0 +1,35 @@
+GET {{baseUrl}}/items/analytics?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}} 
+
+GET {{baseUrl}}/dashboard/stat?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}} 
+
+###
+GET {{baseUrl}}/dashboard/soon-to-expire?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/usage?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/top-selling-items?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/low-selling-items?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/top-categories?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/sales-trend?facilityId={{facilityId}}&startDate=2024-11-11&endDate=2024-12-11
+Authorization: Bearer {{accessToken}}
+
+###
+GET {{baseUrl}}/dashboard/daily-sales?facilityId={{facilityId}}&startDate=2024-11-15&endDate=2024-11-16
+Authorization: Bearer {{accessToken}}
+
+

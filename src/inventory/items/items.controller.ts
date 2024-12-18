@@ -1,19 +1,26 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  ParseUUIDPipe,
-  Query,
+  Get,
   HttpStatus,
   Logger,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { ItemService } from './items.service';
 import { ApiTags } from '@nestjs/swagger';
+import { GetUser, Permission } from 'src/auth/decorator';
+import { IUserPayload } from 'src/auth/interface/payload.interface';
 import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
+import { throwError } from 'src/utils/responses/error.response';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+} from 'src/utils/responses/success.response';
+import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
 import {
   AdjustPriceDto,
   CreateItemDto,
@@ -23,15 +30,7 @@ import {
   OneItem,
   UpdateItemDto,
 } from './dto';
-import { GetUser, Permission } from 'src/auth/decorator';
-import {
-  ApiSuccessResponseDto,
-  ApiSuccessResponseNoData,
-  PaginatedDataResponseDto,
-} from 'src/utils/responses/success.response';
-import { throwError } from 'src/utils/responses/error.response';
-import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
-import { IUserPayload } from 'src/auth/interface/payload.interface';
+import { ItemService } from './items.service';
 
 @ApiTags('Items')
 @Controller('items')
@@ -51,7 +50,7 @@ export class ItemController {
     try {
       !dto.facilityId && (dto.facilityId = user.facility);
       !dto.departmentId && (dto.departmentId = user.department);
-      dto.createdBy = user.name;
+      dto.createdBy = user.stamp;
       const createdItem = await this.itemsService.create(dto);
       return new ApiSuccessResponseDto(
         createdItem,
@@ -79,12 +78,7 @@ export class ItemController {
       !query.departmentId && (query.departmentId = user.department);
       const items = await this.itemsService.findAll(query);
       return new ApiSuccessResponseDto(
-        new PaginatedDataResponseDto(
-          items[0],
-          query.page || 1,
-          query.pageSize,
-          items[1],
-        ),
+        items,
         HttpStatus.OK,
         'Items retrieved successfully',
       );

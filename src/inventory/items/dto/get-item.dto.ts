@@ -1,15 +1,12 @@
 import {
-  ApiProperty,
-  ApiPropertyOptional,
   IntersectionType,
-  PickType,
+  ApiPropertyOptional,
+  ApiProperty,
 } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
-import { Batch, Item } from '../models';
-import { Supplier } from '../../suppliers/models/supplier.model';
-import { ItemCategory } from '../../items-category/models/items-category.model';
+import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
+import { Item, Batch, ItemStatus } from '../models';
 
 export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsUUID()
@@ -79,30 +76,31 @@ export class OneItem extends IntersectionType(Item, GenericResponseDto) {
   batches: Batch[];
 }
 
-export class ManyItem extends IntersectionType(
-  PickType(Item, ['name', 'status', 'reorderPoint']),
-  GenericResponseDto,
-) {
-  @ApiProperty({
-    description: 'The category of the item',
-    example: {
-      id: '52159509-1aee-4d47-8475-47906250423a',
-      name: 'Analgesics',
-    },
-  })
-  category: ItemCategory;
-
-  @ApiProperty({
-    description: 'The suppliers involved with the item',
-    example: [
-      {
-        id: '235eab15-b5b5-4a89-b8ff-ca1d923d58f0',
-        name: 'Supplier A',
-      },
-    ],
-  })
-  suppliers: Supplier[];
-
-  @ApiProperty({ description: 'Total stock of items', example: 2748 })
-  totalStock: number;
+export class ManyItem {
+  @ApiProperty()
+  itemId: string;
+  @ApiProperty()
+  name: string;
+  @ApiProperty()
+  brandName: string;
+  @ApiProperty({ description: 'Expiry date' })
+  validity: Date;
+  @ApiProperty()
+  batchNumber: string;
+  @ApiProperty({ description: 'The quantity of the item in the batch' })
+  quantity: number;
+  @ApiProperty()
+  supplierName: string;
+  @ApiProperty()
+  supplierId: string;
+  @ApiProperty()
+  status: ItemStatus;
+  @ApiProperty()
+  reorderPoint: number;
+  @ApiProperty()
+  category: string;
+  @ApiProperty()
+  categoryId: string;
+  @ApiProperty()
+  createdAt: Date;
 }

@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:5500/api/v1
+
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "example@email.com",
+  "password": "XT(v2EiTqQZ",
+  "loginSessionMeta": {
+    "browser": "Chrome - Mac OS X",
+    "locationBody": {
+      "latitude": "5.614818",
+      "longitude": "-0.205874"
+    }
+  }
+}
+
+# @lang
+> {%
+const data = response.body.data;
+client.global.set("baseUrl", "http://localhost:5500/api/v1");
+client.global.set("accessToken", data.tokens.accessToken);
+client.global.set("refreshToken", data.tokens.refreshToken);
+client.global.set("userId", data.id);
+client.global.set("facilityId", data.facilityId);
+%}
+
+###
+# @name user
+GET {{baseUrl}}/auth/user
+Authorization: Bearer {{accessToken}}
+
+### 
+GET {{baseUrl}}/inventory/stat?facilityId={{facilityId}}
+Authorization: Bearer {{accessToken}} 
