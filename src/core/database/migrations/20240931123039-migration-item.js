@@ -117,6 +117,8 @@ module.exports = {
           key: 'id',
         },
         field: 'item_id',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       validity: {
         type: Sequelize.DATE,

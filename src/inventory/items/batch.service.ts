@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Batch } from './models';
-import { CreateBatchDto } from './dto';
+import { CreateBatchDto, UpdateBatchDto } from './dto';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../suppliers/suppliers.service';
 import { FindAndCountOptions } from 'sequelize';
@@ -36,6 +36,18 @@ export class BatchService {
     const batch = await this.batchRepo.create({ ...createBatchDto });
     this.logger.log(`Batch created successfully. ID: ${batch.id}`);
     return batch;
+  }
+
+  async update(id: string, dto: UpdateBatchDto) {
+    const result = await this.batchRepo.update(
+      { ...dto },
+      { where: { id: id } },
+    );
+    if (result[0] == 0) {
+      throw new NotFoundException(`batch with id ${id} not found`);
+    }
+    this.logger.log(`Updated item with ID: ${id}`);
+    return;
   }
 
   async findAll(): Promise<Batch[]> {

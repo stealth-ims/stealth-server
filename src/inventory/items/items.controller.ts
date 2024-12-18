@@ -23,20 +23,27 @@ import {
 import { Features, PermissionLevel } from '../../shared/enums/permissions.enum';
 import {
   AdjustPriceDto,
+  CreateBatchDto,
   CreateItemDto,
   ItemAnalytics,
   ItemPaginationDto,
   ManyItem,
   OneItem,
+  UpdateBatchDto,
   UpdateItemDto,
 } from './dto';
 import { ItemService } from './items.service';
+import { Batch } from './models';
+import { BatchService } from './batch.service';
 
 @ApiTags('Items')
 @Controller('items')
 export class ItemController {
   private readonly logger: Logger;
-  constructor(private readonly itemsService: ItemService) {
+  constructor(
+    private readonly itemsService: ItemService,
+    private batchService: BatchService,
+  ) {
     this.logger = new Logger(ItemController.name);
   }
 
@@ -55,7 +62,47 @@ export class ItemController {
       return new ApiSuccessResponseDto(
         createdItem,
         HttpStatus.CREATED,
-        'Item category created successfully',
+        'Item created successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['created', 'authorize'], {
+    type: Batch,
+    message: 'Batch created successfully',
+  })
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
+  @Post('add-batch')
+  async addBatch(@Body() dto: CreateBatchDto, @GetUser() user: IUserPayload) {
+    try {
+      dto.createdBy = user.stamp;
+      const createdItem = await this.batchService.create(dto);
+      return new ApiSuccessResponseDto(
+        createdItem,
+        HttpStatus.CREATED,
+        'Batch created successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize'], {
+    message: 'batch updated successfully',
+  })
+  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
+  @Patch('edit-batch/:id')
+  async updateBatch(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateItemDto: UpdateBatchDto,
+  ) {
+    try {
+      await this.batchService.update(id, updateItemDto);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Batch updated successfully',
       );
     } catch (error) {
       throw throwError(this.logger, error);

@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -9,6 +8,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { FindOptions, Op, Sequelize, WhereOptions } from 'sequelize';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { User } from '../../auth/models/user.model';
+import { ItemCategory } from '../items-category/models/items-category.model';
+import { Supplier } from '../suppliers/models/supplier.model';
 import { BatchService } from './batch.service';
 import {
   CreateItemDto,
@@ -17,8 +18,6 @@ import {
   UpdateItemDto,
 } from './dto';
 import { Batch, Item, ItemStatus } from './models';
-import { ItemCategory } from '../items-category/models/items-category.model';
-import { Supplier } from '../suppliers/models/supplier.model';
 
 @Injectable()
 export class ItemService {
@@ -39,31 +38,14 @@ export class ItemService {
    * @throws If any error occurs during the creation process.
    */
   async create(createItemDto: CreateItemDto): Promise<OneItem> {
-    try {
-      const createdItem = await this.itemRepo.create({
-        ...createItemDto,
-        status: ItemStatus.STOCKED,
-      });
+    const createdItem = await this.itemRepo.create({
+      ...createItemDto,
+      status: ItemStatus.OUT_OF_STOCK,
+    });
 
-      const batch = await this.batchService.create({
-        ...createItemDto,
-        itemId: createdItem.id,
-      });
-      const oneItem = createdItem.toJSON() as OneItem;
-      oneItem.batches = [batch];
-      this.logger.log(`Item added successfully. id: ${createdItem.id}`);
-      return oneItem;
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        const id = JSON.parse(error.message).id;
-        this.logger.log(`Item already existed. ID: ${id}`);
-        await this.batchService.create({
-          ...createItemDto,
-          itemId: id,
-        });
-        return await this.findOne(id);
-      }
-    }
+    const oneItem = createdItem.toJSON() as OneItem;
+    this.logger.log(`Item added successfully. id: ${createdItem.id}`);
+    return oneItem;
   }
 
   /**

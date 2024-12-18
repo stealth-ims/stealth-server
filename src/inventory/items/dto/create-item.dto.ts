@@ -54,13 +54,6 @@ export class CreateItemDto {
   code: string;
 
   @ApiProperty({
-    example: '2022-12-31',
-    description: 'The validity of the item',
-  })
-  @Matches(/\d{4}-\d{2}-\d{2}/, { message: 'Invalid date format: YYYY-MM-DD' })
-  validity: Date;
-
-  @ApiProperty({
     example: 'FDA123',
     description: 'The FDA approval of the item',
   })
@@ -73,21 +66,6 @@ export class CreateItemDto {
   })
   @IsString()
   ISO: string;
-
-  @ApiProperty({
-    example: 'BATCH123',
-    description: 'The batch number of the item',
-  })
-  @IsString()
-  batchNumber: string;
-
-  @ApiProperty({
-    example: 100,
-    description: 'The stock quantity of the item',
-  })
-  @IsNumber()
-  quantity: number;
-
   @ApiProperty({
     example: 10,
     description: 'The reorder point of the item',
@@ -134,14 +112,6 @@ export class CreateItemDto {
   })
   @IsUUID()
   categoryId: string;
-
-  @ApiProperty({
-    example: '44220956-0962-4dd0-9e65-1564c585563c',
-    description: 'The supplier ID of the item',
-  })
-  @IsUUID()
-  supplierId: string;
-
   @ApiResponseProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
@@ -155,13 +125,35 @@ export class CreateItemDto {
   departmentId: string;
 }
 
-export class CreateBatchDto extends PickType(CreateItemDto, [
-  'batchNumber',
-  'validity',
-  'quantity',
-  'supplierId',
-  'createdBy',
-]) {
+export class CreateBatchDto extends PickType(CreateItemDto, ['createdBy']) {
+  @ApiProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+    description: 'The supplier ID of the item',
+  })
+  @IsUUID()
+  supplierId: string;
+
+  @ApiProperty({
+    example: 'BATCH123',
+    description: 'The batch number of the item',
+  })
+  @IsString()
+  batchNumber: string;
+
+  @ApiProperty({
+    example: 100,
+    description: 'The stock quantity of the item',
+  })
+  @IsNumber()
+  quantity: number;
+
+  @ApiProperty({
+    example: '2022-12-31',
+    description: 'The validity of the item',
+  })
+  @Matches(/\d{4}-\d{2}-\d{2}/, { message: 'Invalid date format: YYYY-MM-DD' })
+  validity: Date;
+
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
     description: 'The item ID',
