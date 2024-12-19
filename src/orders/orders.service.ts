@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateItemOrderDto, GetOrdersDto, UpdateItemOrderDto } from './dto';
+import {
+  ChangeOrderStatusDto,
+  CreateItemOrderDto,
+  GetOrdersDto,
+  UpdateItemOrderDto,
+} from './dto';
 import { ItemOrder } from './models/itemOrder.model';
 import { FindAndCountOptions, literal } from 'sequelize'; // Sequelize operators for filtering
 import { generateOrderNumber } from 'src/orders/utils/orders.utils';
@@ -119,12 +124,24 @@ export class ItemOrdersService {
     return;
   }
 
+  async changeState(dto: ChangeOrderStatusDto, id: string) {
+    const itemOrder = await this.itemOrderModel.update(
+      { ...dto },
+      { where: { id } },
+    );
+    const affected = itemOrder[0];
+    if (affected == 0) {
+      throw new NotFoundException(`Item Order not found`);
+    }
+    return;
+  }
+
   // Delete a specific item order by ID
   async deleteItemOrder(id: string) {
     const rows = await this.itemOrderModel.destroy({ where: { id } });
     if (rows == 0) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Item Order not found');
     }
-    return { message: 'item order deleted successfully' };
+    return;
   }
 }

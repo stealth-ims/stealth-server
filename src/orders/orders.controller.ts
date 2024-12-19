@@ -9,6 +9,8 @@ import {
   Logger,
   Query,
   HttpStatus,
+  ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
 import {
   ApiSuccessResponseDto,
@@ -22,6 +24,7 @@ import {
   GetOrdersDto,
   GetItemOrdersResponseDto,
   GetItemOrderResponseDto,
+  ChangeOrderStatusDto,
 } from './dto';
 import { ItemOrdersService } from './orders.service';
 import { ItemOrder } from './models/itemOrder.model';
@@ -125,6 +128,28 @@ export class ItemOrdersController {
     }
   }
 
+  @ApiOperation({ summary: "Change an item order's state by ID" })
+  @CustomApiResponse(['successNull', 'notfound', 'authorize'], {
+    type: ItemOrder,
+    message: 'Item order state changed successfully',
+  })
+  @Permission(Features.DRUG_ORDERS, PermissionLevel.READ_WRITE)
+  @Put('/state/:id')
+  async changeItemOrderState(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ChangeOrderStatusDto,
+  ) {
+    try {
+      const _result = await this.orderService.changeState(dto, id);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Item order state changed successfully',
+      );
+    } catch (error) {
+      throw throwError(this.logger, error);
+    }
+  }
+
   @ApiOperation({ summary: 'Delete a item order by ID' })
   @CustomApiResponse(['successNull', 'notfound', 'authorize'], {
     type: ItemOrder,
@@ -134,9 +159,8 @@ export class ItemOrdersController {
   @Delete(':id')
   async deleteItemOrder(@Param('id') id: string) {
     try {
-      const msg = await this.orderService.deleteItemOrder(id);
-      return new ApiSuccessResponseDto(
-        msg,
+      const _deletedOrder = await this.orderService.deleteItemOrder(id);
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item order deleted successfully',
       );
