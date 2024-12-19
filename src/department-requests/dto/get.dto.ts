@@ -3,6 +3,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
   OmitType,
+  PickType,
 } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
@@ -57,6 +58,40 @@ export class GetDepartmentRequestDto extends GenericResponseDto {
   status: DepartmentRequestStatusType;
 }
 
+export class GetItemRequestsResponseDto extends PickType(
+  GetDepartmentRequestDto,
+  ['id', 'requestNumber', 'quantity', 'status'],
+) {
+  @ApiResponseProperty({
+    example: 'Some Name',
+  })
+  itemName: string;
+
+  @ApiResponseProperty({
+    example: new Date(),
+  })
+  dateRequested: Date;
+}
+
+export class GetDepartmentRequestResponseDto extends GetItemRequestsResponseDto {
+  @ApiResponseProperty({
+    example: 'Some Department',
+  })
+  departmentName: string;
+}
+
+export class GetItemRequestResponseDto extends PickType(
+  GetDepartmentRequestDto,
+  ['id', 'quantity', 'additionalNotes'],
+) {
+  @ApiResponseProperty({
+    example: {
+      id: '083587af-d4e4-4f25-a1d7-1a1b97f80d4d',
+      name: 'Analgesics Item 2',
+    },
+  })
+  item: object;
+}
 export class GetDepartmentRequestsPaginationDto extends OmitType(
   PaginationRequestDto,
   ['search'],

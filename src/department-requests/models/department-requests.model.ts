@@ -9,6 +9,7 @@ import {
 import { BaseModel } from '../../shared/models/base.model';
 import { Item } from 'src/inventory/items/models/item.model';
 import { Department } from 'src/admin/department/models/department.model';
+import { Facility } from '../../admin/facility/models/facility.model';
 
 export enum DepartmentRequestStatus {
   PENDING = 'PENDING',
@@ -25,17 +26,24 @@ export type DepartmentRequestStatusType = keyof typeof DepartmentRequestStatus;
 })
 export class DepartmentRequest extends BaseModel {
   @ForeignKey(() => Item)
-  @Column({ type: DataType.UUID, field: 'item_id' })
+  @Column({ type: DataType.UUID })
   itemId: string;
 
-  @BelongsTo(() => Item, 'item_id')
+  @BelongsTo(() => Item)
   item: Item;
 
+  @ForeignKey(() => Facility)
+  @Column({ type: DataType.UUID })
+  facilityId: string;
+
+  @BelongsTo(() => Facility)
+  facility: Department;
+
   @ForeignKey(() => Department)
-  @Column({ type: DataType.STRING, field: 'department_id' })
+  @Column({ type: DataType.UUID })
   departmentId: string;
 
-  @BelongsTo(() => Department, 'department_id')
+  @BelongsTo(() => Department)
   department: Department;
 
   @Column({ type: DataType.STRING, field: 'request_number' })

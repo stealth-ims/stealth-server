@@ -19,6 +19,16 @@ module.exports = {
         },
       },
 
+      facilityId: {
+        type: Sequelize.UUID,
+        field: 'facility_id',
+        allowNull: false,
+        references: {
+          model: 'facilities',
+          key: 'id',
+        },
+      },
+
       departmentId: {
         type: Sequelize.UUID,
         field: 'department_id',
@@ -69,6 +79,10 @@ module.exports = {
 
   async down(queryInterface, _) {
     await Promise.all([
+      await queryInterface.removeConstraint(
+        'department_requests',
+        'department_requests_facility_id_fkey',
+      ),
       await queryInterface.removeConstraint(
         'department_requests',
         'department_requests_department_id_fkey',

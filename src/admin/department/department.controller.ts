@@ -147,7 +147,7 @@ export class DepartmentController {
       const _response = await this.departmentService.remove(id);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Department updated successfully',
+        'Department deleted successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

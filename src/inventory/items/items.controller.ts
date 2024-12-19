@@ -143,9 +143,9 @@ export class ItemController {
   })
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('no-paginate')
-  async findAllNoPaginate() {
+  async findAllNoPaginate(@GetUser('facility') facilityId: string) {
     try {
-      const items = await this.itemsService.findWithNoPaginate();
+      const items = await this.itemsService.findWithNoPaginate(facilityId);
       return new ApiSuccessResponseDto(
         items,
         HttpStatus.OK,

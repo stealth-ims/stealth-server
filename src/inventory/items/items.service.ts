@@ -60,8 +60,11 @@ export class ItemService {
    * @returns A promise that resolves to an array of OneItem and the total count of items.
    * @throws Throws an error if there was an issue retrieving the items.
    */
-  async findWithNoPaginate() {
+  async findWithNoPaginate(facilityId: string) {
     const items = await this.itemRepo.findAndCountAll({
+      where: {
+        facilityId,
+      },
       attributes: ['id', 'name'],
     });
 

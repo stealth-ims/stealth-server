@@ -8,5 +8,6 @@ import { Facility } from './models/facility.model';
   imports: [SequelizeModule.forFeature([Facility])],
   providers: [FacilityService],
   controllers: [FacilityController],
+  exports: [FacilityService],
 })
 export class FacilityModule {}

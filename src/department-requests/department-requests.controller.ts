@@ -1,26 +1,31 @@
 import {
   Controller,
-  Post,
   Body,
   HttpStatus,
   Logger,
   Get,
   Query,
-  Patch,
   Param,
+  ParseUUIDPipe,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { DepartmentRequestsService } from './department-requests.service';
-import {
-  CreateDepartmentRequestDto,
-  UpdateDepartmentRequestDto,
-} from './dto/create.dto';
+import { UpdateRequestStatusDto } from './dto/create.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/shared/docs/decorators';
-import { ApiSuccessResponseDto } from 'src/utils/responses/success.response';
+import {
+  ApiSuccessResponseDto,
+  ApiSuccessResponseNoData,
+} from 'src/utils/responses/success.response';
 import { throwError } from 'src/utils/responses/error.response';
-import { GetDepartmentRequestDto } from './dto/';
+import {
+  GetDepartmentRequestDto,
+  GetDepartmentRequestResponseDto,
+} from './dto/';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GetUser } from 'src/auth/decorator';
+import { IUserPayload } from '../auth/interface/payload.interface';
 
 @ApiTags('Department Requests')
 @Controller('department-requests')
@@ -31,40 +36,21 @@ export class DepartmentRequestsController {
     private readonly departmentRequestsService: DepartmentRequestsService,
   ) {}
 
-  @CustomApiResponse(['success', 'authorize'], {
-    type: CreateDepartmentRequestDto,
-    message: 'Request created successfully',
-  })
-  @Post()
-  async create(
-    @Body() createDepartmentRequestDto: CreateDepartmentRequestDto,
-
-    @GetUser('department') departmentId: string,
-  ) {
-    try {
-      const response = await this.departmentRequestsService.create(
-        createDepartmentRequestDto,
-        departmentId,
-      );
-
-      return new ApiSuccessResponseDto(
-        response,
-        HttpStatus.CREATED,
-        'Request created successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
   @CustomApiResponse(['authorize', 'paginated'], {
-    type: GetDepartmentRequestDto,
+    type: GetDepartmentRequestResponseDto,
     message: 'Requests fetched successfully',
   })
   @Get()
-  async getRequests(@Query() query: PaginationRequestDto) {
+  async getRequests(
+    @Query() query: PaginationRequestDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.departmentRequestsService.fetchAll(query);
+      const response = await this.departmentRequestsService.fetchAll(
+        query,
+        user,
+        true,
+      );
 
       return new ApiSuccessResponseDto(
         response,
@@ -76,41 +62,59 @@ export class DepartmentRequestsController {
     }
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     type: GetDepartmentRequestDto,
-    message: 'Request updated successfully',
+    message: 'Request status updated successfully',
   })
-  @Patch(':id')
+  @Put(':id')
   async updateRequest(
-    @Body() data: UpdateDepartmentRequestDto,
-    @Param() id: string,
+    @Body() data: UpdateRequestStatusDto,
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
     try {
-      const response = await this.departmentRequestsService.update(id, data);
+      const _response = await this.departmentRequestsService.updateStatus(
+        id,
+        data,
+      );
 
-      return new ApiSuccessResponseDto(
-        response,
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Request updated successfully',
+        'Request status updated successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
     }
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
-    type: GetDepartmentRequestDto,
-    message: 'Request fetched successfully',
-  })
-  @Get(':id')
-  async getRequest(@Param() id: string) {
-    try {
-      const response = await this.departmentRequestsService.fetchOne(id);
+  // @CustomApiResponse(['success', 'authorize'], {
+  //   type: GetDepartmentRequestDto,
+  //   message: 'Request fetched successfully',
+  // })
+  // @Get(':id')
+  // async getRequest(@Param() id: string) {
+  //   try {
+  //     const response = await this.departmentRequestsService.fetchOne(id);
 
-      return new ApiSuccessResponseDto(
-        response,
+  //     return new ApiSuccessResponseDto(
+  //       response,
+  //       HttpStatus.OK,
+  //       'Request fetched successfully',
+  //     );
+  //   } catch (error) {
+  //     throwError(this.logger, error);
+  //   }
+  // }
+
+  @CustomApiResponse(['authorize', 'successNull', 'notfound'], {
+    message: 'Request deleted successfully',
+  })
+  @Delete(':id')
+  async deleteRequest(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      const _response = await this.departmentRequestsService.remove(id);
+      return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Request fetched successfully',
+        'Request deleted successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
