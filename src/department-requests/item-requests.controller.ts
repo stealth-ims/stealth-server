@@ -16,8 +16,8 @@ import { DepartmentRequestsService } from './department-requests.service';
 import {
   CreateDepartmentRequestDto,
   GetDepartmentRequestDto,
-  GetItemRequestResponseDto,
   GetItemRequestsResponseDto,
+  GetSpecificRequestResponseDto,
   UpdateDepartmentRequestDto,
 } from './dto';
 import { CustomApiResponse } from '../shared/docs/decorators';
@@ -91,7 +91,7 @@ export class ItemRequestsController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: GetItemRequestResponseDto,
+    type: GetSpecificRequestResponseDto,
     message: 'Request fetched successfully',
   })
   @Get(':id')

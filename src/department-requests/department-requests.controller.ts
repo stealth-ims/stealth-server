@@ -94,7 +94,7 @@ export class DepartmentRequestsController {
   @Get(':id')
   async getRequest(@Param('id', ParseUUIDPipe) id: string) {
     try {
-      const response = await this.departmentRequestsService.fetchOne(id, true);
+      const response = await this.departmentRequestsService.fetchOne(id);
 
       return new ApiSuccessResponseDto(
         response,
