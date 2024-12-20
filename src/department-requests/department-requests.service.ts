@@ -131,9 +131,10 @@ export class DepartmentRequestsService {
     return;
   }
 
-  async fetchOne(id: string) {
+  async fetchOne(id: string, isDepartment: boolean = false) {
+    const statusAttribute = isDepartment ? ['status'] : [];
     const request = await this.departmentRequestRepository.findByPk(id, {
-      attributes: ['id', 'quantity', 'additionalNotes'],
+      attributes: ['id', 'quantity', 'additionalNotes', ...statusAttribute],
       include: [{ model: Item, attributes: ['id', 'name'] }],
     });
     if (!request) {

@@ -22,6 +22,7 @@ import { throwError } from 'src/utils/responses/error.response';
 import {
   GetDepartmentRequestDto,
   GetDepartmentRequestResponseDto,
+  GetSpecificRequestResponseDto,
 } from './dto/';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { GetUser } from 'src/auth/decorator';
@@ -86,24 +87,24 @@ export class DepartmentRequestsController {
     }
   }
 
-  // @CustomApiResponse(['success', 'authorize'], {
-  //   type: GetDepartmentRequestDto,
-  //   message: 'Request fetched successfully',
-  // })
-  // @Get(':id')
-  // async getRequest(@Param() id: string) {
-  //   try {
-  //     const response = await this.departmentRequestsService.fetchOne(id);
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetSpecificRequestResponseDto,
+    message: 'Request fetched successfully',
+  })
+  @Get(':id')
+  async getRequest(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      const response = await this.departmentRequestsService.fetchOne(id, true);
 
-  //     return new ApiSuccessResponseDto(
-  //       response,
-  //       HttpStatus.OK,
-  //       'Request fetched successfully',
-  //     );
-  //   } catch (error) {
-  //     throwError(this.logger, error);
-  //   }
-  // }
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Request fetched successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
 
   @CustomApiResponse(['authorize', 'successNull', 'notfound'], {
     message: 'Request deleted successfully',

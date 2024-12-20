@@ -89,6 +89,19 @@ export class GetItemRequestResponseDto extends PickType(
   })
   item: object;
 }
+
+export class GetSpecificRequestResponseDto extends PickType(
+  GetDepartmentRequestDto,
+  ['id', 'quantity', 'additionalNotes', 'status'],
+) {
+  @ApiResponseProperty({
+    example: {
+      id: '083587af-d4e4-4f25-a1d7-1a1b97f80d4d',
+      name: 'Analgesics Item 2',
+    },
+  })
+  item: object;
+}
 export class GetDepartmentRequestsPaginationDto extends OmitType(
   PaginationRequestDto,
   ['search'],
