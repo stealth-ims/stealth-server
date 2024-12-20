@@ -420,6 +420,40 @@ export class AuthController {
 
   @ApiBearerAuth('access-token')
   @Authorize()
+  @Post('change-email/send-mail')
+  @ApiSuccessResponseNullData({
+    description: 'Email sent successfully',
+  })
+  @ApiInternalServerErrorResponse({
+    type: ApiErrorResponse,
+    description: 'An unexpected error occured',
+  })
+  @HttpCode(HttpStatus.OK)
+  async sendResetMail(
+    @Body() dto: SendForgotPasswordEmailDto,
+    @GetUser('sub') userId: string,
+  ) {
+    try {
+      await this.authService.sendChangeEmailCode(dto.email, userId);
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'email has been sent successfully',
+      );
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      } else {
+        this.logger.error(
+          `An error occured: ${error.name} :: ${error.message}`,
+          error.stack,
+        );
+        throw new InternalServerErrorException(error.message, error);
+      }
+    }
+  }
+
+  @ApiBearerAuth('access-token')
+  @Authorize()
   @Post('change-email/validate-otp')
   @ApiSuccessResponseNullData({
     description: 'OTP validated. User email updated successfully',

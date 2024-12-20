@@ -196,6 +196,18 @@ export class AuthService {
     return true;
   }
 
+  async sendChangeEmailCode(mail: string, userId: string) {
+    const user = await this.userRepository.findByPk(userId);
+    if (!user) {
+      throw new NotFoundException('user with this email not found');
+    }
+    const code = await this.generateCode(user);
+
+    this.sendVerificationCodeMail(mail, user.fullName, code);
+
+    return true;
+  }
+
   async checkCode(dto: CheckCodeDto) {
     const { email, code } = dto;
     const user = await this.userRepository.findOne({
@@ -253,12 +265,6 @@ export class AuthService {
     const user = await this.userRepository.findByPk(userId);
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    if (dto.email) {
-      const code = await this.generateCode(user);
-
-      this.sendVerificationCodeMail(dto.email, user.fullName, code);
     }
     await this.userRepository.update(
       { ...{ fullName, phoneNumber } },

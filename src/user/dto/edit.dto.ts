@@ -3,7 +3,7 @@ import { CreateUserDto } from './create.dto';
 import { IsNotEmpty } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(
-  PickType(CreateUserDto, ['fullName', 'email']),
+  PickType(CreateUserDto, ['fullName']),
 ) {
   @ApiProperty({
     example: '0244335567',
