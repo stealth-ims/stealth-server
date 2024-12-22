@@ -48,9 +48,15 @@ export class SuppliersController {
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() createSupplierDto: CreateSupplierDto) {
+  async create(
+    @Body() createSupplierDto: CreateSupplierDto,
+    @GetUser('facility') facilityId: string,
+  ) {
     try {
-      const supplier = await this.suppliersService.create(createSupplierDto);
+      const supplier = await this.suppliersService.create(
+        createSupplierDto,
+        facilityId,
+      );
       return new ApiSuccessResponseDto(
         supplier,
         HttpStatus.CREATED,

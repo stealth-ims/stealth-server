@@ -14,8 +14,14 @@ export class SuppliersService {
   ) {
     this.logger = new Logger(SuppliersService.name);
   }
-  async create(createSupplierDto: CreateSupplierDto): Promise<Supplier> {
-    const supplier = await this.supplierRepo.create({ ...createSupplierDto });
+  async create(
+    createSupplierDto: CreateSupplierDto,
+    facilityId: string,
+  ): Promise<Supplier> {
+    const supplier = await this.supplierRepo.create({
+      ...createSupplierDto,
+      facilityId,
+    });
 
     this.logger.log(`Created supplier with ID: ${supplier.id}`);
     return supplier;

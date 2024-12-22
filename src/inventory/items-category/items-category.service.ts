@@ -34,9 +34,11 @@ export class ItemCategoryService {
    */
   async create(
     createitemsCategoryDto: CreateItemsCategoryDto,
+    facilityId: string,
   ): Promise<ItemCategoryResponse> {
     const category = await this.itemCategoryRepo.create({
       ...createitemsCategoryDto,
+      facilityId,
     });
     this.logger.log(`Created items category with ID: ${category.id}`);
     return category;

@@ -44,9 +44,15 @@ export class ItemCategoryController {
   })
   @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE)
   @Post()
-  async create(@Body() dto: CreateItemsCategoryDto) {
+  async create(
+    @Body() dto: CreateItemsCategoryDto,
+    @GetUser('facility') facilityId: string,
+  ) {
     try {
-      const createdCategory = await this.itemCategoryService.create(dto);
+      const createdCategory = await this.itemCategoryService.create(
+        dto,
+        facilityId,
+      );
       return new ApiSuccessResponseDto(
         createdCategory,
         HttpStatus.CREATED,
