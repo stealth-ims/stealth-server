@@ -180,6 +180,17 @@ export class ItemController {
     }
   }
 
+  // @CustomApiResponse(['success', 'authorize'], {
+  //   type: GetNoPaginateDto,
+  //   isArray: true,
+  //   message: 'Item status updated successfully',
+  // })
+  // @Put()
+  // async assignStatus() {
+  //   const response = await this.itemsService.assignStatus();
+  //   return response;
+  // }
+
   @CustomApiResponse(['success', 'authorize'], {
     type: GetNoPaginateDto,
     isArray: true,

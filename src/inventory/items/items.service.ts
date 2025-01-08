@@ -111,6 +111,29 @@ export class ItemService {
     );
   }
 
+  async assignStatus() {
+    const items = await this.itemRepo.findAll({
+      attributes: ['id', 'name', 'status', 'reorderPoint'],
+      include: [{ model: Batch, attributes: ['id', 'quantity'] }],
+    });
+
+    items.forEach((item) => {
+      const totalQuantity = item.batches.reduce(
+        (accum, batch) => accum + batch.quantity,
+        0,
+      );
+
+      if (totalQuantity == 0) {
+        item.status = ItemStatus.OUT_OF_STOCK;
+      } else if (totalQuantity > item.reorderPoint) {
+        item.status = ItemStatus.STOCKED;
+      } else {
+        item.status = ItemStatus.LOW;
+      }
+      item.save();
+    });
+    return 'adjusted';
+  }
   /**
    * Finds a item by its ID.
    *
