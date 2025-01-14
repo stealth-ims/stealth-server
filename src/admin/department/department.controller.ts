@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -46,8 +47,8 @@ export class DepartmentController {
   @Post()
   async addDepartment(
     @Body() dto: CreateDepartmentDto,
-    @GetUser('facility') facilityId: string,
-    @GetUser('sub') adminId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     try {
       const response = await this.departmentService.create(
@@ -73,7 +74,7 @@ export class DepartmentController {
   @Get()
   async getDepartments(
     @Query() query: PaginationRequestDto,
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
   ) {
     try {
       const { rows, count } = await this.departmentService.findAll(
@@ -123,7 +124,7 @@ export class DepartmentController {
   async editDepartment(
     @Body() dto: UpdateDepartmentDto,
     @Param('id') id: string,
-    @GetUser('sub') adminId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     try {
       await this.departmentService.update(id, dto, adminId);

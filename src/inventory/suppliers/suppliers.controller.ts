@@ -50,7 +50,7 @@ export class SuppliersController {
   @Post()
   async create(
     @Body() createSupplierDto: CreateSupplierDto,
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
   ) {
     try {
       const supplier = await this.suppliersService.create(
@@ -75,7 +75,7 @@ export class SuppliersController {
   @Permission(Features.SUPPLIERS, PermissionLevel.READ)
   @Get()
   async findAll(
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
     @Query() query: PaginationRequestDto,
   ) {
     try {
@@ -102,7 +102,9 @@ export class SuppliersController {
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ)
   @Get('no-paginate')
-  async findAllNoPaginate(@GetUser('facility') facilityId: string) {
+  async findAllNoPaginate(
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
+  ) {
     try {
       const suppliers =
         await this.suppliersService.findAllNoPaginate(facilityId);

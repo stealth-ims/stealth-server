@@ -46,7 +46,7 @@ export class ItemCategoryController {
   @Post()
   async create(
     @Body() dto: CreateItemsCategoryDto,
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
   ) {
     try {
       const createdCategory = await this.itemCategoryService.create(
@@ -70,7 +70,7 @@ export class ItemCategoryController {
   @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ)
   @Get()
   async findAll(
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
     @Query() query?: PaginationRequestDto,
   ) {
     try {
@@ -100,7 +100,9 @@ export class ItemCategoryController {
   })
   @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ)
   @Get('no-paginate')
-  async findAllNoPaginate(@GetUser('facility') facilityId: string) {
+  async findAllNoPaginate(
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
+  ) {
     try {
       const categories =
         await this.itemCategoryService.findAllNoPaginate(facilityId);

@@ -121,7 +121,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
-    @GetUser('sub') userId: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       await this.authService.uploadUserPicture(userId, file);
@@ -188,7 +188,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @Authorize()
   @Get('user')
-  async getUser(@GetUser('sub') id: string) {
+  async getUser(@GetUser('sub', ParseUUIDPipe) id: string) {
     try {
       const response = await this.authService.retrieveUser(id);
       return new ApiSuccessResponseDto<User>(
@@ -224,7 +224,7 @@ export class AuthController {
   @ApiBearerAuth('access-token')
   @Authorize()
   @Get('sessions')
-  async getSessions(@GetUser('sub') id: string) {
+  async getSessions(@GetUser('sub', ParseUUIDPipe) id: string) {
     try {
       const response = await this.authService.retrieveSessions(id);
       return new ApiSuccessResponseDto(
@@ -261,8 +261,8 @@ export class AuthController {
   @Authorize()
   @Get('refresh')
   async refreshTokens(
-    @GetUser('sub') id: string,
-    @GetUser('session') sessionId: string,
+    @GetUser('sub', ParseUUIDPipe) id: string,
+    @GetUser('session', ParseUUIDPipe) sessionId: string,
   ) {
     try {
       const response = await this.authService.refreshToken(id, sessionId);
@@ -392,7 +392,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async updateUserDetails(
     @Body() dto: UpdateUserDto,
-    @GetUser('sub') userId: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       await this.authService.updateUser(userId, dto);
@@ -426,7 +426,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async sendResetMail(
     @Body() dto: SendForgotPasswordEmailDto,
-    @GetUser('sub') userId: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       await this.authService.sendChangeEmailCode(dto.email, userId);
@@ -460,7 +460,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async validateEmailCode(
     @Body() dto: CheckCodeDto,
-    @GetUser('sub') userId: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       await this.authService.verifychangeEmailCode(dto, userId);
@@ -494,7 +494,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async passwordChange(
     @Body() dto: ChangePasswordDto,
-    @GetUser('sub') userId: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       await this.authService.changePassword(dto, userId);

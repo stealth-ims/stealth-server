@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -103,7 +104,7 @@ export class FacilityController {
   async updateFacility(
     @Body() dto: UpdateFacilityDto,
     @Param('id') id: string,
-    @GetUser('sub') adminId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     try {
       const _response = await this.facilityService.update(id, dto, adminId);

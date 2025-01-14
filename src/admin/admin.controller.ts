@@ -48,7 +48,7 @@ export class AdminController {
   @Post('/user')
   async createUser(
     @Body() dto: CreateUserDto,
-    @GetUser('facility') facilityId: string,
+    @GetUser('facility', ParseUUIDPipe) facilityId: string,
   ) {
     try {
       const response = await this.adminService.createPersonnel(dto, facilityId);
@@ -114,7 +114,7 @@ export class AdminController {
   async changeRole(
     @Param('id', ParseUUIDPipe) personnelId: string,
     @Body() dto: ChangeRoleDto,
-    @GetUser('sub') adminId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     await this.adminService.changeUserRole(personnelId, dto, adminId);
     return new ApiSuccessResponseNoData(
@@ -131,7 +131,7 @@ export class AdminController {
   @Patch('/users/:id/deactivate')
   async deactivateUser(
     @Param('id', ParseUUIDPipe) userId: string,
-    @GetUser('sub') adminId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     await this.adminService.deactivateUser(userId, adminId);
     return new ApiSuccessResponseNoData(
@@ -148,7 +148,7 @@ export class AdminController {
   @Patch('/users/:id/activate')
   async activateUser(
     @Param('id', ParseUUIDPipe) userId: string,
-    @GetUser('sub') adminId: string,
+    @GetUser('sub', ParseUUIDPipe) adminId: string,
   ) {
     await this.adminService.activateUser(userId, adminId);
     return new ApiSuccessResponseNoData(
