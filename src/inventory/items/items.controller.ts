@@ -220,9 +220,9 @@ export class ItemController {
     message: 'Item analytics retrieved successfully',
   })
   @Permission(Features.ITEMS, PermissionLevel.READ)
-  @Get('/analytics')
-  async analytics() {
-    return await this.itemsService.getAnalytics();
+  @Get('/analytics/:id')
+  async analytics(@Param('id', ParseUUIDPipe) itemId: string) {
+    return await this.itemsService.getAnalytics(itemId);
   }
 
   @CustomApiResponse(['success', 'authorize'], {

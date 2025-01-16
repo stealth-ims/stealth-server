@@ -187,8 +187,10 @@ export class ItemService {
     this.logger.log(`Deleted Item with id: ${id}`);
   }
 
-  async getAnalytics() {
-    return new NotImplementedException(`Retrieving analytics not implemented`);
+  async getAnalytics(itemId: string) {
+    return new NotImplementedException(
+      `Retrieving analytics not implemented ${itemId}`,
+    );
   }
 
   async getItemCount(user: IUserPayload) {

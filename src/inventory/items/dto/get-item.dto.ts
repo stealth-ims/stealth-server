@@ -32,37 +32,94 @@ export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   departmentId: string;
 }
 
+class AnalyticsData {
+  @ApiProperty({
+    description: 'The data representing the labels',
+  })
+  data: number[];
+
+  @ApiProperty({
+    description: 'The labels describing the individual data',
+  })
+  labels: string[];
+}
+
 export class ItemAnalytics {
   @ApiProperty({
-    example: 4500,
-    description: 'The total number of items in the system',
+    example: {
+      data: [10, 15, 8, 12, 14, 18, 20],
+      labels: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ],
+    },
+    description:
+      'The total consumption of the item in the system over the past week.',
   })
-  totalItems: number;
+  oneWeek: AnalyticsData;
 
   @ApiProperty({
-    example: 1200,
-    description: 'The total items in stock in the system',
+    example: {
+      data: [50, 60, 55, 70],
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    },
+    description:
+      'The total consumption of the item in the system over the past month.',
   })
-  totalInStock: number;
+  oneMonth: AnalyticsData;
 
   @ApiProperty({
-    example: 20,
-    description: 'The number of items that are out of stock',
+    example: {
+      data: [40, 35, 50, 60, 45, 55, 70, 65, 75, 80, 90, 85],
+      labels: [
+        'Week 1',
+        'Week 2',
+        'Week 3',
+        'Week 4',
+        'Week 5',
+        'Week 6',
+        'Week 7',
+        'Week 8',
+        'Week 9',
+        'Week 10',
+        'Week 11',
+        'Week 12',
+      ],
+    },
+    description:
+      'The total consumption of the item in the system over the past three months.',
   })
-  outOfStock: number;
+  threeMonths: AnalyticsData;
 
   @ApiProperty({
-    example: 50,
-    description: 'The number of items that are high in stock',
+    example: {
+      data: [500, 450, 480, 470, 520, 530, 510, 490, 500, 480, 470, 460],
+      labels: [
+        'Month 1',
+        'Month 2',
+        'Month 3',
+        'Month 4',
+        'Month 5',
+        'Month 6',
+        'Month 7',
+        'Month 8',
+        'Month 9',
+        'Month 10',
+        'Month 11',
+        'Month 12',
+      ],
+    },
+    description:
+      'The total consumption of the item in the system over the past year.',
   })
-  highStocked: number;
-
-  @ApiProperty({
-    example: 80,
-    description: 'The number of items that are low in stock',
-  })
-  lowStocked: number;
+  oneYear: AnalyticsData;
 }
+
 export class ItemCounts {
   @ApiProperty({
     example: 4500,
