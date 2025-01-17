@@ -153,8 +153,17 @@ export class ItemService {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
 
+    let quantity = 0;
+    if (item.batches.length) {
+      quantity = item.batches.reduce(
+        (total, batch) => total + batch.quantity,
+        0,
+      );
+    }
+    const result = item.get({ plain: true });
     this.logger.log(`Found items category with ID: ${id}`);
-    return item;
+    result.totalStock = quantity;
+    return result;
   }
 
   /**

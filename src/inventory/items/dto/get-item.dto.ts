@@ -157,6 +157,11 @@ export class OneItem extends IntersectionType(Item, GenericResponseDto) {
     example: 'John Doe,58dceb42-02bb-465f-bd5d-4b52ef181a18',
   })
   createdBy: string;
+
+  @ApiResponseProperty({
+    example: 120,
+  })
+  totalStock: number;
 }
 
 export class ManyItem {
