@@ -20,6 +20,7 @@ export class OneStockAdjustment extends IntersectionType(
     'reason',
     'notes',
     'status',
+    'createdBy',
   ]),
   PickType(GenericResponseDto, ['id', 'createdAt']),
 ) {

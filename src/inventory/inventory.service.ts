@@ -102,6 +102,7 @@ export class StockAdjustmentsService {
         'status',
         'type',
         'quantity',
+        'createdBy',
       ],
     });
 
@@ -222,6 +223,7 @@ export class StockAdjustmentsService {
         'status',
         'type',
         'quantity',
+        'createdBy',
       ],
       distinct: true,
     };
