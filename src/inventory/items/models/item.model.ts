@@ -6,6 +6,7 @@ import {
   ForeignKey,
   Table,
   HasMany,
+  AfterFind,
 } from 'sequelize-typescript';
 import { Department } from 'src/admin/department/models/department.model';
 import { Facility } from 'src/admin/facility/models/facility.model';
@@ -15,6 +16,7 @@ import { BaseModel } from 'src/shared/models/base.model';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Batch } from '.';
 import { StockAdjustment } from '../../models/stock-adjustment.model';
+import { User } from '../../../auth/models/user.model';
 
 @Table({
   tableName: 'items',
@@ -109,6 +111,33 @@ export class Item extends BaseModel {
 
   @HasMany(() => DepartmentRequest)
   departmentRequests: DepartmentRequest[];
+
+  @AfterFind
+  static async addCreatedByUser(items: Item | Item[]) {
+    const records = Array.isArray(items) ? items : [items];
+
+    if (!records.length) return;
+
+    const createdByNotExist = records.every((record) => !record.createdBy);
+    if (createdByNotExist) return;
+
+    const userIds = records.map((record) => record.createdBy);
+
+    const users = await User.findAll({
+      where: {
+        id: userIds,
+      },
+      attributes: ['id', 'fullName', 'email'],
+    });
+
+    const userMap = new Map(users.map((user) => [user.id, user]));
+
+    for (const record of records) {
+      const user = userMap.get(record.createdBy) || null;
+
+      record.createdBy = `${user.fullName},${user.id}`;
+    }
+  }
 
   @BeforeCreate
   static async validate(item: Item) {

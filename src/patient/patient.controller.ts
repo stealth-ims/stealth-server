@@ -44,7 +44,7 @@ export class PatientController {
   @Post()
   async create(
     @Body() dto: CreatePatientDto,
-    @GetUser('stamp') createdBy: string,
+    @GetUser('sub', ParseUUIDPipe) createdBy: string,
   ) {
     try {
       const response = await this.patientService.create(dto, createdBy);

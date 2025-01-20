@@ -61,9 +61,13 @@ module.exports = {
         mobile_money_phone_number: '+233552985678',
       },
     ];
-
+    const facilities = await queryInterface.sequelize.query(
+      'SELECT id, name FROM facilities',
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
+    );
     const seedData = suppliers.map((supplier) => ({
       id: uuidv4(),
+      facility_id: facilities[0].id,
       ...supplier,
       ...baseModelColumns,
     }));

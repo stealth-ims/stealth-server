@@ -20,10 +20,15 @@ module.exports = {
       'Gastrointestinal',
     ];
 
+    const facilities = await queryInterface.sequelize.query(
+      'SELECT id, name FROM facilities',
+      { type: queryInterface.sequelize.QueryTypes.SELECT },
+    );
     const seedData = itemCategories.map((category) => ({
       id: uuidv4(),
       name: category,
       status: 'ACTIVE',
+      facility_id: facilities[0].id,
       ...baseModelColumns,
     }));
 

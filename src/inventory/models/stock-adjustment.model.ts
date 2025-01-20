@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, IsUUID, Min } from 'class-validator';
 import {
+  AfterFind,
   BelongsTo,
   Column,
   DataType,
@@ -11,6 +12,7 @@ import { Facility } from 'src/admin/facility/models/facility.model';
 import { Batch, Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/shared/models/base.model';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { User } from '../../auth/models/user.model';
 
 export enum StockAdjustmentType {
   REDUCTION = 'REDUCTION',
@@ -105,7 +107,7 @@ export class StockAdjustment extends BaseModel {
   status: StockAdjustmentStatus;
 
   @ApiResponseProperty({
-    example: 'Kratos Godson,96fdc209-0551-4d67-b9ad-0e9067a44bc4',
+    example: 'John Doe,58dceb42-02bb-465f-bd5d-4b52ef181a18',
   })
   @Column
   createdBy: string;
@@ -135,4 +137,35 @@ export class StockAdjustment extends BaseModel {
 
   @BelongsTo(() => Department)
   department: Department;
+
+  @AfterFind
+  static async addCreatedByUser(
+    stockAdjustments: StockAdjustment | StockAdjustment[],
+  ) {
+    const records = Array.isArray(stockAdjustments)
+      ? stockAdjustments
+      : [stockAdjustments];
+
+    if (!records.length) return;
+
+    const createdByNotExist = records.every((record) => !record.createdBy);
+    if (createdByNotExist) return;
+
+    const userIds = records.map((record) => record.createdBy);
+
+    const users = await User.findAll({
+      where: {
+        id: userIds,
+      },
+      attributes: ['id', 'fullName', 'email'],
+    });
+
+    const userMap = new Map(users.map((user) => [user.id, user]));
+
+    for (const record of records) {
+      const user = userMap.get(record.createdBy) || null;
+
+      record.createdBy = `${user.fullName},${user.id}`;
+    }
+  }
 }
