@@ -106,6 +106,22 @@ export class NotificationService {
     return;
   }
 
+  // @Cron(CronExpression.EVERY_MINUTE)
+  // async handleDeleteNotificationsCron() {
+  //   const currentDate = new Date();
+  //   console.log(`executing delete cron at ${currentDate.toString()}`);
+  //   const deleted = await this.notifcationRepo.destroy({
+  //     where: {
+  //       createdAt: { [Op.lte]: currentDate },
+  //       status: NotificationStatus.READ,
+  //     },
+  //   });
+  //   if (deleted == 0) {
+  //     throw new NotFoundException('Notifications not found');
+  //   }
+  //   return;
+  // }
+
   getNotifications(
     permissions: string[],
     departmentId: string,

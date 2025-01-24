@@ -4,6 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { IndexModels } from './shared/models/index.models';
 import { IndexModules } from './shared/modules/index.modules';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       models: [...IndexModels],
     }),
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     ...IndexModules,
   ],
 })
