@@ -12,7 +12,7 @@ import { CreateItemDto } from '../../dto';
 import { format } from 'date-fns';
 import { Type } from 'class-transformer';
 
-export class CreateBatchDto extends PickType(CreateItemDto, ['createdBy']) {
+export class CreateBatchDto extends PickType(CreateItemDto, ['createdById']) {
   @ApiProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
     description: 'The supplier ID of the item',

@@ -128,6 +128,11 @@ export class CreateItemDto {
   @ApiResponseProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
+  createdById: string;
+
+  @ApiResponseProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+  })
   facilityId: string;
 
   @ApiResponseProperty({

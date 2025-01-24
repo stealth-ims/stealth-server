@@ -65,7 +65,7 @@ export class ItemController {
     try {
       !dto.facilityId && (dto.facilityId = user.facility);
       !dto.departmentId && (dto.departmentId = user.department);
-      dto.createdBy = user.sub;
+      dto.createdById = user.sub;
       const createdItem = await this.itemsService.create(dto);
       return new ApiSuccessResponseDto(
         createdItem,
@@ -85,7 +85,7 @@ export class ItemController {
   @Post('add-batch')
   async addBatch(@Body() dto: CreateBatchDto, @GetUser() user: IUserPayload) {
     try {
-      dto.createdBy = user.sub;
+      dto.createdById = user.sub;
       const createdItem = await this.batchService.create(dto);
       return new ApiSuccessResponseDto(
         createdItem,

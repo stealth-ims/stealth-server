@@ -53,7 +53,7 @@ export class StockAdjustmentsService {
       throw new BadRequestException('unknown adjustment type');
     }
     dto.status = StockAdjustmentStatus.ADJUSTED;
-    dto.createdBy = user.sub;
+    dto.createdById = user.sub;
     dto.facilityId = user.facility;
     dto.departmentId = user.department;
     const adjustedStock = await this.stockAdjustmentRepo.create({

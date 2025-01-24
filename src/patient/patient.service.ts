@@ -12,7 +12,10 @@ export class PatientService {
   ) {}
 
   async create(dto: CreatePatientDto, createdBy: string) {
-    const patient = await this.patientRepository.create({ ...dto, createdBy });
+    const patient = await this.patientRepository.create({
+      ...dto,
+      createdById: createdBy,
+    });
     return patient;
   }
 
