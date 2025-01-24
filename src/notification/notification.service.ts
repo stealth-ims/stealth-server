@@ -78,6 +78,26 @@ export class NotificationService {
     return;
   }
 
+  async markAllRead(user: IUserPayload) {
+    const whereOptions: any = {
+      facilityId: user.facility,
+      departmentId: user.department,
+    };
+    const updatedNotification = await this.notifcationRepo.update(
+      { status: NotificationStatus.READ },
+      {
+        where: {
+          status: NotificationStatus.UNREAD,
+          ...whereOptions,
+        },
+      },
+    );
+    if (updatedNotification[0] == 0) {
+      throw new NotFoundException('Notification not found');
+    }
+    return;
+  }
+
   async remove(id: string) {
     const deleted = await this.notifcationRepo.destroy({ where: { id } });
     if (deleted == 0) {

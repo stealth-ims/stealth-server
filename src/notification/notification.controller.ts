@@ -77,9 +77,26 @@ export class NotificationController {
   }
 
   @CustomApiResponse(['successNull', 'authorize'], {
+    message: 'Notifications marked as read successfully',
+  })
+  @Put('read')
+  async markNotificationsAsRead(@GetUser() user: IUserPayload) {
+    try {
+      const _response = await this.notificationService.markAllRead(user);
+
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Notifications marked as read successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize'], {
     message: 'Notification marked as read successfully',
   })
-  @Put(':id')
+  @Put(':id/read')
   async markNotificationAsRead(@Param('id', ParseUUIDPipe) id: string) {
     try {
       const _response = await this.notificationService.markAsRead(id);
