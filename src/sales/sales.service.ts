@@ -236,6 +236,13 @@ export class SalesService {
       saleItemsBody.saleItems = saleItems;
     }
 
+    if (dto.patientCardId) {
+      const patient = await this.patientService.findByCardId(
+        dto.patientCardId,
+        false,
+      );
+      dto.patientId = patient.id;
+    }
     const [rowsUpdated] = await this.saleRepository.update(
       { ...dto, ...saleItemsBody },
       {

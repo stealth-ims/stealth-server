@@ -114,6 +114,4 @@ export class CreateSaleResponseDto extends IntersectionType(
   deletedBy: string;
 }
 
-export class UpdateSalesDto extends PartialType(
-  OmitType(CreateSaleDto, ['patientCardId']),
-) {}
+export class UpdateSalesDto extends PartialType(CreateSaleDto) {}
