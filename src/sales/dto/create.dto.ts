@@ -55,11 +55,11 @@ export class CreateSaleDto {
   @IsArray()
   saleItems: CreateSaleItemsDto[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'To be refilled next month',
     description: 'Additional notes for the sale',
   })
-  @IsNotEmpty()
+  @IsOptional()
   notes: string;
 
   @ApiResponseProperty({

@@ -46,6 +46,7 @@ export class Sale extends BaseModel {
   @Column
   total: number;
 
+  @AllowNull
   @Column(DataType.TEXT)
   notes: string;
 

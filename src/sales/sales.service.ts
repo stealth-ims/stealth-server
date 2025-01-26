@@ -92,12 +92,13 @@ export class SalesService {
       );
       dto.patientId = patient.id;
     }
-
+    const notes = dto.notes ? dto.notes : null;
     const sale = await this.saleRepository.create({
       ...dto,
       saleItems,
       departmentId: user.department,
       facilityId: user.facility,
+      notes,
     });
 
     return sale;
@@ -136,7 +137,10 @@ export class SalesService {
         'status',
       ],
       include: [
-        { model: Patient, attributes: ['id', 'cardIdentificationNumber'] },
+        {
+          model: Patient,
+          attributes: ['id', 'cardIdentificationNumber', 'name'],
+        },
       ],
       distinct: true,
     };
@@ -170,7 +174,10 @@ export class SalesService {
     const sale = await this.saleRepository.findByPk(id, {
       attributes: { exclude: ['patientId', 'deletedAt', 'deletedBy'] },
       include: [
-        { model: Patient, attributes: ['id', 'cardIdentificationNumber'] },
+        {
+          model: Patient,
+          attributes: ['id', 'cardIdentificationNumber', 'name'],
+        },
       ],
     });
     if (!sale) {

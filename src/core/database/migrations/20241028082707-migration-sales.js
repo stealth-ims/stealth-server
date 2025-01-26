@@ -42,7 +42,7 @@ module.exports = {
 
       notes: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
         field: 'notes',
       },
 
