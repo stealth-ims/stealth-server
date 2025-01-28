@@ -4,7 +4,7 @@ import {
   ApiProperty,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { CreateItemDto, ItemStatus } from './create-item.dto';
@@ -21,14 +21,15 @@ export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
   @IsOptional()
   categories: string[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: ItemStatus,
+  })
   @IsOptional()
-  @IsUUID()
+  @IsEnum(ItemStatus)
+  status: ItemStatus;
+
   facilityId: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUUID()
   departmentId: string;
 }
 

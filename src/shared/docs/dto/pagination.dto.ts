@@ -1,6 +1,19 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
+
+export enum OrderDirectionType {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
+
+export enum DateRange {
+  TODAY = 'today',
+  THIS_WEEK = 'this_week',
+  THIS_MONTH = 'this_month',
+  LAST_MONTH = 'last_month',
+  THIS_YEAR = 'this_year',
+}
 
 export class PaginationRequestDto {
   @ApiPropertyOptional()
@@ -25,8 +38,17 @@ export class PaginationRequestDto {
   @IsString()
   orderBy: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: OrderDirectionType,
+  })
   @IsOptional()
-  @IsString()
-  orderDirection: string = 'DESC';
+  @IsEnum(OrderDirectionType)
+  orderDirection: OrderDirectionType;
+
+  @ApiPropertyOptional({
+    enum: DateRange,
+  })
+  @IsOptional()
+  @IsEnum(DateRange)
+  dateRange: DateRange;
 }

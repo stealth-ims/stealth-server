@@ -21,6 +21,7 @@ import {
   UpdateStockAdjustmentDto,
 } from './dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { generateFilter } from '../shared/factory';
 
 @Injectable()
 export class StockAdjustmentsService {
@@ -212,26 +213,22 @@ export class StockAdjustmentsService {
   private applyFilter(
     query: StockAdjustmentPaginationDto,
   ): FindAndCountOptions<StockAdjustment> {
+    const queryFilter = generateFilter(query, {
+      [Op.or]: [{ reason: { [Op.iLike]: `%${query.search}%` } }],
+    });
     const whereOptions: WhereOptions<StockAdjustment> = {
       [Op.and]: [
         query.facilityId && { facilityId: query.facilityId },
         query.departmentId && { departmentId: query.departmentId },
         query.type && { type: query.type },
         query.status && { status: query.status },
-        query.search && {
-          [Op.or]: [{ reason: { [Op.iLike]: `%${query.search}%` } }],
-        },
         query.startDate && { createdAt: { [Op.gte]: query.startDate } },
         query.endDate && { createdAt: { [Op.lte]: query.endDate } },
       ],
     };
     return {
-      where: whereOptions,
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy
-        ? [[query.orderBy, query.orderDirection ? query.orderDirection : 'ASC']]
-        : [['updatedAt', 'DESC']],
+      where: { ...whereOptions, ...queryFilter.searchFilter },
+      ...queryFilter.pageFilter,
       include: [
         { model: Item, attributes: ['id', 'name'] },
         { model: Batch, attributes: ['id', 'batchNumber'] },

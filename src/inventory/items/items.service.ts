@@ -29,6 +29,7 @@ import { NotificationService } from '../../notification/notification.service';
 import { CreateNotificationDto } from '../../notification/dto';
 import { Features } from '../../shared/enums/permissions.enum';
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
+import { generateFilter } from '../../shared/factory';
 
 @Injectable()
 export class ItemService {
@@ -303,6 +304,7 @@ export class ItemService {
    * @returns The FindAndCountOptions object with the applied filter options.
    */
   private applyFilter(query: ItemPaginationDto): FindAndCountOptions<Item> {
+    const queryFilter = generateFilter(query);
     const whereOptions: WhereOptions<Item> = {
       [Op.and]: [
         query.facilityId && { facilityId: query.facilityId },
@@ -313,25 +315,17 @@ export class ItemService {
             { brandName: { [Op.iLike]: `%${query.search}` } },
           ],
         },
-        query.categories && {
-          category: {
-            name: { [Op.in]: query.categories },
-          },
+        query.status && {
+          status: query.status,
         },
-        query.supplierId && {
-          batches: {
-            supplierId: query.supplierId,
-          },
+        query.categories && {
+          categoryId: query.categories,
         },
       ],
     };
     return {
-      where: whereOptions,
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy
-        ? [[query.orderBy, query.orderDirection ? query.orderDirection : 'ASC']]
-        : [['updatedAt', 'DESC']],
+      where: { ...whereOptions, ...queryFilter.searchFilter },
+      ...queryFilter.pageFilter,
       attributes: [
         'id',
         'name',
@@ -343,7 +337,17 @@ export class ItemService {
       include: [
         {
           model: Batch,
-          include: [{ model: Supplier, attributes: ['id', 'name'] }],
+          include: [
+            {
+              model: Supplier,
+              attributes: ['id', 'name'],
+              where: {
+                ...(query.supplierId && {
+                  id: query.supplierId,
+                }),
+              },
+            },
+          ],
         },
         { model: ItemCategory, attributes: ['id', 'name'] },
       ],

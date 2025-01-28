@@ -6,6 +6,7 @@ import { CreateDepartmentDto, UpdateDepartmentDto } from './dto';
 import { PaginationRequestDto } from '../../shared/docs/dto/pagination.dto';
 import { NotificationService } from '../../notification/notification.service';
 import { User } from '../../auth/models/user.model';
+import { generateFilter } from '../../shared/factory';
 
 @Injectable()
 export class DepartmentService {
@@ -57,18 +58,16 @@ export class DepartmentService {
    * @throws {InternalServerErrorException} if an error occurs while retrieving the categories.
    */
   async findAll(query: PaginationRequestDto, facilityId: string) {
-    const searchByName =
-      (query.search && { name: { [Op.iLike]: `%${query.search}%` } }) || {};
+    const searchByName = { name: { [Op.iLike]: `%${query.search}%` } };
+
+    const queryFilter = generateFilter(query, searchByName);
+
     const filter: FindAndCountOptions<Department> = {
       where: {
         facilityId,
-        ...searchByName,
+        ...queryFilter.searchFilter,
       },
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy
-        ? [[query.orderBy, query.orderDirection ? query.orderDirection : 'ASC']]
-        : [['updatedAt', 'DESC']],
+      ...queryFilter.pageFilter,
       distinct: true,
     };
     const { rows, count } = await this.departmentRepo.findAndCountAll(filter);
