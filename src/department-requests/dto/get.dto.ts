@@ -109,6 +109,11 @@ export class GetItemRequestsResponseDto extends PickType(
 
 export class GetDepartmentRequestResponseDto extends GetItemRequestsResponseDto {
   @ApiResponseProperty({
+    example: '8304e5ff-6324-4863-ac51-8fcbc6812b13',
+  })
+  departmentId: string;
+
+  @ApiResponseProperty({
     example: 'Some Department',
   })
   departmentName: string;

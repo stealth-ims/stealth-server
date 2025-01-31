@@ -54,6 +54,7 @@ export class DepartmentRequestsService {
 
     const attributes: FindAttributeOptions = [
       'id',
+      'departmentId',
       [col('department.name'), 'departmentName'],
       'requestNumber',
       'itemId',
