@@ -216,6 +216,15 @@ export class StockAdjustmentsService {
     const queryFilter = generateFilter(query, {
       [Op.or]: [{ reason: { [Op.iLike]: `%${query.search}%` } }],
     });
+    let itemOrderOptions = {};
+    if (query.orderBy == 'itemName') {
+      itemOrderOptions = {
+        order: [
+          [Item, 'name', query.orderDirection ? query.orderDirection : 'ASC'],
+        ],
+      };
+      delete queryFilter.pageFilter.order;
+    }
     const whereOptions: WhereOptions<StockAdjustment> = {
       [Op.and]: [
         query.facilityId && { facilityId: query.facilityId },
@@ -233,6 +242,7 @@ export class StockAdjustmentsService {
         { model: Item, attributes: ['id', 'name'] },
         { model: Batch, attributes: ['id', 'batchNumber'] },
       ],
+      ...itemOrderOptions,
       attributes: [
         'id',
         'createdAt',

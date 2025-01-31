@@ -4,7 +4,10 @@ import { getDateRangeFilter } from './date-filter.factory';
 export function generateFilter<T extends PaginationRequestDto>(
   query: T,
   searchOption?: any,
-): { pageFilter: object; searchFilter: object } {
+): {
+  pageFilter: { limit: number; offset: number; order: any };
+  searchFilter: object;
+} {
   return {
     pageFilter: {
       limit: query.pageSize || 10,
