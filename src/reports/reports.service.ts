@@ -2,7 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Report } from './models/reports.models';
 import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { GetReportDto, GetReportPaginationDto } from './dto/get.dto';
+import {
+  GetReportDto,
+  GetReportPaginationDto,
+  InventoryReportCategories,
+  SalesReportCategories,
+} from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { UpdateReportDto } from './dto/edit.dto';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
@@ -112,6 +117,21 @@ export class ReportsService {
     const csv = this.dataToCSV(headerLabels, rowsWithItems);
 
     return { reportName, csv };
+  }
+
+  getReportCategories() {
+    const inventoryReports = Object.keys(InventoryReportCategories).map(
+      (key) => ({ id: key, label: InventoryReportCategories[key] as string }),
+    );
+
+    const salesReport = Object.keys(SalesReportCategories).map((key) => ({
+      id: key,
+      label: SalesReportCategories[key] as string,
+    }));
+
+    const categories = { inventoryReports, salesReport };
+
+    return categories;
   }
 
   async create(dto: CreateReportDto) {
