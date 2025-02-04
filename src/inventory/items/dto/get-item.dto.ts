@@ -4,18 +4,13 @@ import {
   ApiProperty,
   ApiResponseProperty,
 } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { GenericResponseDto } from 'src/shared/docs/dto/base.dto';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { CreateItemDto, ItemStatus } from './create-item.dto';
 import { OneBatch } from '../batches/dto';
 
 export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
-  @IsUUID()
-  @IsOptional()
-  @ApiPropertyOptional()
-  supplierId: string;
-
   @ApiPropertyOptional()
   @IsString({ each: true })
   @IsOptional()
