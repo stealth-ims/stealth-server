@@ -10,7 +10,6 @@ import { Sale } from './models/sales.models';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { FindAndCountOptions } from 'sequelize';
 import { Op } from 'sequelize';
-import { ItemService } from '../inventory/items/items.service';
 import { BatchService } from '../inventory/items/batches/batch.service';
 import { Patient } from '../patient/models/patient.model';
 import { Batch, Item } from '../inventory/items/models';
@@ -26,7 +25,6 @@ export class SalesService {
     @InjectModel(Sale)
     private saleRepository: typeof Sale,
 
-    private itemService: ItemService,
     private batchService: BatchService,
     private patientService: PatientService,
   ) {}

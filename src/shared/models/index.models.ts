@@ -7,6 +7,7 @@ import { SalesModels } from 'src/sales/models';
 import { ItemOrderModels } from '../../orders/models';
 import { PatientModels } from '../../patient/models';
 import { NotificationModels } from '../../notification/models';
+import { UserSecondaryModels } from '../../user/models';
 
 export const IndexModels = [
   ...AdminModels,
@@ -18,4 +19,5 @@ export const IndexModels = [
   ...SalesModels,
   ...PatientModels,
   ...NotificationModels,
+  ...UserSecondaryModels,
 ];

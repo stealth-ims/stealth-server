@@ -1,4 +1,3 @@
-import { DepartmentService } from './department/department.service';
 import {
   Body,
   Controller,
@@ -32,10 +31,7 @@ import { IUserPayload } from '../auth/interface/payload.interface';
 @Controller('admin')
 export class AdminController {
   private readonly logger: Logger;
-  constructor(
-    private readonly adminService: AdminService,
-    private readonly departmentService: DepartmentService,
-  ) {
+  constructor(private readonly adminService: AdminService) {
     this.logger = new Logger(AdminController.name);
   }
 

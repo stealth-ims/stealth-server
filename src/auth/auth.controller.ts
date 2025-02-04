@@ -262,7 +262,7 @@ export class AuthController {
   @Get('refresh')
   async refreshTokens(
     @GetUser('sub', ParseUUIDPipe) id: string,
-    @GetUser('session', ParseUUIDPipe) sessionId: string,
+    @GetUser('session') sessionId: string,
   ) {
     try {
       const response = await this.authService.refreshToken(id, sessionId);

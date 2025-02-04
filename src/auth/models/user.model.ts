@@ -6,12 +6,14 @@ import {
   DeletedAt,
   ForeignKey,
   HasMany,
+  HasOne,
   Table,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../shared/models/base.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { Department } from '../../admin/department/models/department.model';
 import { LoginSession } from './login-session.model';
+import { Settings } from '../../user/models/setting.model';
 
 export enum AccountState {
   PENDING = 'Pending',
@@ -94,4 +96,7 @@ export class User extends BaseModel {
 
   @Column({ type: DataType.STRING })
   deletedBy: string;
+
+  @HasOne(() => Settings)
+  settings: Settings;
 }

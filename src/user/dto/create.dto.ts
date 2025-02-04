@@ -89,3 +89,14 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   })
   deletedBy: string;
 }
+
+export class CreateSettingsDto {
+  @ApiProperty({ example: true })
+  emailDepartmentRequests: boolean;
+
+  @ApiProperty({ example: true })
+  emailItemLowStocks: boolean;
+
+  @ApiProperty({ example: true })
+  emailItemOutOfStock: boolean;
+}
