@@ -3,7 +3,7 @@ import {
   ApiResponseProperty,
   PickType,
 } from '@nestjs/swagger';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsUUID } from 'class-validator';
 import { PaginationRequestDto } from 'src/shared/docs/dto/pagination.dto';
 import { OrderStatus } from 'src/shared/enums/itemOrder.enum';
 import { CreateItemOrderDto } from './createOrder.dto';
@@ -11,9 +11,10 @@ import { CreateItemOrderDto } from './createOrder.dto';
 export class GetOrdersDto extends PaginationRequestDto {
   @ApiPropertyOptional({
     description: 'The status of the order',
-    enum: ['requested', 'draft', 'cancelled', 'delivering', 'received'],
+    enum: OrderStatus,
   })
   @IsOptional()
+  @IsEnum(OrderStatus)
   status?: OrderStatus;
 
   @ApiPropertyOptional({

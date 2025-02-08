@@ -74,6 +74,7 @@ export class ItemOrdersService {
       offset: (page - 1) * pageSize,
       attributes: [
         'id',
+        'itemId',
         'orderNumber',
         ['updated_at', 'date'],
         'quantity',
