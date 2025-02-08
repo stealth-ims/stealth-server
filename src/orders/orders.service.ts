@@ -12,6 +12,7 @@ import { generateOrderNumber } from 'src/orders/utils/orders.utils';
 import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
 import { Supplier } from '../inventory/suppliers/models/supplier.model';
 import { Item } from '../inventory/items/models';
+import { generateFilter } from '../shared/factory';
 
 @Injectable()
 export class ItemOrdersService {
@@ -33,26 +34,21 @@ export class ItemOrdersService {
   async findItemOrders(
     dto: GetOrdersDto,
   ): Promise<PaginatedDataResponseDto<ItemOrder[]>> {
-    const {
-      page = 1,
-      pageSize = 10,
-      orderBy,
-      orderDirection = 'DESC',
-      status,
-      supplierId,
-      itemId,
-    } = dto;
-
+    const queryFilter = generateFilter(dto);
+    const limit = queryFilter.pageFilter.limit;
+    const offset = queryFilter.pageFilter.offset;
+    const order = queryFilter.pageFilter.order;
     // Define query options
     const queryOptions: FindAndCountOptions<ItemOrder> = {
       where: {
-        ...(status && { status }),
-        ...(supplierId && { supplierId }),
-        ...(itemId && { itemId }),
+        ...(dto.status && { status: dto.status }),
+        ...(dto.supplierId && { supplierId: dto.supplierId }),
+        ...(dto.itemId && { itemId: dto.itemId }),
+        ...queryFilter.searchFilter,
       },
       distinct: true,
       order: [
-        !orderBy
+        !dto.orderBy
           ? [
               literal(`
               CASE 
@@ -65,13 +61,10 @@ export class ItemOrdersService {
             `),
               'ASC',
             ]
-          : [
-              orderBy && orderBy,
-              orderDirection && orderDirection.toUpperCase(),
-            ],
+          : order,
       ],
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
+      limit,
+      offset,
       attributes: [
         'id',
         'itemId',
@@ -90,8 +83,8 @@ export class ItemOrdersService {
     const orders = await this.itemOrderModel.findAndCountAll(queryOptions);
     return new PaginatedDataResponseDto(
       orders.rows,
-      page,
-      pageSize,
+      dto.page,
+      dto.pageSize,
       orders.count,
     );
   }
