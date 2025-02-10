@@ -1,34 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ItemCategoryController } from './items-category.controller';
-import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
-import { ItemCategory } from './models/items-category.model';
-import { Item } from '../items/models/item.model';
-import { Supplier } from '../suppliers/models/supplier.model';
-import { configuration } from 'src/shared/config/config';
 import { ItemCategoryService } from './items-category.service';
 
 describe('ItemsCategoryController', () => {
   let controller: ItemCategoryController;
 
-  // let testCategory: ItemsCategory;
+  let service: ItemCategoryService;
+  const mockItemCategoryService = {};
 
   // formalities
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        SequelizeModule.forRoot(configuration.test as SequelizeModuleOptions),
-        SequelizeModule.forFeature([ItemCategory, Item, Supplier]),
-        // ConfigModule.forFeature(jwtConfig),
-        // JwtModule.registerAsync(jwtConfig.asProvider()),
-      ],
       controllers: [ItemCategoryController],
-      providers: [ItemCategoryService],
+      providers: [
+        { provide: ItemCategoryService, useValue: mockItemCategoryService },
+      ],
     }).compile();
+
     controller = module.get<ItemCategoryController>(ItemCategoryController);
+    service = module.get<ItemCategoryService>(ItemCategoryService);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+    expect(service).toBeDefined();
   });
 
   // it('should create a new item category', async () => {

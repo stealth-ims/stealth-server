@@ -10,31 +10,28 @@ import {
   Patch,
   Post,
   Query,
-  Res,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiParam, ApiTags } from '@nestjs/swagger';
 import { ReportsService } from './reports.service';
-import { CreateReportDto } from './dto/create.dto';
-import {
-  CustomApiResponse,
-  CustomResponses,
-} from 'src/shared/docs/decorators/default.response.decorators';
-import {
-  GetReportCategoriesDto,
-  GetReportDto,
-  GetReportPaginationDto,
-} from './dto/get.dto';
+import { CustomApiResponse } from 'src/shared/docs/decorators/default.response.decorators';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
+  PaginatedDataResponseDto,
 } from 'src/utils/responses/success.response';
-import { Response } from 'express';
-import { UpdateReportDto } from './dto/edit.dto';
 import { throwError } from 'src/utils/responses/error.response';
-import { Permission } from '../auth/decorator';
+import { GetUser, Permission } from '../auth/decorator';
 import { Features, PermissionLevel } from '../shared/enums/permissions.enum';
-
-const generalResponses: CustomResponses[] = ['success', 'authorize'];
+import {
+  CreateReportDto,
+  FindReportDataDto,
+  GetReportDataDto,
+  GetReportDto,
+  GetReportPaginationDto,
+  ReportCategories,
+  UpdateReportDto,
+} from './dto';
+import { IUserPayload } from '../auth/interface/payload.interface';
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -43,15 +40,18 @@ export class ReportsController {
 
   constructor(private readonly reportsService: ReportsService) {}
 
-  @CustomApiResponse([...generalResponses], {
+  @CustomApiResponse(['success', 'authorize'], {
     type: GetReportDto,
     message: 'Report created successfully',
   })
   @Permission(Features.REPORTS, PermissionLevel.READ_WRITE)
   @Post()
-  async postReport(@Body() dto: CreateReportDto) {
+  async postReport(
+    @Body() dto: CreateReportDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.reportsService.create(dto);
+      const response = await this.reportsService.create(dto, user);
 
       return new ApiSuccessResponseDto(
         response,
@@ -63,73 +63,63 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse(['authorize', 'success'], {
-    type: GetReportCategoriesDto,
-    message: 'Report categories fetched successfully',
-  })
-  @Permission(Features.REPORTS, PermissionLevel.READ)
-  @Get('/categories')
-  async getReportCategories() {
-    try {
-      const response = this.reportsService.getReportCategories();
-
-      return new ApiSuccessResponseDto(
-        response,
-        HttpStatus.OK,
-        'Report categories fetched successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['authorize', 'paginated'], {
+  @CustomApiResponse(['paginated', 'authorize'], {
     type: GetReportDto,
-    message: 'Report fetched successfully',
+    message: 'Reports fetched successfully',
   })
   @Permission(Features.REPORTS, PermissionLevel.READ)
   @Get()
-  async getReports(@Query() query: GetReportPaginationDto) {
+  async getReports(
+    @Query() query: GetReportPaginationDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.reportsService.fetchAll(query);
+      const response = await this.reportsService.fetchAll(query, user);
+      const paginated = new PaginatedDataResponseDto(
+        response.rows,
+        query.page || 1,
+        query.pageSize,
+        response.count,
+      );
+      return new ApiSuccessResponseDto(
+        paginated,
+        HttpStatus.OK,
+        'Reports fetched successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
 
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetReportDataDto,
+    isArray: true,
+    message: 'Report data fetched successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @ApiParam({
+    name: 'type',
+    description: 'Experiment with periodic_sales_report',
+    enum: ReportCategories,
+  })
+  @Get(':type/data')
+  async getReportData(
+    @Param('type') type: ReportCategories,
+    @Query() query: FindReportDataDto,
+  ) {
+    try {
+      const response = await this.reportsService.fetchData(type, query);
       return new ApiSuccessResponseDto(
         response,
         HttpStatus.OK,
-        'Report fetched successfully',
+        'Report data successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
     }
   }
 
-  @CustomApiResponse(['authorize', 'successNull'], {
-    message: 'Report exported successfully',
-  })
-  @HttpCode(HttpStatus.OK)
-  @Permission(Features.REPORTS, PermissionLevel.READ)
-  @Get(':id/export')
-  async exportReport(@Res() res: Response, @Param('id') id: string) {
-    try {
-      const { csv, reportName } = await this.reportsService.export(id);
-
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader(
-        'Content-Disposition',
-        `attachment; filename=${reportName}.csv`,
-      );
-      res.send(csv);
-
-      return new ApiSuccessResponseNoData(
-        HttpStatus.OK,
-        'Report exported successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse([...generalResponses, 'notfound'], {
+  @CustomApiResponse(['success', 'authorize', 'notfound'], {
     type: GetReportDto,
     message: 'Report fetched successfully',
   })
@@ -149,27 +139,7 @@ export class ReportsController {
     }
   }
 
-  @CustomApiResponse([...generalResponses, 'notfound'], {
-    type: String,
-    message: 'Report deleted successfully',
-  })
-  @Permission(Features.REPORTS, PermissionLevel.READ_WRITE_DELETE)
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
-    try {
-      await this.reportsService.removeOne(id);
-
-      return new ApiSuccessResponseNoData(
-        HttpStatus.OK,
-        'Report deleted successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse([...generalResponses, 'notfound'], {
-    type: null,
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     message: 'Report updated successfully',
   })
   @HttpCode(HttpStatus.OK)
@@ -182,6 +152,25 @@ export class ReportsController {
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Report updated successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
+    type: String,
+    message: 'Report deleted successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ_WRITE_DELETE)
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    try {
+      await this.reportsService.removeOne(id);
+
+      return new ApiSuccessResponseNoData(
+        HttpStatus.OK,
+        'Report deleted successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

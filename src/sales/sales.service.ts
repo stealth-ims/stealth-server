@@ -182,6 +182,44 @@ export class SalesService {
     return response;
   }
 
+  async fetchData(whereConditions: Record<string, Record<any, any>>) {
+    const filter: FindAndCountOptions<Sale> = {
+      where: { ...whereConditions },
+      attributes: [
+        'id',
+        'saleItems',
+        'saleNumber',
+        'total',
+        'createdAt',
+        'status',
+      ],
+      include: [
+        {
+          model: Patient,
+          attributes: ['id', 'cardIdentificationNumber', 'name'],
+        },
+      ],
+      order: [['createdAt', 'ASC']],
+      distinct: true,
+    };
+
+    const { rows, count } = await this.saleRepository.findAndCountAll(filter);
+
+    // const modRows = rows.map((sale) => {
+    //   const modSale: Sale = sale.get({ plain: true });
+    //   const saleItem: any = modSale.saleItems[0];
+    //   const remainderItems = modSale.saleItems.length - 1;
+    //   const totalQuantity = modSale.saleItems.reduce(
+    //     (total, saleItem: any) => total + saleItem.quantity,
+    //     0,
+    //   );
+    //   delete saleItem.quantity;
+    //   return { ...modSale, saleItem totalQuantity };
+    // });
+
+    return { rows, count };
+  }
+
   async fetchOne(id: string) {
     const sale = await this.saleRepository.findByPk(id, {
       attributes: { exclude: ['patientId', 'deletedAt', 'deletedBy'] },

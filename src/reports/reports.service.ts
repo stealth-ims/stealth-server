@@ -1,143 +1,94 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Report } from './models/reports.models';
-import { CreateReportDto } from './dto/create.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import {
-  GetReportDto,
-  GetReportPaginationDto,
-  InventoryReportCategories,
-  SalesReportCategories,
-} from './dto/get.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
-import { UpdateReportDto } from './dto/edit.dto';
-import { PaginatedDataResponseDto } from 'src/utils/responses/success.response';
-import { plainToInstance } from 'class-transformer';
 import { ItemService } from 'src/inventory/items/items.service';
 import { StockAdjustmentsService } from '../inventory/inventory.service';
-import { StockAdjustmentPaginationDto } from '../inventory/dto';
+import { SalesService } from '../sales/sales.service';
+import {
+  CreateReportDto,
+  FindReportDataDto,
+  GetReportPaginationDto,
+  ReportCategories,
+  UpdateReportDto,
+} from './dto';
+import { IUserPayload } from '../auth/interface/payload.interface';
+import { generateFilter } from '../shared/factory';
+import { endOfDay, startOfDay } from 'date-fns';
 
 @Injectable()
 export class ReportsService {
   constructor(
     @InjectModel(Report)
     private reportRepository: typeof Report,
-
-    private stockAdjustmentService: StockAdjustmentsService,
     private itemService: ItemService,
+    private stockAdjustmentService: StockAdjustmentsService,
+    private salesService: SalesService,
   ) {}
 
-  private dataToCSV(headerLabels: Record<string, string>, rowsJson: any[]) {
-    const csvRows = [];
+  async create(dto: CreateReportDto, user: IUserPayload) {
+    const report = await this.reportRepository.create({
+      ...dto,
+      facilityId: user.facility,
+      departmentId: user.department,
+    });
 
-    csvRows.push(Object.values(headerLabels).join(','));
-
-    for (const [index, row] of rowsJson.entries()) {
-      const values = Object.keys(headerLabels).map((header) => {
-        const escaped =
-          headerLabels[header] === '#'
-            ? index + 1
-            : ('' + (row[header] ?? '')).replace(/"/g, '\\"');
-        return `"${escaped}"`;
-      });
-      csvRows.push(values.join(','));
-    }
-
-    return csvRows.join('\n');
+    return report;
   }
 
-  async fetchAll(query: GetReportPaginationDto) {
+  async fetchAll(query: GetReportPaginationDto, user: IUserPayload) {
     const whereConditions: Record<string, Record<any, any>> = {};
+    const queryFilter = generateFilter(query);
 
-    if (query.reportName) {
-      whereConditions.reportName = { [Op.iLike]: `%${query.reportName}%` };
-    }
+    whereConditions.facilityId = { [Op.is]: `%${user.facility}%` };
 
-    if (query.nameInExport) {
-      whereConditions.nameInExport = { [Op.iLike]: `%${query.nameInExport}%` };
-    }
-
-    if (query.startDate || query.endDate) {
-      whereConditions.createdAt = {
-        ...(query.startDate && { [Op.gte]: new Date(query.startDate) }),
-        ...(query.endDate && { [Op.lte]: new Date(query.endDate) }),
-      };
+    if (user.department) {
+      whereConditions.departmentId = { [Op.is]: `%${user.department}%` };
     }
 
     const filter: FindAndCountOptions<Report> = {
-      where: whereConditions,
-      limit: query.pageSize || 10,
-      offset: query.pageSize * (query.page - 1) || 0,
-      order: query.orderBy && [[query.orderBy, 'ASC']],
+      where: { ...whereConditions, ...queryFilter.searchFilter },
+      ...queryFilter.pageFilter,
       distinct: true,
     };
 
     const { rows, count } = await this.reportRepository.findAndCountAll(filter);
 
-    const response = new PaginatedDataResponseDto<GetReportDto[]>(
-      rows,
-      query.page || 1,
-      query.pageSize,
-      count,
-    );
-
-    return response;
+    return { rows, count };
   }
 
-  async export(id: string) {
-    const { reportName, startDate, endDate } = await this.fetchOne(id);
+  async fetchData(type: ReportCategories, query: FindReportDataDto) {
+    const whereConditions: Record<string, Record<any, any>> = {};
 
-    const [rows] = await this.stockAdjustmentService.findAll(
-      plainToInstance(StockAdjustmentPaginationDto, { startDate, endDate }),
-    );
+    if (query.startDate && query.endDate) {
+      whereConditions.createdAt = {
+        [Op.between]: [query.startDate, query.endDate],
+      };
+    }
 
-    const items = await Promise.all(
-      rows.map(({ itemId }) => this.itemService.findOne(itemId)),
-    );
+    if (query.specificDate) {
+      const specificDateStart = startOfDay(query.specificDate);
+      const specificDateEnd = endOfDay(query.specificDate);
+      whereConditions.createdAt = {
+        [Op.between]: [specificDateStart, specificDateEnd],
+      };
+    }
 
-    const rowsWithItems = rows.map(({ type, reason }, index) => ({
-      type,
-      reason,
-      name: items[index].name,
-      brand: items[index].brandName,
-      costPrice: items[index].costPrice,
-      sellingPrice: items[index].sellingPrice,
-      code: items[index].code,
-    }));
-
-    const headerLabels = {
-      type: 'Type',
-      reason: 'Reason',
-      name: 'Item Name',
-      brand: 'Brand',
-      costPrice: 'Cost Price',
-      sellingPrice: 'Selling Price',
-      code: 'Code',
-    };
-
-    const csv = this.dataToCSV(headerLabels, rowsWithItems);
-
-    return { reportName, csv };
+    switch (type) {
+      case ReportCategories.PERIODIC_SALES_REPORT:
+        const { rows, count } =
+          await this.salesService.fetchData(whereConditions);
+        return { count, rows };
+      default:
+        return { count: 0, rows: [] };
+    }
   }
 
-  getReportCategories() {
-    const inventoryReports = Object.keys(InventoryReportCategories).map(
-      (key) => ({ id: key, label: InventoryReportCategories[key] as string }),
-    );
-
-    const salesReport = Object.keys(SalesReportCategories).map((key) => ({
-      id: key,
-      label: SalesReportCategories[key] as string,
-    }));
-
-    const categories = { inventoryReports, salesReport };
-
-    return categories;
-  }
-
-  async create(dto: CreateReportDto) {
-    const report = await this.reportRepository.create({
-      ...dto,
-    });
+  async fetchOne(id: string) {
+    const report = await this.reportRepository.findByPk(id);
+    if (!report) {
+      throw new NotFoundException(`Report not found`);
+    }
 
     return report;
   }
@@ -154,16 +105,7 @@ export class ReportsService {
       throw new NotFoundException(`Report not found`);
     }
 
-    return rowsUpdated;
-  }
-
-  async fetchOne(id: string) {
-    const report = await this.reportRepository.findByPk(id);
-    if (!report) {
-      throw new NotFoundException(`Report not found`);
-    }
-
-    return report;
+    return;
   }
 
   async removeOne(id: string) {

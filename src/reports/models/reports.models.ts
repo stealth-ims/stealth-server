@@ -1,41 +1,63 @@
-import { Column, Table, DataType, DeletedAt } from 'sequelize-typescript';
+import {
+  Column,
+  Table,
+  DeletedAt,
+  AllowNull,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { BaseModel } from '../../shared/models/base.model';
-
-export enum ReportLayout {
-  PORTRAIT = 'PORTRAIT',
-  LANDSCAPE = 'LANDSCAPE',
-}
-
-export type ReportLayoutType = keyof typeof ReportLayout;
+import { Facility } from '../../admin/facility/models/facility.model';
+import { Department } from '../../admin/department/models/department.model';
 
 @Table({
   tableName: 'reports',
   underscored: true,
 })
 export class Report extends BaseModel {
-  @Column({ type: DataType.STRING, field: 'report_name' })
-  reportName: string;
+  @Column
+  reportType: string;
 
-  @Column({ type: DataType.STRING, field: 'name_in_export' })
+  @Column
+  name: string;
+
+  @AllowNull
+  @Column
   nameInExport: string;
 
-  @Column({ type: DataType.DATE, field: 'start_date' })
+  @AllowNull
+  @Column
   startDate: Date;
 
-  @Column({ type: DataType.DATE, field: 'end_date' })
+  @AllowNull
+  @Column
   endDate: Date;
 
+  @AllowNull
+  @Column
+  specificDate: Date;
+
   @DeletedAt
-  @Column({ type: DataType.DATE, field: 'deleted_at' })
+  @AllowNull
+  @Column
   deletedAt: Date;
 
-  @Column({ type: DataType.STRING, field: 'deleted_by' })
+  @AllowNull
+  @Column
   deletedBy: string;
 
-  @Column({
-    type: DataType.ENUM(...Object.values(ReportLayout)),
-    defaultValue: 'PORTRAIT',
-    field: 'report_layout',
-  })
-  reportLayout: ReportLayoutType;
+  @ForeignKey(() => Department)
+  @AllowNull
+  @Column
+  departmentId: string;
+
+  @BelongsTo(() => Department)
+  department: Department;
+
+  @ForeignKey(() => Facility)
+  @Column
+  facilityId: string;
+
+  @BelongsTo(() => Facility)
+  facility: Facility;
 }
