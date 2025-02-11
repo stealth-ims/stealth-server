@@ -43,7 +43,7 @@ export class AdminService {
       facilityId,
     });
     if (user.id) {
-      this.sendUserCreatedMail(user);
+      this.sendUserCreatedMail(user, facility.password);
     }
 
     const response = await this.userRepository.findByPk(user.id, {
@@ -200,7 +200,7 @@ export class AdminService {
     return personnel;
   }
 
-  private sendUserCreatedMail(user: User) {
+  private sendUserCreatedMail(user: User, password: string) {
     const updatedAt = new Date(user.updatedAt).toUTCString();
     const email = {
       from: this.configService.get<string>('EMAIL_FROM'),
@@ -211,6 +211,7 @@ export class AdminService {
         email: user.email,
         fullName: user.fullName,
         role: user.role,
+        password: password,
         updatedAt,
       },
     };
