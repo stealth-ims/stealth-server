@@ -2,6 +2,7 @@ import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { User } from '../models/user.model';
 import { Role } from '../interface/roles.enum';
+import { addSeconds } from 'date-fns';
 
 export class TokenDto {
   constructor(accessToken: string, refreshToken: string) {
@@ -24,7 +25,7 @@ export class TokenDto {
 }
 
 export class LoginTokenDto {
-  constructor(user: User, tokens: TokenDto) {
+  constructor(user: User, tokens: TokenDto, expiresAt: number) {
     this.id = user.id;
     this.fullName = user.fullName;
     this.email = user.email;
@@ -34,6 +35,7 @@ export class LoginTokenDto {
     this.permissions = user.permissions;
     this.role = user.role as Role;
     this.tokens = tokens;
+    this.expiresAt = addSeconds(new Date(), expiresAt);
   }
   @ApiResponseProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
@@ -85,4 +87,9 @@ export class LoginTokenDto {
     type: TokenDto,
   })
   tokens: TokenDto;
+
+  @ApiResponseProperty({
+    example: addSeconds(new Date(), 3600),
+  })
+  expiresAt: Date;
 }

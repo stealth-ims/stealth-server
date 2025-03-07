@@ -81,7 +81,11 @@ export class AuthService {
 
     this.sendAccountCreationConfirmation(dto.email, user.fullName, user.role);
     const token = await this.generateTokens(user, null);
-    return new LoginTokenDto(user, token);
+
+    const expiresAt: number = this.configService.get<number>(
+      'JWT_ACCESS_TOKEN_TTL',
+    );
+    return new LoginTokenDto(user, token, expiresAt);
     // return createdUser;
   }
 
@@ -113,7 +117,10 @@ export class AuthService {
       token = await this.generateTokens(user, null);
     }
 
-    return new LoginTokenDto(user, token);
+    const expiresAt: number = this.configService.get<number>(
+      'JWT_ACCESS_TOKEN_TTL',
+    );
+    return new LoginTokenDto(user, token, expiresAt);
   }
 
   async retrieveUser(userId: string) {
