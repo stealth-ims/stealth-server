@@ -34,7 +34,6 @@ import {
   RefreshTokenDto,
   ResetPasswordDto,
   SendForgotPasswordEmailDto,
-  TokenDto,
 } from './dto';
 import {
   ApiBadRequestResponse,
@@ -248,7 +247,7 @@ export class AuthController {
   }
 
   @ApiSuccessResponse({
-    type: TokenDto,
+    type: RefreshTokenDto,
     description: 'Tokens refreshed successfully',
   })
   @ApiUnauthorizedResponse({
