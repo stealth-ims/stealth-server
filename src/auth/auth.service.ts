@@ -174,6 +174,9 @@ export class AuthService {
     const payload: IUserPayload = await this.jwtService.verifyAsync(token, {
       secret: this.jwtConfiguration.secret,
     });
+    const expiresAt: number = this.configService.get<number>(
+      'JWT_ACCESS_TOKEN_TTL',
+    );
     const user = await this.userRepository.findByPk(payload.sub);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -187,10 +190,12 @@ export class AuthService {
 
       return new RefreshTokenDto(
         (await this.generateTokens(user, payload.session)).accessToken,
+        expiresAt,
       );
     } else {
       return new RefreshTokenDto(
         (await this.generateTokens(user, null)).accessToken,
+        expiresAt,
       );
     }
   }
