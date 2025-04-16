@@ -8,7 +8,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Batch, Item } from '../models';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../../suppliers/suppliers.service';
-import { FindAndCountOptions, Op } from 'sequelize';
+import { FindAndCountOptions, Op, QueryTypes } from 'sequelize';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateBatchDto, UpdateBatchDto } from './dto';
 import { PaginationRequestDto } from '../../../core/shared/docs/dto/pagination.dto';
@@ -69,6 +69,28 @@ export class BatchService {
       where: whereOptions,
       include: [{ model: Supplier, attributes: ['id', 'name'] }],
     });
+  }
+
+  async getAggregatedBatches(from: Date, to: Date) {
+    const sequelize = this.batchRepo.sequelize;
+
+    const [results] = await sequelize.query(
+      `
+        SELECT 
+          DATE("updated_at") as day, 
+          SUM("quantity") as totalQuantity
+        FROM "sales"
+        WHERE "updated_at" BETWEEN :from AND :to
+        GROUP BY day
+        ORDER BY day ASC
+        `,
+      {
+        replacements: { from, to },
+        type: QueryTypes.SELECT,
+      },
+    );
+
+    return results;
   }
 
   async fetchAllPaginate(itemId: string, query: PaginationRequestDto) {
