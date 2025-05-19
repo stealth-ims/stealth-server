@@ -50,9 +50,13 @@ export class AuthGuard implements CanActivate {
         secret: this.jwtConfiguration.secret,
       });
       request['user'] = payload;
+
       if (payload.session) {
         const session = await this.loginSessionRepository.findByPk(
           payload.session,
+          {
+            attributes: ['id', 'location'],
+          },
         );
         if (!session) {
           throw new UnauthorizedException('CLOSED_SESSION');

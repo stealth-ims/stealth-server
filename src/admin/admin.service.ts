@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { AccountState, User } from '../auth/models/user.model';
 import { literal } from 'sequelize';
-import { ChangeRoleDto } from './dto';
+import { ChangeRoleDto, FindUserQueryDto } from './dto';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../notification/mail/mail.service';
 import { Department } from './department/models/department.model';
@@ -15,9 +15,9 @@ import { CreateUserDto } from '../user/dto';
 import * as roles from './data/roles.json';
 import * as bcrypt from 'bcrypt';
 import { FacilityService } from './facility/facility.service';
-import { PaginationRequestDto } from '../core/shared/docs/dto/pagination.dto';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { generateFilter } from '../core/shared/factory';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AdminService {
@@ -59,17 +59,24 @@ export class AdminService {
     return roles.roles;
   }
 
-  async findFaciltyPersonnel(user: IUserPayload, query: PaginationRequestDto) {
+  async findFaciltyPersonnel(user: IUserPayload, query: FindUserQueryDto) {
     this.logger.log(`Retrieving facilities personnel`);
     const queryFilter = generateFilter(query);
+    const whereOptions: Record<string, any> = {};
     const userId = user.sub;
-    const departmentIdObj = user.department
-      ? { departmentId: user.department }
-      : {};
+    if (user.department) {
+      whereOptions.departmentId = { [Op.eq]: user.department };
+    }
+    if (query.status) {
+      whereOptions.status = { [Op.eq]: query.status };
+    }
+    if (query.role) {
+      whereOptions.role = { [Op.iLike]: `%${query.role}%` };
+    }
     const users = await this.userRepository.findAndCountAll({
       where: {
         facilityId: user.facility,
-        ...departmentIdObj,
+        ...whereOptions,
         ...queryFilter.searchFilter,
       },
       ...queryFilter.pageFilter,

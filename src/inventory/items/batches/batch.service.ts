@@ -182,8 +182,8 @@ export class BatchService {
       throw new BadRequestException('Insufficient stock in batch');
 
     batch.quantity -= qty;
-    if (batch.quantity == 0) await batch.destroy({ force: true });
     await batch.save();
+    if (batch.quantity == 0) await batch.destroy({ force: true });
     this.eventEmitter.emit('quantity.changed', { itemId: itemId });
     this.logger.log(`Stock removed from batch. ID: ${id}`);
   }

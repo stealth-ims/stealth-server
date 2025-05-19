@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
-import { PaginationRequestDto } from '../core/shared/docs/dto/pagination.dto';
 import { GetUser, Permission } from '../auth/decorator';
 import {
   ApiSuccessResponseDto,
@@ -21,7 +20,7 @@ import {
 } from '../core/shared/responses/success.response';
 import { throwError } from '../core/shared/responses/error.response';
 import { User } from '../auth/models/user.model';
-import { ChangeRoleDto, GetAdminUserDto } from './dto';
+import { ChangeRoleDto, FindUserQueryDto, GetAdminUserDto } from './dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   Features,
@@ -44,7 +43,7 @@ export class AdminController {
     message: 'User created successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
-  @Post('/user')
+  @Post('user')
   async createUser(
     @Body() dto: CreateUserDto,
     @GetUser('facility', ParseUUIDPipe) facilityId: string,
@@ -66,9 +65,9 @@ export class AdminController {
     message: 'Personnels retrieved successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ)
-  @Get('/users')
+  @Get('users')
   async getFacilityPersonnel(
-    @Query() query: PaginationRequestDto,
+    @Query() query: FindUserQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     const { rows, count } = await this.adminService.findFaciltyPersonnel(
@@ -107,7 +106,7 @@ export class AdminController {
     message: 'User role updated successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
-  @Patch('/users/:id/role')
+  @Patch('users/:id/role')
   async changeRole(
     @Param('id', ParseUUIDPipe) personnelId: string,
     @Body() dto: ChangeRoleDto,
@@ -125,7 +124,7 @@ export class AdminController {
     message: 'User deactivated successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
-  @Patch('/users/:id/deactivate')
+  @Patch('users/:id/deactivate')
   async deactivateUser(
     @Param('id', ParseUUIDPipe) userId: string,
     @GetUser('sub', ParseUUIDPipe) adminId: string,
@@ -142,7 +141,7 @@ export class AdminController {
     message: 'User re-activated successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
-  @Patch('/users/:id/activate')
+  @Patch('users/:id/activate')
   async activateUser(
     @Param('id', ParseUUIDPipe) userId: string,
     @GetUser('sub', ParseUUIDPipe) adminId: string,
@@ -160,7 +159,7 @@ export class AdminController {
     message: 'Starter roles retrieved successfully',
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
-  @Get('/roles')
+  @Get('roles')
   getStarterRoles() {
     const response = this.adminService.retrieveStarterRoles();
     return new ApiSuccessResponseDto(

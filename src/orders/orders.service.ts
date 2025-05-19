@@ -102,7 +102,7 @@ export class ItemOrdersService {
         {
           model: Item,
           attributes: ['id', 'name'],
-          where: dto.searchBy == SearchBy.ITEM_NAME && {
+          where: (dto.searchBy == SearchBy.ITEM_NAME || dto.search) && {
             name: { [Op.iLike]: `%${dto.search}%` },
           },
         },
