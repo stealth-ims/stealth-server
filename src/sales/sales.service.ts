@@ -40,7 +40,7 @@ export class SalesService {
 
     if (query.search) {
       itemWhereConditions.name = {
-        [Op.like]: `%${query.search}%`,
+        [Op.iLike]: `%${query.search}%`,
       };
     }
 
