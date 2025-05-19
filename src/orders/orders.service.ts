@@ -13,6 +13,7 @@ import { PaginatedDataResponseDto } from 'src/core/shared/responses/success.resp
 import { Supplier } from '../inventory/suppliers/models/supplier.model';
 import { Item } from '../inventory/items/models';
 import { generateFilter } from '../core/shared/factory';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ItemOrdersService {
@@ -34,7 +35,12 @@ export class ItemOrdersService {
   async findItemOrders(
     dto: GetOrdersDto,
   ): Promise<PaginatedDataResponseDto<ItemOrder[]>> {
-    const queryFilter = generateFilter(dto);
+    let searchCondtion = {};
+    if (dto.searchBy && dto.search) {
+      searchCondtion = { [dto.searchBy]: { [Op.iLike]: `%${dto.search}%` } };
+    }
+
+    const queryFilter = generateFilter(dto, searchCondtion);
     const limit = queryFilter.pageFilter.limit;
     const offset = queryFilter.pageFilter.offset;
     const order = queryFilter.pageFilter.order;

@@ -8,6 +8,12 @@ import { PaginationRequestDto } from 'src/core/shared/docs/dto/pagination.dto';
 import { OrderStatus } from 'src/core/shared/enums/itemOrder.enum';
 import { CreateItemOrderDto } from './createOrder.dto';
 
+export enum SearchBy {
+  ORDER_NUMBER = 'orderNumber',
+  SUPPLIER_NUMBER = 'supplierNumber',
+  ITEM_NAME = 'itemName',
+}
+
 export class GetOrdersDto extends PaginationRequestDto {
   @ApiPropertyOptional({
     description: 'The status of the order',
@@ -30,6 +36,14 @@ export class GetOrdersDto extends PaginationRequestDto {
   @IsOptional()
   @IsUUID(4)
   itemId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Options to search for orders by',
+    enum: SearchBy,
+  })
+  @IsOptional()
+  @IsEnum(SearchBy)
+  searchBy?: SearchBy;
 }
 
 export class GetItemOrdersResponseDto extends PickType(CreateItemOrderDto, [
