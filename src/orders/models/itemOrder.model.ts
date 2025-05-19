@@ -9,6 +9,8 @@ import {
 import { OrderStatus } from 'src/core/shared/enums/itemOrder.enum';
 import { Item } from '../../inventory/items/models';
 import { Supplier } from '../../inventory/suppliers/models/supplier.model';
+import { Facility } from '../../admin/facility/models/facility.model';
+import { User } from '../../auth/models/user.model';
 @Table({
   tableName: 'item_orders',
   underscored: true,
@@ -54,4 +56,28 @@ export class ItemOrder extends BaseModel {
 
   @Column({ defaultValue: OrderStatus.DRAFT })
   status: OrderStatus;
+
+  @AllowNull
+  @ForeignKey(() => Facility)
+  @Column
+  facilityId: string;
+
+  @BelongsTo(() => Facility)
+  facility: Facility;
+
+  @AllowNull
+  @ForeignKey(() => User)
+  @Column
+  createdById: string;
+
+  @BelongsTo(() => User, { as: 'createdBy' })
+  createdBy: User;
+
+  @AllowNull
+  @ForeignKey(() => User)
+  @Column
+  updatedById: string;
+
+  @BelongsTo(() => User, { as: 'updatedBy' })
+  updatedBy: User;
 }

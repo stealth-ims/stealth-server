@@ -17,6 +17,17 @@ module.exports = {
         allowNull: false,
         field: 'item_id',
       },
+      facilityId: {
+        references: {
+          model: 'facilities',
+          key: 'id',
+        },
+        allowNull: true,
+        type: Sequelize.UUID,
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        field: 'facility_id',
+      },
       orderNumber: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -65,6 +76,28 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
         defaultValue: 'draft',
+      },
+      createdById: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        field: 'created_by_id',
+      },
+      updatedById: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+        field: 'updated_by_id',
       },
     });
   },

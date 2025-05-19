@@ -42,12 +42,6 @@ export class CreateItemOrderDto extends GenericResponseDto {
   @SupplierExists()
   supplierId: string;
 
-  @ApiResponseProperty({
-    example: '4456677383',
-  })
-  @IsOptional()
-  orderNumber: string;
-
   @ApiPropertyOptional({
     description: 'The expected delivery date of the order',
     example: new Date(),
@@ -92,4 +86,28 @@ export class CreateItemOrderDto extends GenericResponseDto {
   })
   @IsEnum(OrderStatus)
   status: OrderStatus;
+
+  @ApiResponseProperty({
+    example: '4456677383',
+  })
+  @IsOptional()
+  orderNumber: string;
+
+  @ApiResponseProperty({
+    example: '1f03c227-2217-4f1d-a4b7-bfe4bec06557',
+  })
+  @IsOptional()
+  facilityId: string;
+
+  @ApiResponseProperty({
+    example: '7a3038b8-4105-45e4-8849-d777a7251dc1',
+  })
+  @IsOptional()
+  createdById: string;
+
+  @ApiResponseProperty({
+    example: null,
+  })
+  @IsOptional()
+  updatedById: string;
 }

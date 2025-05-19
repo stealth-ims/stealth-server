@@ -4,6 +4,7 @@ import {
   ChangeOrderStatusDto,
   CreateItemOrderDto,
   GetOrdersDto,
+  SearchBy,
   UpdateItemOrderDto,
 } from './dto';
 import { ItemOrder } from './models/itemOrder.model';
@@ -14,6 +15,7 @@ import { Supplier } from '../inventory/suppliers/models/supplier.model';
 import { Item } from '../inventory/items/models';
 import { generateFilter } from '../core/shared/factory';
 import { Op } from 'sequelize';
+import { IUserPayload } from '../auth/interface/payload.interface';
 
 @Injectable()
 export class ItemOrdersService {
@@ -23,21 +25,29 @@ export class ItemOrdersService {
   ) {}
 
   // Create a new item order
-  async createItemOrder(dto: CreateItemOrderDto): Promise<ItemOrder> {
+  async createItemOrder(
+    dto: CreateItemOrderDto,
+    user: IUserPayload,
+  ): Promise<ItemOrder> {
     if (!dto.orderNumber) {
       dto.orderNumber = generateOrderNumber();
     }
 
-    return this.itemOrderModel.create({ ...dto });
+    return this.itemOrderModel.create({
+      ...dto,
+      facilityId: user.facility,
+      createdById: user.sub,
+    });
   }
 
   // Fetch multiple item orders with optional filters
   async findItemOrders(
     dto: GetOrdersDto,
+    facilityId: string,
   ): Promise<PaginatedDataResponseDto<ItemOrder[]>> {
     let searchCondtion = {};
-    if (dto.searchBy && dto.search) {
-      searchCondtion = { [dto.searchBy]: { [Op.iLike]: `%${dto.search}%` } };
+    if (dto.searchBy == SearchBy.ORDER_NUMBER) {
+      searchCondtion = { orderNumber: { [Op.iLike]: `%${dto.search}%` } };
     }
 
     const queryFilter = generateFilter(dto, searchCondtion);
@@ -47,6 +57,7 @@ export class ItemOrdersService {
     // Define query options
     const queryOptions: FindAndCountOptions<ItemOrder> = {
       where: {
+        facilityId,
         ...(dto.status && { status: dto.status }),
         ...(dto.supplierId && { supplierId: dto.supplierId }),
         ...(dto.itemId && { itemId: dto.itemId }),
@@ -81,8 +92,20 @@ export class ItemOrdersService {
         'status',
       ],
       include: [
-        { model: Supplier, attributes: ['id', 'name'] },
-        { model: Item, attributes: ['id', 'name'] },
+        {
+          model: Supplier,
+          attributes: ['id', 'name'],
+          where: dto.searchBy == SearchBy.SUPPLIER_NAME && {
+            name: { [Op.iLike]: `%${dto.search}%` },
+          },
+        },
+        {
+          model: Item,
+          attributes: ['id', 'name'],
+          where: dto.searchBy == SearchBy.ITEM_NAME && {
+            name: { [Op.iLike]: `%${dto.search}%` },
+          },
+        },
       ],
     };
 
@@ -115,12 +138,13 @@ export class ItemOrdersService {
   async updateItemOrder(
     id: string,
     dto: UpdateItemOrderDto,
+    userId: string,
   ): Promise<ItemOrder> {
     const itemOrder = await this.itemOrderModel.findOne({ where: { id } });
     if (!itemOrder) {
       throw new NotFoundException('User not found');
     }
-    await itemOrder.update(dto);
+    await itemOrder.update({ ...dto, updatedById: userId });
     return;
   }
 

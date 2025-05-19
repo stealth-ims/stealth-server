@@ -10,7 +10,7 @@ import { CreateItemOrderDto } from './createOrder.dto';
 
 export enum SearchBy {
   ORDER_NUMBER = 'orderNumber',
-  SUPPLIER_NUMBER = 'supplierNumber',
+  SUPPLIER_NAME = 'supplierName',
   ITEM_NAME = 'itemName',
 }
 

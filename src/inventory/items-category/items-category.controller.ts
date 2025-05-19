@@ -14,12 +14,12 @@ import {
 import { ItemCategoryService } from './items-category.service';
 import {
   CreateItemsCategoryDto,
+  FindItemCategoryDto,
   ItemCategoryResponse,
   UpdateItemCategoryDto,
 } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators/default.response.decorators';
-import { PaginationRequestDto } from 'src/core/shared/docs/dto/pagination.dto';
 import { GetUser, Permission } from 'src/auth/decorator';
 import {
   ApiSuccessResponseDto,
@@ -74,7 +74,7 @@ export class ItemCategoryController {
   @Get()
   async findAll(
     @GetUser('facility', ParseUUIDPipe) facilityId: string,
-    @Query() query?: PaginationRequestDto,
+    @Query() query?: FindItemCategoryDto,
   ) {
     try {
       const categories = await this.itemCategoryService.findAll(

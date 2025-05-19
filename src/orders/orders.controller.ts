@@ -28,13 +28,14 @@ import {
 } from './dto';
 import { ItemOrdersService } from './orders.service';
 import { ItemOrder } from './models/itemOrder.model';
-import { Permission } from 'src/auth/decorator';
+import { GetUser, Permission } from 'src/auth/decorator';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators';
 import { throwError } from '../core/shared/responses/error.response';
 import {
   Features,
   PermissionLevel,
 } from '../core/shared/enums/permissions.enum';
+import { IUserPayload } from '../auth/interface/payload.interface';
 
 @ApiTags('Item Orders')
 @Controller('item-orders')
@@ -50,10 +51,11 @@ export class ItemOrdersController {
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ_WRITE)
   @Post()
   async create(
+    @GetUser() user: IUserPayload,
     @Body() dto: CreateItemOrderDto,
   ): Promise<ApiSuccessResponseDto<ItemOrder>> {
     try {
-      const result = await this.orderService.createItemOrder(dto);
+      const result = await this.orderService.createItemOrder(dto, user);
       return new ApiSuccessResponseDto<ItemOrder>(
         result,
         HttpStatus.CREATED,
@@ -72,10 +74,11 @@ export class ItemOrdersController {
   @Permission(Features.DRUG_ORDERS, PermissionLevel.READ)
   @Get()
   async getItemOrders(
+    @GetUser('facility') facilityId: string,
     @Query() query: GetOrdersDto,
   ): Promise<ApiSuccessResponseDto<PaginatedDataResponseDto<ItemOrder[]>>> {
     try {
-      const result = await this.orderService.findItemOrders(query);
+      const result = await this.orderService.findItemOrders(query, facilityId);
       return new ApiSuccessResponseDto(
         result,
         HttpStatus.OK,
@@ -118,10 +121,11 @@ export class ItemOrdersController {
   @Patch(':id')
   async updateItemOrder(
     @Param('id') id: string,
+    @GetUser('sub') userId: string,
     @Body() dto: UpdateItemOrderDto,
   ): Promise<ApiSuccessResponseDto<ItemOrder>> {
     try {
-      const _result = await this.orderService.updateItemOrder(id, dto);
+      const _result = await this.orderService.updateItemOrder(id, dto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item order updated successfully',

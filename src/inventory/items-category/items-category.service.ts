@@ -6,11 +6,11 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import {
   CreateItemsCategoryDto,
+  FindItemCategoryDto,
   ItemCategoryResponse,
   UpdateItemCategoryDto,
 } from './dto';
 import { ApiSuccessResponseNoData } from 'src/core/shared/responses/success.response';
-import { PaginationRequestDto } from 'src/core/shared/docs/dto/pagination.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
 import { Item } from '../items/models/item.model';
 import { generateFilter } from '../../core/shared/factory';
@@ -54,23 +54,20 @@ export class ItemCategoryService {
    */
   async findAll(
     facilityId: string,
-    query?: PaginationRequestDto,
+    query?: FindItemCategoryDto,
   ): Promise<[ItemCategory[], number]> {
     const queryFilter = generateFilter(query);
-    const paginateObject = query
-      ? {
-          where: {
-            facilityId,
-            ...((query.search && {
-              name: { [Op.iLike]: `%${query.search}%` },
-            }) ||
-              {}),
-            ...queryFilter.searchFilter,
-          },
-        }
-      : {};
+    const whereCondition: Record<string, any> = {};
+
+    if (query.search) {
+      whereCondition.name = { [Op.iLike]: `%${query.search}%` };
+    }
+    if (query.status) {
+      whereCondition.status = { [Op.eq]: query.status };
+    }
+
     const filter: FindAndCountOptions<ItemCategory> = {
-      ...paginateObject,
+      where: { facilityId, ...whereCondition, ...queryFilter.searchFilter },
       ...queryFilter.pageFilter,
       include: [Item],
       attributes: { exclude: ['facilityId'] },
