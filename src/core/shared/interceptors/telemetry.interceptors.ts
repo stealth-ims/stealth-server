@@ -15,7 +15,11 @@ export class TelemetryInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const { method, route, url, headers, body } = request;
     const isDevelopment = process.env.NODE_ENV == 'development';
-    if (!isDevelopment) {
+    const isProduction = process.env.NODE_ENV == 'production';
+    const endpoints = ['login', 'signup', 'reset', 'change-password'];
+    const blacklisted = (element: string) => route.path.includes(element);
+    const noBlacklistedData = isProduction && !endpoints.some(blacklisted);
+    if (!isDevelopment && noBlacklistedData) {
       this.logger.debug(`Request: ${method} ${route.path}`, {
         method,
         url,
