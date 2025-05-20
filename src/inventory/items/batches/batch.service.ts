@@ -13,6 +13,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateBatchDto, UpdateBatchDto } from './dto';
 import { PaginationRequestDto } from '../../../core/shared/docs/dto/pagination.dto';
 import { generateFilter } from '../../../core/shared/factory';
+import { User } from '../../../auth/models/user.model';
 
 @Injectable()
 export class BatchService {
@@ -67,7 +68,10 @@ export class BatchService {
     const whereOptions = itemId ? { itemId } : {};
     return this.batchRepo.findAll({
       where: whereOptions,
-      include: [{ model: Supplier, attributes: ['id', 'name'] }],
+      include: [
+        { model: Supplier, attributes: ['id', 'name'] },
+        { model: User, attributes: ['id', 'fullName', 'email'] },
+      ],
     });
   }
 
@@ -93,13 +97,17 @@ export class BatchService {
     return results;
   }
 
-  async fetchAllPaginate(itemId: string, query: PaginationRequestDto) {
+  async fetchAllPaginate(
+    itemId: string,
+    query: PaginationRequestDto,
+    departmentId: string,
+  ) {
     const paginationFilter = generateFilter(query, {
       batchNumber: { [Op.iLike]: `%${query.search}%` },
     });
     const { rows, count } = await this.batchRepo.findAndCountAll({
       ...paginationFilter.pageFilter,
-      where: { itemId, ...paginationFilter.searchFilter },
+      where: { itemId, departmentId, ...paginationFilter.searchFilter },
       attributes: ['id', 'createdAt', 'validity', 'batchNumber', 'quantity'],
       include: [
         { model: Supplier, attributes: ['id', 'name'] },
@@ -109,15 +117,27 @@ export class BatchService {
     return { rows, count };
   }
 
-  async findAllNoPaginate(itemId: string) {
+  async findAllNoPaginate(itemId: string, departmentId: string) {
     return this.batchRepo.findAll({
-      where: { itemId },
+      where: { itemId, departmentId },
       attributes: ['id', 'batchNumber', 'quantity'],
     });
   }
 
   async findBySpecs(options?: FindAndCountOptions<Batch>) {
     return this.batchRepo.findAndCountAll(options);
+  }
+
+  async calculateTotalBatchStock(whereOptions: any) {
+    const total = await this.batchRepo.findAll({
+      where: { ...whereOptions },
+      attributes: ['id', 'quantity'],
+    });
+    const totalStock: number = total.reduce(
+      (total, batch) => total + batch.quantity,
+      0,
+    );
+    return totalStock;
   }
 
   async calculateTotalStock(whereOptions: any) {
@@ -149,6 +169,10 @@ export class BatchService {
           { model: Supplier, attributes: ['id', 'name'] },
           { model: Item, attributes: ['id', 'name'] },
         ],
+      };
+    } else {
+      options = {
+        include: [{ model: User, attributes: ['id', 'fullName', 'email'] }],
       };
     }
     const batch = await this.batchRepo.findByPk(id, {

@@ -133,9 +133,15 @@ module.exports = {
         allowNull: false,
       },
       created_by_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
         field: 'created_by_id',
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
       deletedAt: {
         type: Sequelize.DATE,
@@ -149,6 +155,17 @@ module.exports = {
           key: 'id',
         },
         field: 'supplier_id',
+      },
+      departmentId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'departments',
+          key: 'id',
+        },
+        field: 'department_id',
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
       },
     });
   },

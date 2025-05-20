@@ -89,6 +89,7 @@ export class ItemController {
   async addBatch(@Body() dto: CreateBatchDto, @GetUser() user: IUserPayload) {
     try {
       dto.createdById = user.sub;
+      dto.departmentId = user.department;
       const createdItem = await this.batchService.create(dto);
       return new ApiSuccessResponseDto(
         createdItem,
@@ -109,9 +110,13 @@ export class ItemController {
   @Get('batches/:itemId/no-paginate')
   async retrieveBatchesNoPaginate(
     @Param('itemId', ParseUUIDPipe) itemId: string,
+    @GetUser('department', ParseUUIDPipe) departmentId: string,
   ) {
     try {
-      const batches = await this.batchService.findAllNoPaginate(itemId);
+      const batches = await this.batchService.findAllNoPaginate(
+        itemId,
+        departmentId,
+      );
       return new ApiSuccessResponseDto(
         batches,
         HttpStatus.OK,
@@ -132,9 +137,14 @@ export class ItemController {
   async retrieveBatches(
     @Param('id', ParseUUIDPipe) itemId: string,
     @Query() query: PaginationRequestDto,
+    @GetUser('department', ParseUUIDPipe) departmentId: string,
   ) {
     try {
-      const batches = await this.batchService.fetchAllPaginate(itemId, query);
+      const batches = await this.batchService.fetchAllPaginate(
+        itemId,
+        query,
+        departmentId,
+      );
       const paginated = new PaginatedDataResponseDto(
         batches.rows,
         query.page || 1,

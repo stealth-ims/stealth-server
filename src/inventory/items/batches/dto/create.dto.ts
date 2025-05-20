@@ -1,4 +1,4 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty, ApiResponseProperty, PickType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
@@ -52,4 +52,9 @@ export class CreateBatchDto extends PickType(CreateItemDto, ['createdById']) {
   @IsUUID()
   @ItemExists()
   itemId: string;
+
+  @ApiResponseProperty({
+    example: '44220956-0962-4dd0-9e65-1564c585563c',
+  })
+  departmentId: string;
 }

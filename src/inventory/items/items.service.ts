@@ -93,16 +93,21 @@ export class ItemService {
     const itemList = await Promise.all(
       items.rows.map(async (item) => {
         const modItem: Item = item.get({ plain: true });
-        const batches = await this.batchService.findAll(modItem.id);
-        const totalStock = batches.reduce(
-          (total, batch) => total + batch.quantity,
-          0,
-        );
-        // const suppliers = modItem.batches.map((batch) => batch.supplier);
-        // supplier: suppliers[0],
-        //   ...(suppliers.length > 1 && {
-        //     supplierRemainder: suppliers.length - 1,
-        //   }),
+        // const batches = await this.batchService.findAll(modItem.id);
+        const whereOptions: Record<string, any> = { itemId: modItem.id };
+        if (query.departmentId) {
+          whereOptions.departmentId = query.departmentId;
+        }
+        const totalStock =
+          await this.batchService.calculateTotalBatchStock(whereOptions);
+        // delete modItem.status;
+        if (totalStock > modItem.reorderPoint) {
+          modItem.status = ItemStatus.STOCKED;
+        } else if (totalStock === 0) {
+          modItem.status = ItemStatus.OUT_OF_STOCK;
+        } else {
+          modItem.status = ItemStatus.LOW;
+        }
         return {
           ...modItem,
           totalStock,
