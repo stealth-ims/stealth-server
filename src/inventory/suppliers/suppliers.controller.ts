@@ -103,7 +103,7 @@ export class SuppliersController {
     isArray: true,
     message: 'Suppliers retrieved successfully',
   })
-  @Permission(Features.SUPPLIERS, PermissionLevel.READ)
+  // @Permission(Features.SUPPLIERS, PermissionLevel.READ)
   @Get('no-paginate')
   async findAllNoPaginate(
     @GetUser('facility', ParseUUIDPipe) facilityId: string,
