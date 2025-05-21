@@ -4,9 +4,16 @@ import {
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
-import { IsArray, IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 import { GenericResponseDto } from '../../core/shared/docs/dto/base.dto';
 import { AccountState } from '../../auth/models/user.model';
+import { PermissionsTypes } from '../../admin/dto';
 
 export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   @ApiProperty({
@@ -60,10 +67,16 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
       'item_orders:READ_WRITE_DELETE',
     ],
     description: 'The permissions assigned to a user',
+    enum: PermissionsTypes,
   })
   @IsNotEmpty()
   @IsArray()
-  permissions: string[];
+  @IsEnum(PermissionsTypes, {
+    each: true,
+    message:
+      "The permissions must be of the features ['items, item_categories, stock_adjustment, item_orders, reports, suppliers, sales, department_requests, departments, users, stock_requests'] and permission levels: [READ, READ_WRITE, READ_WRITE_DELETE]",
+  })
+  permissions: PermissionsTypes[];
 
   @ApiResponseProperty({
     example: '9dcf380d-a58b-4f35-8870-9948af717cb8',
