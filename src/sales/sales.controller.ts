@@ -158,7 +158,7 @@ export class SalesController {
       await this.salesService.removeOne(id);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'Sale updated successfully',
+        'Sale deleted successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

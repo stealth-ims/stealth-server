@@ -6,7 +6,14 @@ import {
   OmitType,
   PartialType,
 } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsNotEmpty, IsOptional, Min } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  Min,
+} from 'class-validator';
 import { GenericResponseDto } from 'src/core/shared/docs/dto/base.dto';
 import { PaymentStatus, SalePaymentType } from '../models/sales.models';
 import { BatchExists, PatientExists } from '../../core/shared/validators';
@@ -53,6 +60,7 @@ export class CreateSaleDto {
   })
   @IsNotEmpty()
   @IsArray()
+  @ArrayMinSize(1)
   saleItems: CreateSaleItemsDto[];
 
   @ApiPropertyOptional({

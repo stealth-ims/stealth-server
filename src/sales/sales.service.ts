@@ -166,15 +166,21 @@ export class SalesService {
     if (rows.length != 0) {
       modRows = rows.map((sale) => {
         const modSale: Sale = sale.get({ plain: true });
-        const saleItem: any = modSale.saleItems[0];
-        const remainderItems = modSale.saleItems.length - 1;
+        const saleItem: any = modSale.saleItems[0] || {};
+        const remainderItems =
+          modSale.saleItems.length > 0 ? modSale.saleItems.length - 1 : 0;
         const totalQuantity = modSale.saleItems.reduce(
           (total, saleItem: any) => total + saleItem.quantity,
           0,
         );
         delete modSale.saleItems;
         delete saleItem.quantity;
-        return { ...modSale, saleItem, remainderItems, totalQuantity };
+        return {
+          ...modSale,
+          saleItem,
+          remainderItems,
+          totalQuantity,
+        };
       });
     }
 
