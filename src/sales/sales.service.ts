@@ -34,9 +34,9 @@ export class SalesService {
 
     itemWhereConditions.facilityId = { [Op.eq]: user.facility };
 
-    if (user.department) {
-      itemWhereConditions.departmentId = { [Op.eq]: user.department };
-    }
+    // if (user.department) {
+    //   itemWhereConditions.departmentId = { [Op.eq]: user.department };
+    // }
 
     if (query.search) {
       itemWhereConditions.name = {
@@ -45,6 +45,9 @@ export class SalesService {
     }
 
     const filter: FindAndCountOptions<Batch> = {
+      where: {
+        departmentId: user.department,
+      },
       limit: query.pageSize || 10,
       offset: query.pageSize * (query.page - 1) || 0,
       order: [['validity', 'ASC']],
@@ -158,8 +161,13 @@ export class SalesService {
     };
 
     const { rows, count } = await this.saleRepository.findAndCountAll(filter);
+    let modRows: object[];
 
-    const modRows = rows.map((sale) => {
+    if (rows.length == 0) {
+      modRows = [];
+    }
+
+    modRows = rows.map((sale) => {
       const modSale: Sale = sale.get({ plain: true });
       const saleItem: any = modSale.saleItems[0];
       const remainderItems = modSale.saleItems.length - 1;
