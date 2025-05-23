@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import {
   CreateDepartmentRequestDto,
   UpdateDepartmentRequestDto,
@@ -52,6 +56,11 @@ export class DepartmentRequestsService {
   async fetchAll(query: FindRequestPaginationDto, user: IUserPayload) {
     const queryFilter = generateFilter(query);
 
+    if (user.department) {
+      throw new UnauthorizedException(
+        'You are not authorized to perform this action',
+      );
+    }
     const attributes: FindAttributeOptions = [
       'id',
       'departmentId',

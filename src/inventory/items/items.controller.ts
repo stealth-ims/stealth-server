@@ -241,7 +241,7 @@ export class ItemController {
     isArray: true,
     message: 'Items retrieved successfully',
   })
-  @Permission(Features.ITEMS, PermissionLevel.READ)
+  // @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('no-paginate')
   async findAllNoPaginate(
     @GetUser('facility', ParseUUIDPipe) facilityId: string,
