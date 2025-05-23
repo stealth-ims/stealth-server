@@ -30,7 +30,7 @@ export class ComplaintsService {
         email: user.email,
         fullName: user.fullName,
         facility: user.facility.id,
-        department: user.departmentId || 'none',
+        department: user.departmentId || 'not provided',
         feature: dto.feature,
         complaint: dto.complaint,
         errorMessage: dto.errorMessage || 'not provided',
