@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { NotificationsGateway } from './gateway/notification.gateway';
 import { Role } from '../auth/interface/roles.enum';
 import { Observable, Subject } from 'rxjs';
@@ -8,6 +12,7 @@ import { NotificationModel } from './models/notification.model';
 import { CreateNotificationDto } from './dto';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { NotificationStatus } from './enum';
+import { AccountState, User } from '../auth/models/user.model';
 
 @Injectable()
 export class NotificationService {
@@ -15,6 +20,7 @@ export class NotificationService {
     private readonly notificationsGateway: NotificationsGateway,
     @InjectModel(NotificationModel)
     private notifcationRepo: typeof NotificationModel,
+    @InjectModel(User) private userRepository: typeof User,
   ) {}
 
   private notificationSubject = new Subject<any>();
@@ -181,8 +187,36 @@ export class NotificationService {
     }
   }
 
-  async authenticateUser(token: string) {
-    return await this.notificationsGateway.decodeToken(token);
+  async authenticateUser(userId: string) {
+    const user = await this.userRepository.findByPk(userId, {
+      attributes: [
+        'id',
+        'email',
+        'facilityId',
+        'departmentId',
+        'role',
+        'permissions',
+        'status',
+      ],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.status !== AccountState.ACTIVE) {
+      throw new UnauthorizedException();
+    }
+    const userPayload: IUserPayload = {
+      sub: user.id,
+      email: user.email,
+      stamp: null,
+      facility: user.facilityId,
+      department: user.departmentId,
+      role: user.role,
+      permissions: user.permissions,
+      session: null,
+    };
+    return userPayload;
   }
 
   private findPermission(permissions: string[], feature: Features) {

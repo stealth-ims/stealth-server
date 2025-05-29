@@ -3,6 +3,7 @@ import {
   BelongsTo,
   Column,
   DataType,
+  DeletedAt,
   ForeignKey,
   Table,
 } from 'sequelize-typescript';
@@ -56,4 +57,8 @@ export class Batch extends BaseModel {
 
   @BelongsTo(() => Department)
   department: Department;
+
+  @DeletedAt
+  @Column({ type: DataType.DATE, field: 'deleted_at' })
+  deletedAt: Date;
 }

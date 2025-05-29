@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CreatePatientDto, FindPatientDto, UpdatePatientDto } from './dto';
 import { Sale } from '../sales/models/sales.models';
 import { FindAndCountOptions, Op, WhereOptions } from 'sequelize';
+import { User } from '../auth/models/user.model';
 
 @Injectable()
 export class PatientService {
@@ -26,12 +27,15 @@ export class PatientService {
   }
 
   async findOne(id: string, populate: boolean) {
-    let includeOption: any = {};
+    const includeOption: Record<string, any> = { include: [] };
     if (populate) {
-      includeOption = { include: [Sale] };
+      includeOption.include = [Sale];
     }
     const patient = await this.patientRepository.findByPk(id, {
-      ...includeOption,
+      include: [
+        ...includeOption.include,
+        { model: User, attributes: ['id', 'fullName'], paranoid: false },
+      ],
     });
     if (!patient) {
       throw new NotFoundException('Patient not found');

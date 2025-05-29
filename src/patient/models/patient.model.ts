@@ -1,9 +1,10 @@
 import {
-  AfterFind,
   AllowNull,
+  BelongsTo,
   Column,
   DataType,
   DeletedAt,
+  ForeignKey,
   HasMany,
   Table,
   Unique,
@@ -27,11 +28,12 @@ export class Patient extends BaseModel {
   @Column(DataType.DATE)
   dateOfBirth: Date;
 
-  @Column
+  @ForeignKey(() => User)
+  @Column({ field: 'created_by_id' })
   createdById: string;
 
-  @Column(DataType.VIRTUAL)
-  createdBy: string;
+  @BelongsTo(() => User)
+  createdBy: User;
 
   @DeletedAt
   @Column
@@ -43,32 +45,4 @@ export class Patient extends BaseModel {
 
   @HasMany(() => Sale)
   sales: Sale[];
-
-  @AfterFind
-  static async addCreatedByUser(patients: Patient | Patient[]) {
-    if (!patients) return;
-    const records = Array.isArray(patients) ? patients : [patients];
-
-    if (!records.length) return;
-
-    const createdByNotExist = records.every((record) => !record.createdById);
-    if (createdByNotExist) return;
-
-    const userIds = records.map((record) => record.createdById);
-
-    const users = await User.findAll({
-      where: {
-        id: userIds,
-      },
-      attributes: ['id', 'fullName', 'email'],
-    });
-
-    const userMap = new Map(users.map((user) => [user.id, user]));
-
-    for (const record of records) {
-      const user = userMap.get(record.createdById) || null;
-
-      record.createdBy = `${user.fullName},${user.id}`;
-    }
-  }
 }

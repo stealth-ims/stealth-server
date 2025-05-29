@@ -36,10 +36,10 @@ export class NotificationController {
   })
   @Sse('stream')
   async streamEvents(
-    @Query('token') token: string,
+    @Query('user') userId: string,
   ): Promise<Observable<MessageEvent>> {
     try {
-      const user = await this.notificationService.authenticateUser(token);
+      const user = await this.notificationService.authenticateUser(userId);
 
       return this.notificationService
         .getNotifications(user.permissions, user.department)

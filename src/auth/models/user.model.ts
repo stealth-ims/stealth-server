@@ -26,6 +26,7 @@ export enum AccountState {
 @Table({
   tableName: 'users',
   underscored: true,
+  paranoid: true,
 })
 export class User extends BaseModel {
   @Column

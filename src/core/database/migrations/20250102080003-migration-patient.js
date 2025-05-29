@@ -28,8 +28,14 @@ module.exports = {
       },
 
       createdById: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
         allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
         field: 'created_by_id',
       },
 
@@ -59,6 +65,10 @@ module.exports = {
   },
 
   async down(queryInterface, _Sequelize) {
+    await queryInterface.removeConstraint(
+      'patients',
+      'patients_created_by_id_fkey',
+    );
     await queryInterface.removeConstraint('sales', 'sales_patient_id_fkey');
     await queryInterface.removeColumn('sales', 'patient_id');
     await queryInterface.dropTable('patients');

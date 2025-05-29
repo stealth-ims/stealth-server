@@ -96,7 +96,7 @@ export class StockAdjustmentsService {
     const adjustment = await this.stockAdjustmentRepo.findByPk(id, {
       include: [
         { model: Item, attributes: ['id', 'name'] },
-        { model: Batch, attributes: ['id', 'batchNumber'] },
+        { model: Batch, attributes: ['id', 'batchNumber'], paranoid: false },
       ],
       attributes: [
         'id',
@@ -247,7 +247,7 @@ export class StockAdjustmentsService {
       ...queryFilter.pageFilter,
       include: [
         { model: Item, attributes: ['id', 'name'] },
-        { model: Batch, attributes: ['id', 'batchNumber'] },
+        { model: Batch, attributes: ['id', 'batchNumber'], paranoid: false },
       ],
       ...itemOrderOptions,
       attributes: [
