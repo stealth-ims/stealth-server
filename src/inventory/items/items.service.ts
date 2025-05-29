@@ -399,22 +399,24 @@ export class ItemService {
       );
     }
     const item = await this.findOne(payload.itemId);
-    let itemStatus;
+    let itemStatus: ItemStatus;
     const notification = new CreateNotificationDto();
 
     if (quantity === 0) {
       itemStatus = ItemStatus.OUT_OF_STOCK;
       notification.message = `${item.name} is out of stock. Restock now`;
       notification.linkName = 'Restock';
-      notification.linkRoute = `/item/${item.id}`;
+      notification.linkRoute = `/items/${item.id}/batches`;
     } else if (quantity < item.reorderPoint) {
       itemStatus = ItemStatus.LOW;
       notification.message = `${item.name} is almost out of stock. ${quantity} pieces left`;
       notification.linkName = 'Restock';
-      notification.linkRoute = `/item/${item.id}`;
+      notification.linkRoute = `/items/${item.id}/batches`;
     } else {
       itemStatus = ItemStatus.STOCKED;
-      notification.message = `${item.name} just got restocked`;
+      notification.message = `${item.name} just got stocked`;
+      notification.linkName = 'View';
+      notification.linkRoute = `/items/${item.id}/batches`;
     }
 
     await this.notificationService.sendNotification(
