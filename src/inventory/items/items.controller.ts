@@ -44,8 +44,8 @@ import {
   OneBatch,
   BatchResponseDto,
   UpdateBatchDto,
+  FetchBatchesQueryDto,
 } from './batches/dto';
-import { PaginationRequestDto } from '../../core/shared/dto/pagination.dto';
 
 @ApiTags('Items')
 @Controller('items')
@@ -137,7 +137,7 @@ export class ItemController {
   @Get(':id/batches')
   async retrieveBatches(
     @Param('id', ParseUUIDPipe) itemId: string,
-    @Query() query: PaginationRequestDto,
+    @Query() query: FetchBatchesQueryDto,
     @GetUser('department') departmentId: string,
   ) {
     try {

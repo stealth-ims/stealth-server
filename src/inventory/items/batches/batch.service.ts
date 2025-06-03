@@ -10,8 +10,7 @@ import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../../suppliers/suppliers.service';
 import { FindAndCountOptions, IncludeOptions, Op, QueryTypes } from 'sequelize';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CreateBatchDto, UpdateBatchDto } from './dto';
-import { PaginationRequestDto } from '../../../core/shared/dto/pagination.dto';
+import { CreateBatchDto, FetchBatchesQueryDto, UpdateBatchDto } from './dto';
 import { generateFilter } from '../../../core/shared/factory';
 import { User } from '../../../auth/models/user.model';
 import { QueryOptionsDto } from '../../../core/shared/dto/query-options.dto';
@@ -136,16 +135,35 @@ export class BatchService {
 
   async fetchAllPaginate(
     itemId: string,
-    query: PaginationRequestDto,
+    query: FetchBatchesQueryDto,
     departmentId: string,
   ) {
     const paginationFilter = generateFilter(query, {
       batchNumber: { [Op.iLike]: `%${query.search}%` },
     });
+    const validityOptions: Record<string, any> = {};
+    if (query.validityStartDate && query.validityEndDate) {
+      validityOptions.validity = {
+        [Op.between]: [query.validityStartDate, query.validityEndDate],
+      };
+    } else if (query.validityStartDate) {
+      validityOptions.validity = {
+        [Op.gte]: query.validityStartDate,
+      };
+    } else if (query.validityEndDate) {
+      validityOptions.validity = {
+        [Op.lte]: query.validityEndDate,
+      };
+    }
 
     const { rows, count } = await this.batchRepo.findAndCountAll({
       ...paginationFilter.pageFilter,
-      where: { itemId, departmentId, ...paginationFilter.searchFilter },
+      where: {
+        itemId,
+        departmentId,
+        ...paginationFilter.searchFilter,
+        ...validityOptions,
+      },
       attributes: ['id', 'createdAt', 'validity', 'batchNumber', 'quantity'],
       include: [
         { model: Supplier, attributes: ['id', 'name'] },

@@ -10,7 +10,7 @@ import { PaginationRequestDto } from 'src/core/shared/dto/pagination.dto';
 import { CreateItemDto, ItemStatus } from './create-item.dto';
 import { OneBatch } from '../batches/dto';
 
-export class ItemPaginationDto extends IntersectionType(PaginationRequestDto) {
+export class ItemPaginationDto extends PaginationRequestDto {
   @ApiPropertyOptional()
   @IsString({ each: true })
   @IsOptional()

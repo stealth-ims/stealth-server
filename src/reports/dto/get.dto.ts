@@ -34,6 +34,7 @@ export class FindReportDataDto {
     example: new Date(),
   })
   @IsOptional()
+  @Type(() => Date)
   startDate: Date;
 
   @ApiPropertyOptional({ example: addDays(new Date(), 1) })
