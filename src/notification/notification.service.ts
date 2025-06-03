@@ -13,6 +13,8 @@ import { CreateNotificationDto } from './dto';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { NotificationStatus } from './enum';
 import { AccountState, User } from '../auth/models/user.model';
+import { FetchNotificationsQueryDto } from './dto/get.dto';
+import { generateFilter } from '../core/shared/factory';
 
 @Injectable()
 export class NotificationService {
@@ -44,7 +46,9 @@ export class NotificationService {
     return dto;
   }
 
-  async getAll(user: IUserPayload) {
+  async getAll(query: FetchNotificationsQueryDto, user: IUserPayload) {
+    const queryFilter = generateFilter(query);
+
     const features = user.permissions.map(
       (permission) => permission.split(':')[0],
     );
@@ -55,9 +59,10 @@ export class NotificationService {
       departmentId: user.department,
     };
 
-    const notifications = await this.notifcationRepo.findAll({
+    const notifications = await this.notifcationRepo.findAndCountAll({
       where: {
         ...whereOptions,
+        ...queryFilter.searchFilter,
       },
       attributes: [
         'id',
@@ -67,7 +72,7 @@ export class NotificationService {
         'createdAt',
         'status',
       ],
-      order: [['createdAt', 'DESC']],
+      ...queryFilter.pageFilter,
     });
 
     return notifications;

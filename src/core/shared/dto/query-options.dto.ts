@@ -85,7 +85,7 @@ export class QueryOptionsDto<T> {
     description: 'Filter query as object or JSON string',
   })
   @IsOptional()
-  query?: Record<string, any>[] | Record<string, any>;
+  query?: Record<string, any>;
 
   @ApiPropertyOptional({
     type: String,

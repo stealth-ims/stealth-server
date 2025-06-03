@@ -16,12 +16,13 @@ import { NotificationService } from './notification.service';
 import { ApiTags } from '@nestjs/swagger';
 import { throwError } from '../core/shared/responses/error.response';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
-import { GetNotificationDto } from './dto/get.dto';
+import { FetchNotificationsQueryDto, GetNotificationDto } from './dto/get.dto';
 import { GetUser } from '../auth/decorator';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import {
   ApiSuccessResponseDto,
   ApiSuccessResponseNoData,
+  PaginatedDataResponseDto,
 } from '../core/shared/responses/success.response';
 
 @ApiTags('Notifications')
@@ -56,18 +57,25 @@ export class NotificationController {
     }
   }
 
-  @CustomApiResponse(['success', 'authorize'], {
+  @CustomApiResponse(['paginated', 'authorize'], {
     type: GetNotificationDto,
-    isArray: true,
     message: 'Notifications retrieved successfully',
   })
   @Get()
-  async fetchAllNotifications(@GetUser() user: IUserPayload) {
+  async fetchAllNotifications(
+    @Query() query: FetchNotificationsQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.notificationService.getAll(user);
-
+      const response = await this.notificationService.getAll(query, user);
+      const paginated = new PaginatedDataResponseDto(
+        response.rows,
+        query.page || 1,
+        query.pageSize,
+        response.count,
+      );
       return new ApiSuccessResponseDto(
-        response,
+        paginated,
         HttpStatus.OK,
         'Notifications retrieved successfully',
       );

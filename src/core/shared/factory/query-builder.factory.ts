@@ -13,20 +13,18 @@ export function buildQuery<T>(
     }));
   }
 
-  let queryOptions: Record<string, any> = {
-    where: {
+  const queryOptions: Record<string, any> = {};
+
+  if (searchQuery) {
+    queryOptions.where = {
       ...(searchQuery.length > 0 && {
         [Op.or]: searchQuery,
       }),
-    },
-  };
+    };
+  }
 
   if (params.query) {
-    queryOptions = {
-      where: {
-        [Op.and]: params.query,
-      },
-    };
+    queryOptions.where = params.query;
   }
 
   if (params.fields) {

@@ -29,6 +29,7 @@ import { CreateNotificationDto } from '../../notification/dto';
 import { Features } from '../../core/shared/enums/permissions.enum';
 import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
 import { generateFilter } from '../../core/shared/factory';
+import { NotificationStatus } from '../../notification/enum';
 
 @Injectable()
 export class ItemService {
@@ -401,6 +402,7 @@ export class ItemService {
     const item = await this.findOne(payload.itemId);
     let itemStatus: ItemStatus;
     const notification = new CreateNotificationDto();
+    notification.status = NotificationStatus.UNREAD;
 
     if (quantity === 0) {
       itemStatus = ItemStatus.OUT_OF_STOCK;

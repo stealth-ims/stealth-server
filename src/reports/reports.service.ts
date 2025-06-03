@@ -14,7 +14,7 @@ import {
 } from './dto';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { generateFilter } from '../core/shared/factory';
-import { endOfDay, startOfDay } from 'date-fns';
+import { addDays, endOfDay, startOfDay, startOfToday } from 'date-fns';
 import { BatchService } from '../inventory/items/batches/batch.service';
 
 @Injectable()
@@ -99,9 +99,71 @@ export class ReportsService {
         });
         return { count, rows };
       }
+      case ReportCategories.EXPIRY_REPORT: {
+        const { rows, count } = await this.fetchStockNearingExpiry(
+          facility,
+          department,
+        );
+        return { count, rows };
+      }
       default:
         return { count: 0, rows: [] };
     }
+  }
+
+  private async findBatchesByValidity(
+    ownershipQuery: Record<string, any>,
+    validityCondition: Record<string, any>,
+  ) {
+    return this.batchService.findAndCount({
+      query: {
+        ...ownershipQuery,
+        validity: validityCondition,
+      },
+      fields: ['id', 'batchNumber', 'createdAt', 'validity'],
+      populate: ['item', 'department', 'facility'],
+      sort: 'validity',
+    });
+  }
+
+  async fetchStockNearingExpiry(
+    facilityId: string,
+    departmentId: string,
+  ): Promise<{ rows: Record<string, any>; count: number }> {
+    const rows: Record<string, any> = {};
+    const ownershipQuery = {
+      facilityId,
+      ...(departmentId && { departmentId }),
+    };
+
+    const today = startOfToday();
+    const nDaysFromNow = (days: number) => addDays(new Date(), days);
+
+    const expired = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.lt]: today,
+    });
+    const critical = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [today, nDaysFromNow(30)],
+    });
+    const highRisk = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [nDaysFromNow(30), nDaysFromNow(60)],
+    });
+    const approaching = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [nDaysFromNow(60), nDaysFromNow(90)],
+    });
+
+    rows.expired = expired.rows;
+    rows.critical = critical.rows;
+    rows.highRisk = highRisk.rows;
+    rows.approaching = approaching.rows;
+
+    const totalCount =
+      (expired.count || 0) +
+      (critical.count || 0) +
+      (highRisk.count || 0) +
+      (approaching.count || 0);
+
+    return { rows, count: totalCount };
   }
 
   async fetchOne(id: string) {
