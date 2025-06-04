@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +18,7 @@ import { IUserPayload } from '../interface/payload.interface';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private logger = new Logger(AuthGuard.name);
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
@@ -65,8 +67,11 @@ export class AuthGuard implements CanActivate {
     } catch (error: any) {
       if (error.message == 'CLOSED_SESSION') {
         throw new UnauthorizedException(error.message);
-      } else {
+      } else if (error.name == 'TokenExpiredError') {
         throw new UnauthorizedException('TOKEN_EXPIRED');
+      } else {
+        this.logger.error(error);
+        throw new UnauthorizedException(error.message);
       }
     }
     return true;
