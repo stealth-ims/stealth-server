@@ -18,6 +18,15 @@ module.exports = {
       'SELECT id, name FROM facilities;',
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
+    const existingUser = await queryInterface.rawSelect(
+      'users',
+      {
+        where: {
+          email: 'example@email.com',
+        },
+      },
+      ['id'],
+    );
 
     // Get all suppliers
     const suppliers = await queryInterface.sequelize.query(
@@ -53,7 +62,7 @@ module.exports = {
           status: ['LOW', 'STOCKED', 'OUT_OF_STOCK'][
             Math.floor(Math.random() * 3)
           ],
-          created_by: 'System',
+          created_by_id: existingUser,
           category_id: category.id,
           facility_id: facilityId,
           ...baseModelColumns,
@@ -71,7 +80,7 @@ module.exports = {
             ),
             batch_number: `BATCH${itemId.substring(0, 4)}${j}`,
             quantity: Math.floor(Math.random() * 1000) + 100,
-            created_by: 'System',
+            created_by_id: existingUser,
             supplier_id:
               suppliers[Math.floor(Math.random() * suppliers.length)].id,
             ...baseModelColumns,

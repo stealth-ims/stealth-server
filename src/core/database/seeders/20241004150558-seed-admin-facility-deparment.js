@@ -10,65 +10,6 @@ const { createdAt, updatedAt, ...baseModelColumnsWithoutId } = baseModelColumns;
 module.exports = {
   async up(queryInterface, _Sequelize) {
     const adminId = uuidv4();
-
-    const existingFacility = await queryInterface.rawSelect(
-      'facilities',
-      {
-        where: {
-          name: 'Facility A',
-        },
-      },
-      ['id'],
-    );
-
-    let facilityId;
-    if (!existingFacility) {
-      facilityId = uuidv4();
-
-      await queryInterface.bulkInsert('facilities', [
-        {
-          id: facilityId,
-          name: 'Facility A',
-          region: 'North',
-          location: '123 Main St',
-          created_by: adminId,
-          updated_by: null,
-          ...baseModelColumns,
-        },
-      ]);
-    } else {
-      facilityId = existingFacility;
-    }
-
-    const existingDepartment = await queryInterface.rawSelect(
-      'departments',
-      {
-        where: {
-          name: 'Department A',
-        },
-      },
-      ['id'],
-    );
-
-    let departmentId;
-    const createdBy = { id: adminId, name: 'Foster Asare' };
-    if (!existingDepartment) {
-      departmentId = uuidv4();
-
-      await queryInterface.bulkInsert('departments', [
-        {
-          id: departmentId,
-          name: 'Department A',
-          facility_id: facilityId,
-          created_by: JSON.stringify(createdBy),
-          updated_by: null,
-          ...baseModelColumns,
-        },
-      ]);
-    } else {
-      departmentId = existingDepartment;
-    }
-
     const existingUser = await queryInterface.rawSelect(
       'users',
       {
@@ -90,7 +31,7 @@ module.exports = {
           full_name: 'Foster Asare',
           email: 'asare4ster@gmail.com',
           phone_number: '0244335567',
-          facility_id: facilityId,
+          // facility_id: facilityId,
           department_id: null,
           role: 'Central Admin',
           permissions: [
@@ -118,7 +59,7 @@ module.exports = {
           full_name: 'Jack Frost',
           email: 'example@email.com',
           phone_number: '0244335567',
-          facility_id: facilityId,
+          // facility_id: facilityId,
           department_id: null,
           role: 'Central Admin',
           permissions: [
@@ -142,6 +83,63 @@ module.exports = {
           ...baseModelColumnsWithoutId,
         },
       ]);
+    }
+
+    const existingFacility = await queryInterface.rawSelect(
+      'facilities',
+      {
+        where: {
+          name: 'Facility A',
+        },
+      },
+      ['id'],
+    );
+
+    let facilityId;
+    if (!existingFacility) {
+      facilityId = uuidv4();
+
+      await queryInterface.bulkInsert('facilities', [
+        {
+          id: facilityId,
+          name: 'Facility A',
+          region: 'North',
+          location: '123 Main St',
+          created_by: existingUser,
+          updated_by: null,
+          ...baseModelColumns,
+        },
+      ]);
+    } else {
+      facilityId = existingFacility;
+    }
+
+    const existingDepartment = await queryInterface.rawSelect(
+      'departments',
+      {
+        where: {
+          name: 'Department A',
+        },
+      },
+      ['id'],
+    );
+
+    let departmentId;
+    if (!existingDepartment) {
+      departmentId = uuidv4();
+
+      await queryInterface.bulkInsert('departments', [
+        {
+          id: departmentId,
+          name: 'Department A',
+          facility_id: facilityId,
+          created_by_id: existingUser,
+          updated_by_id: null,
+          ...baseModelColumns,
+        },
+      ]);
+    } else {
+      departmentId = existingDepartment;
     }
   },
 
