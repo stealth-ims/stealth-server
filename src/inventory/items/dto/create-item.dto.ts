@@ -1,8 +1,13 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  ApiResponseProperty,
+} from '@nestjs/swagger';
 import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -44,10 +49,11 @@ export class CreateItemDto {
   @IsString()
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Brand Name',
     description: 'The brand name of the item',
   })
+  @IsOptional()
   @IsString()
   brandName: string;
 
@@ -74,24 +80,27 @@ export class CreateItemDto {
   @IsEnum(DosageForm)
   dosageForm: DosageForm;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'ABC-DGU-123',
     description: 'The code of the item',
   })
+  @IsOptional()
   @IsString()
   code: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'FDA123',
     description: 'The FDA approval of the item',
   })
+  @IsOptional()
   @IsString()
   fdaApproval: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'ISO123',
     description: 'The ISO certification of the item',
   })
+  @IsOptional()
   @IsString()
   ISO: string;
 
@@ -102,31 +111,35 @@ export class CreateItemDto {
   @IsNumber()
   reorderPoint: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'strength',
     description: 'The strength of the item',
   })
+  @IsOptional()
   @IsString()
   strength: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'gramms',
     description: 'The unit of measurement of the item',
   })
+  @IsOptional()
   @IsString()
   unitOfMeasurement: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Manufacturer Name',
     description: 'The manufacturer of the item',
   })
+  @IsOptional()
   @IsString()
   manufacturer: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Store in a cool, dry place',
     description: 'The storage requirements of the item',
   })
+  @IsOptional()
   @IsString()
   storageReq: string;
 
