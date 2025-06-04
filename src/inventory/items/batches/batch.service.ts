@@ -233,7 +233,9 @@ export class BatchService {
       };
     } else {
       options = {
-        include: [{ model: User, attributes: ['id', 'fullName', 'email'] }],
+        include: [
+          { model: User, attributes: ['id', 'fullName', 'email', 'quantity'] },
+        ],
       };
     }
     const batch = await this.batchRepo.findByPk(id, {
