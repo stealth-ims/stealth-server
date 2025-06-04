@@ -289,13 +289,6 @@ export class BatchService {
     this.logger.log(`Stock added to batch. ID: ${id}`);
   }
 
-  // async update(id: string, updateBatchDto: UpdateBatchDto): Promise<Batch> {
-  //   const batch = await this.findOne(id);
-  //   await batch.update(updateBatchDto);
-  //   this.logger.log(`Batch updated successfully. ID: ${id}`);
-  //   return batch;
-  // }
-
   async remove(id: string): Promise<void> {
     const batch = await this.findOne(id);
     this.eventEmitter.emit('quantity.changed', { itemId: batch.itemId });

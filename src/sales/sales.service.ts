@@ -243,18 +243,25 @@ export class SalesService {
   async fetchData(whereConditions: Record<string, Record<any, any>>) {
     const filter: FindAndCountOptions<Sale> = {
       where: { ...whereConditions },
-      attributes: [
-        'id',
-        'saleItems',
-        'saleNumber',
-        'total',
-        'createdAt',
-        'status',
-      ],
+      attributes: ['id', 'saleNumber', 'total', 'createdAt', 'status'],
       include: [
         {
           model: Patient,
           attributes: ['id', 'cardIdentificationNumber', 'name'],
+        },
+        {
+          model: SaleItem,
+          attributes: ['id', 'batchId', 'quantity'],
+          include: [
+            {
+              model: Item,
+              attributes: ['name', 'brandName', 'sellingPrice'],
+            },
+            {
+              model: Batch,
+              attributes: ['batchNumber'],
+            },
+          ],
         },
       ],
       order: [['createdAt', 'ASC']],
@@ -263,7 +270,17 @@ export class SalesService {
 
     const { rows, count } = await this.saleRepository.findAndCountAll(filter);
 
-    return { rows, count };
+    const modRows: Sale[] = rows.map((sale) => {
+      const refinedSale: Sale = sale.get({ plain: true });
+
+      refinedSale.saleItems.forEach((item) => {
+        item.batchNumber = item.batch.batchNumber;
+        delete item.batch;
+      });
+      return refinedSale;
+    });
+
+    return { rows: modRows, count };
   }
 
   async fetchOne(id: string) {
