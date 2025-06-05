@@ -426,22 +426,6 @@ export class ItemService {
       include: [{ model: ItemCategory, attributes: ['id', 'name'] }],
       distinct: true,
     };
-    //  {
-    //       model: Batch,
-    //       attributes: ['quantity', 'supplierId'],
-    //       limit: 3,
-    //       include: [
-    //         {
-    //           model: Supplier,
-    //           attributes: ['id', 'name'],
-    //           where: {
-    //             ...(query.supplierId && {
-    //               id: query.supplierId,
-    //             }),
-    //           },
-    //         },
-    //       ],
-    //     },
   }
 
   @OnEvent('quantity.changed')
