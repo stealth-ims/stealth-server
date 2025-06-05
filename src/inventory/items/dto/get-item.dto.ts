@@ -3,12 +3,15 @@ import {
   ApiPropertyOptional,
   ApiProperty,
   ApiResponseProperty,
+  PickType,
 } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { GenericResponseDto } from 'src/core/shared/dto/base.dto';
 import { PaginationRequestDto } from 'src/core/shared/dto/pagination.dto';
 import { CreateItemDto, ItemStatus } from './create-item.dto';
 import { OneBatch } from '../batches/dto';
+import { addDays } from 'date-fns';
+import { Type } from 'class-transformer';
 
 export class ItemPaginationDto extends PaginationRequestDto {
   @ApiPropertyOptional()
@@ -26,6 +29,49 @@ export class ItemPaginationDto extends PaginationRequestDto {
   facilityId: string;
 
   departmentId: string;
+}
+export class FetchExpiredQueryDto extends PickType(PaginationRequestDto, [
+  'search',
+  'page',
+  'pageSize',
+]) {
+  @ApiPropertyOptional({
+    example: new Date(),
+  })
+  @IsOptional()
+  @Type(() => Date)
+  startDate: Date;
+
+  @ApiPropertyOptional({ example: addDays(new Date(), 1) })
+  @IsOptional()
+  @Type(() => Date)
+  endDate: Date;
+}
+
+export class GetExpiredItemsDto {
+  @ApiResponseProperty({
+    example: 'e0ef0214-d468-49a8-8f6e-453912da751b',
+  })
+  batchId: string;
+
+  @ApiResponseProperty({
+    example: 'BATCH4325',
+  })
+  batchNumber: string;
+
+  @ApiResponseProperty({
+    example: new Date(),
+  })
+  validity: string;
+
+  @ApiResponseProperty({
+    example: {
+      id: '35f12433-2eee-410f-9cd6-2bd9e946c65f',
+      name: 'Some Item',
+      status: 'LOW',
+    },
+  })
+  item: object;
 }
 
 class AnalyticsData {

@@ -14,6 +14,7 @@ import {
   ChangeQuantityEvent,
   ChangeType,
   CreateItemDto,
+  FetchExpiredQueryDto,
   ItemCounts,
   ItemPaginationDto,
   ItemStatus,
@@ -79,6 +80,41 @@ export class ItemService {
     this.logger.log(`Retrieved ${items.count} items`);
     // this.logger.log(itemList);
     return items.rows;
+  }
+
+  async fetchExpiredItems(query: FetchExpiredQueryDto, user: IUserPayload) {
+    const itemWhereConditions: Record<string, Record<any, any>> = {};
+
+    itemWhereConditions.facilityId = { [Op.eq]: user.facility };
+
+    if (query.search) {
+      itemWhereConditions.name = {
+        [Op.iLike]: `%${query.search}%`,
+      };
+    }
+    const filter: FindAndCountOptions<Batch> = {
+      where: {
+        departmentId: user.department,
+        ...(query.startDate && { validity: { [Op.gte]: query.startDate } }),
+        ...(query.endDate && { validity: { [Op.lte]: query.endDate } }),
+      },
+      limit: query.pageSize || 10,
+      offset: query.pageSize * (query.page - 1) || 0,
+      order: [['validity', 'ASC']],
+      attributes: [['id', 'batchId'], 'batchNumber', 'validity'],
+      include: [
+        {
+          model: Item,
+          attributes: ['id', 'name', 'status'],
+          where: itemWhereConditions,
+        },
+      ],
+      distinct: true,
+    };
+
+    const { rows, count } = await this.batchService.findBySpecs(filter);
+
+    return { rows, count };
   }
 
   /**

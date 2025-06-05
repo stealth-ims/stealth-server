@@ -28,6 +28,8 @@ import {
 import {
   AdjustPriceDto,
   CreateItemDto,
+  FetchExpiredQueryDto,
+  GetExpiredItemsDto,
   ItemAnalytics,
   ItemCounts,
   ItemPaginationDto,
@@ -227,15 +229,33 @@ export class ItemController {
     }
   }
 
-  // @CustomApiResponse(['success', 'authorize'], {
-  //   type: GetNoPaginateDto,
-  //   message: 'Item status updated successfully',
-  // })
-  // @Put()
-  // async assignStatus() {
-  //   const response = await this.itemsService.assignStatus();
-  //   return response;
-  // }
+  @CustomApiResponse(['paginated', 'authorize'], {
+    type: GetExpiredItemsDto,
+    message: 'Items retrieved successfully',
+  })
+  @Permission(Features.ITEMS, PermissionLevel.READ)
+  @Get('validity')
+  async findAllExpired(
+    @Query() query: FetchExpiredQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response = await this.itemsService.fetchExpiredItems(query, user);
+
+      return new ApiSuccessResponseDto(
+        new PaginatedDataResponseDto(
+          response.rows,
+          query.page || 1,
+          query.pageSize,
+          response.count,
+        ),
+        HttpStatus.OK,
+        'Items retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
 
   @CustomApiResponse(['success', 'authorize'], {
     type: GetNoPaginateDto,
