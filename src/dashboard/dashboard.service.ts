@@ -9,10 +9,16 @@ import {
   SalesTrendDto,
   TopSellingCategoriesDto,
 } from './dto';
+import { FindOptions } from 'sequelize';
+import { Sale } from 'src/sales/models/sales.model';
+import { InjectModel } from '@nestjs/sequelize';
 
 @Injectable()
 export class DashboardService {
-  constructor() {}
+  constructor(
+    @InjectModel(Sale)
+    private saleRepository: typeof Sale,
+  ) {}
   async findAll(_query: FindGeneralAnalyticsQueryDto) {
     const analytics = new GeneralAnalyticsDto();
     // analytics.totalItemsSold=
@@ -24,9 +30,11 @@ export class DashboardService {
     return new ItemSalesAnalyticsDto();
   }
 
-  async findLeastSellingItems(query: FindAnalyticsQueryDto) {
-    const _response = query;
-    return new ItemSalesAnalyticsDto();
+  async findLeastSellingItems(_query: FindAnalyticsQueryDto) {
+    const filter: FindOptions<Sale> = {};
+    const response = await this.saleRepository.findAndCountAll(filter);
+    // const res  = new ItemSalesAnalyticsDto();
+    return response;
   }
 
   async getSalesTrend(query: FindAnalyticsQueryDto) {
