@@ -22,13 +22,19 @@ import {
   TotalItemsDto,
   UpdateItemDto,
 } from './dto';
-import { Batch, Item } from './models';
+import { Batch, BatchValidityStatus, Item } from './models';
 import { IUserPayload } from '../../auth/interface/payload.interface';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationService } from '../../notification/notification.service';
 import { CreateNotificationDto } from '../../notification/dto';
 import { Features } from '../../core/shared/enums/permissions.enum';
-import { endOfMonth, startOfMonth, subMonths } from 'date-fns';
+import {
+  addDays,
+  endOfMonth,
+  startOfMonth,
+  startOfToday,
+  subMonths,
+} from 'date-fns';
 import { generateFilter } from '../../core/shared/factory';
 import { NotificationStatus } from '../../notification/enum';
 
@@ -83,7 +89,16 @@ export class ItemService {
   }
 
   async fetchExpiredItems(query: FetchExpiredQueryDto, user: IUserPayload) {
-    const itemWhereConditions: Record<string, Record<any, any>> = {};
+    const filter: FindAndCountOptions<Batch> = this.filterBuilder(user, query);
+
+    const { rows, count } = await this.batchService.findBySpecs(filter);
+
+    return { rows, count };
+  }
+
+  private filterBuilder(user: IUserPayload, query: FetchExpiredQueryDto) {
+    const itemWhereConditions: Record<string, any> = {};
+    const batchWhereConditions: Record<string, any> = {};
 
     itemWhereConditions.facilityId = { [Op.eq]: user.facility };
 
@@ -92,29 +107,69 @@ export class ItemService {
         [Op.iLike]: `%${query.search}%`,
       };
     }
+
+    const today = startOfToday();
+    switch (query.status) {
+      case BatchValidityStatus.EXPIRED:
+        batchWhereConditions.validity = { [Op.lte]: today };
+        break;
+      case BatchValidityStatus.CRITICAL: {
+        const tomorrow = addDays(today, 1);
+        const thirtyDays = addDays(today, 30);
+        batchWhereConditions.validity = {
+          [Op.between]: [tomorrow, thirtyDays],
+        };
+        break;
+      }
+      case BatchValidityStatus.APPROACHING: {
+        const thirtyDays = addDays(today, 31);
+        const ninetyDays = addDays(today, 90);
+        batchWhereConditions.validity = {
+          [Op.between]: [thirtyDays, ninetyDays],
+        };
+        break;
+      }
+      case BatchValidityStatus.SAFE: {
+        const ninetyDays = addDays(today, 90);
+        batchWhereConditions.validity = { [Op.gte]: ninetyDays };
+        break;
+      }
+      default:
+        break;
+    }
+
+    if (query.startDate && !query.status) {
+      batchWhereConditions.validity = { [Op.gte]: query.startDate };
+    }
+    if (query.endDate && !query.status) {
+      batchWhereConditions.validity = { [Op.lte]: query.endDate };
+    }
+
     const filter: FindAndCountOptions<Batch> = {
       where: {
         departmentId: user.department,
-        ...(query.startDate && { validity: { [Op.gte]: query.startDate } }),
-        ...(query.endDate && { validity: { [Op.lte]: query.endDate } }),
+        ...batchWhereConditions,
       },
       limit: query.pageSize || 10,
       offset: query.pageSize * (query.page - 1) || 0,
       order: [['validity', 'ASC']],
-      attributes: [['id', 'batchId'], 'batchNumber', 'validity'],
+      attributes: [
+        ['id', 'batchId'],
+        'batchNumber',
+        'validity',
+        'status',
+        'quantity',
+      ],
       include: [
         {
           model: Item,
-          attributes: ['id', 'name', 'status'],
+          attributes: ['id', 'name'],
           where: itemWhereConditions,
         },
       ],
       distinct: true,
     };
-
-    const { rows, count } = await this.batchService.findBySpecs(filter);
-
-    return { rows, count };
+    return filter;
   }
 
   /**

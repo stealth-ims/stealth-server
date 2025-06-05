@@ -12,6 +12,7 @@ import { CreateItemDto, ItemStatus } from './create-item.dto';
 import { OneBatch } from '../batches/dto';
 import { addDays } from 'date-fns';
 import { Type } from 'class-transformer';
+import { BatchValidityStatus } from '../models';
 
 export class ItemPaginationDto extends PaginationRequestDto {
   @ApiPropertyOptional()
@@ -46,6 +47,14 @@ export class FetchExpiredQueryDto extends PickType(PaginationRequestDto, [
   @IsOptional()
   @Type(() => Date)
   endDate: Date;
+
+  @ApiPropertyOptional({
+    example: 'EXPIRED',
+    enum: BatchValidityStatus,
+  })
+  @IsOptional()
+  @IsEnum(BatchValidityStatus)
+  status: BatchValidityStatus;
 }
 
 export class GetExpiredItemsDto {
@@ -63,6 +72,17 @@ export class GetExpiredItemsDto {
     example: new Date(),
   })
   validity: string;
+
+  @ApiResponseProperty({
+    example: 'SAFE',
+    enum: BatchValidityStatus,
+  })
+  status: BatchValidityStatus;
+
+  @ApiResponseProperty({
+    example: 20,
+  })
+  quantity: number;
 
   @ApiResponseProperty({
     example: {

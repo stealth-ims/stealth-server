@@ -14,7 +14,14 @@ import { Item } from '.';
 import { User } from '../../../auth/models/user.model';
 import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
+import { differenceInDays } from 'date-fns';
 
+export enum BatchValidityStatus {
+  EXPIRED = 'EXPIRED',
+  CRITICAL = 'CRITICAL',
+  APPROACHING = 'APPROACHING',
+  SAFE = 'SAFE',
+}
 @Table({
   tableName: 'batches',
   underscored: true,
@@ -31,6 +38,26 @@ export class Batch extends BaseModel {
 
   @Column({ type: DataType.DATE, allowNull: false })
   validity: Date;
+
+  @Column({
+    type: DataType.VIRTUAL,
+    get(this: Batch) {
+      let status: BatchValidityStatus;
+
+      const daysDifference = differenceInDays(this.validity, new Date());
+      if (daysDifference < 0) {
+        status = BatchValidityStatus.EXPIRED;
+      } else if (daysDifference <= 30) {
+        status = BatchValidityStatus.CRITICAL;
+      } else if (daysDifference <= 90) {
+        status = BatchValidityStatus.APPROACHING;
+      } else {
+        status = BatchValidityStatus.SAFE;
+      }
+      return status;
+    },
+  })
+  status: BatchValidityStatus;
 
   @Unique
   @Column
