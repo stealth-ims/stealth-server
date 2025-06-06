@@ -87,7 +87,10 @@ export class ItemService {
     return items.rows;
   }
 
-  async fetchExpiredItems(query: FetchExpiredQueryDto, user: IUserPayload) {
+  async fetchItemsWithValidity(
+    query: FetchExpiredQueryDto,
+    user: IUserPayload,
+  ) {
     const filter: FindAndCountOptions<Batch> = this.filterBuilder(user, query);
 
     const { rows, count } = await this.batchService.findBySpecs(filter);
@@ -306,7 +309,7 @@ export class ItemService {
         break;
       }
       case BatchValidityStatus.SAFE: {
-        const ninetyDays = addDays(today, 90);
+        const ninetyDays = addDays(today, 91);
         batchWhereConditions.validity = { [Op.gte]: ninetyDays };
         break;
       }

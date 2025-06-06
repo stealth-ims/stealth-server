@@ -14,7 +14,7 @@ import { Item } from '.';
 import { User } from '../../../auth/models/user.model';
 import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, startOfToday } from 'date-fns';
 
 export enum BatchValidityStatus {
   EXPIRED = 'EXPIRED',
@@ -44,7 +44,7 @@ export class Batch extends BaseModel {
     get(this: Batch) {
       let status: BatchValidityStatus;
 
-      const daysDifference = differenceInDays(this.validity, new Date());
+      const daysDifference = differenceInDays(this.validity, startOfToday());
       if (daysDifference < 0) {
         status = BatchValidityStatus.EXPIRED;
       } else if (daysDifference <= 30) {

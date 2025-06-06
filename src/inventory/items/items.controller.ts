@@ -235,12 +235,15 @@ export class ItemController {
   })
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('validity')
-  async findAllExpired(
+  async findAllWithValidity(
     @Query() query: FetchExpiredQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {
-      const response = await this.itemsService.fetchExpiredItems(query, user);
+      const response = await this.itemsService.fetchItemsWithValidity(
+        query,
+        user,
+      );
 
       return new ApiSuccessResponseDto(
         new PaginatedDataResponseDto(
