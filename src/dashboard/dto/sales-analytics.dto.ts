@@ -17,14 +17,8 @@ export class SalesTrendDto {
 
   constructor() {
     this.trend = {
-      dates: [
-        new Date('2025-03-05T00:00:00.000Z'),
-        new Date('2025-03-10T00:00:00.000Z'),
-        new Date('2025-03-15T00:00:00.000Z'),
-        new Date('2025-03-20T00:00:00.000Z'),
-        new Date('2025-03-25T00:00:00.000Z'),
-      ],
-      quantities: [190, 400, 600, 800, 1000],
+      dates: [],
+      quantities: [],
     };
   }
 }

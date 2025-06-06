@@ -68,9 +68,32 @@ export class DashboardService {
     return res;
   }
 
-  async getSalesTrend(query: FindAnalyticsQueryDto) {
-    const _response = query;
-    return new SalesTrendDto();
+  async getSalesTrend(query: FindAnalyticsQueryDto, user: IUserPayload) {
+    const { createdAt, groupby } = getDateRangeFilter(query.dateRange);
+    const filter: FindOptions<SaleItem> = {
+      where: {
+        [Op.and]: [
+          { createdAt },
+          user.facility && { facilityId: user.facility },
+          user.department && { departmentId: user.department },
+        ],
+      },
+      attributes: [
+        [fn('SUM', col('quantity')), 'quantity'],
+        [fn('DATE_TRUNC', groupby, col('created_at')), groupby],
+      ],
+      group: [groupby],
+      order: [[groupby, 'asc']],
+    };
+
+    const sales = await this.saleItemRepo.findAll(filter);
+    const res = new SalesTrendDto();
+
+    sales.map((i) => {
+      res.trend.dates.push(i.dataValues[groupby]);
+      res.trend.quantities.push(Number(i.dataValues.quantity));
+    });
+    return res;
   }
 
   async findTopSellingItemCategories(

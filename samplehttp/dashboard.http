@@ -27,7 +27,7 @@ GET {{baseUrl}}/dashboard/item-categories/top-selling?dateRange=this_year
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/dashboard/sales-trend?facilityId={{facilityId}}&startDate=2024-11-11&endDate=2024-12-11
+GET {{baseUrl}}/dashboard/sales/trend?dateRange=this_week
 Authorization: Bearer {{accessToken}}
 
 ###

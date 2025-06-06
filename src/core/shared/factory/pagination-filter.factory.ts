@@ -16,7 +16,9 @@ export function generateFilter<T extends Partial<PaginationRequestDto>>(
     },
     searchFilter: {
       ...(query.search && searchOption),
-      ...(query.dateRange && getDateRangeFilter(query.dateRange)),
+      ...(query.dateRange && {
+        createdAt: getDateRangeFilter(query.dateRange).createdAt,
+      }),
     },
   };
 }

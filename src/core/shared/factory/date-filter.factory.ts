@@ -17,7 +17,9 @@ import { DateRange } from '../dto/pagination.dto';
 
 export const getDateRangeFilter = (
   dateRange: DateRange,
-): { createdAt: { [Op.between]: [Date, Date] } } | undefined => {
+):
+  | { createdAt: { [Op.between]: [Date, Date] }; groupby?: string }
+  | undefined => {
   const now = new Date();
 
   switch (dateRange) {
@@ -26,18 +28,21 @@ export const getDateRangeFilter = (
         createdAt: {
           [Op.between]: [startOfDay(now), endOfDay(now)],
         },
+        groupby: 'hour',
       };
     case DateRange.THIS_WEEK:
       return {
         createdAt: {
           [Op.between]: [startOfWeek(now), endOfWeek(now)],
         },
+        groupby: 'day',
       };
     case DateRange.THIS_MONTH:
       return {
         createdAt: {
           [Op.between]: [startOfMonth(now), endOfMonth(now)],
         },
+        groupby: 'day',
       };
     case DateRange.LAST_MONTH: {
       const lastMonth = subMonths(now, 1);
@@ -45,6 +50,7 @@ export const getDateRangeFilter = (
         createdAt: {
           [Op.between]: [startOfMonth(lastMonth), endOfMonth(lastMonth)],
         },
+        groupby: 'day',
       };
     }
     case DateRange.LAST_THREE_MONTHS: {
@@ -53,6 +59,7 @@ export const getDateRangeFilter = (
         createdAt: {
           [Op.between]: [startOfMonth(lastThreeMonths), endOfMonth(now)],
         },
+        groupby: 'week',
       };
     }
     case DateRange.THIS_YEAR:
@@ -60,6 +67,7 @@ export const getDateRangeFilter = (
         createdAt: {
           [Op.between]: [startOfYear(now), endOfYear(now)],
         },
+        groupby: 'month',
       };
     default:
       return undefined;
