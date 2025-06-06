@@ -9,7 +9,7 @@ import {
   SalesTrendDto,
   TopSellingCategoriesDto,
 } from './dto';
-import { FindOptions, Sequelize } from 'sequelize';
+import { col, FindOptions, fn, Sequelize } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
 import { SaleItem } from 'src/sales/models/sale-items.model';
 import { Item } from 'src/inventory/items/models';
@@ -47,7 +47,10 @@ export class DashboardService {
           user.department && { departmentId: user.department },
         ],
       },
-      attributes: ['quantity', [Sequelize.col('item.name'), 'name']],
+      attributes: [
+        [fn('SUM', col('quantity')), 'quantity'],
+        [col('item.name'), 'name'],
+      ],
       include: { model: Item, attributes: [] },
       group: ['item.name', 'quantity'],
       order: [['quantity', direction]],
@@ -58,7 +61,7 @@ export class DashboardService {
     let sum = 0;
     items.map((i) => {
       res.items.names.push(i.dataValues.name);
-      res.items.quantities.push(i.dataValues.quantity);
+      res.items.quantities.push(Number(i.dataValues.quantity));
       sum += i.dataValues.quantity;
     });
     res.average = sum / items.length;
@@ -83,7 +86,10 @@ export class DashboardService {
           user.department && { departmentId: user.department },
         ],
       },
-      attributes: ['quantity', [Sequelize.col('item.category.name'), 'name']],
+      attributes: [
+        [fn('SUM', col('quantity')), 'quantity'],
+        [Sequelize.col('item.category.name'), 'name'],
+      ],
       include: [
         {
           model: Item,
@@ -100,14 +106,15 @@ export class DashboardService {
 
     cats.map((i) => {
       res.topSelling.categories.push(i.dataValues.name);
-      res.topSelling.quantities.push(i.dataValues.quantity);
+      res.topSelling.quantities.push(Number(i.dataValues.quantity));
     });
     return res;
   }
 
-  // TODO: fix date range for grouping
   async getDailySales(query: FindAnalyticsQueryDto, user: IUserPayload) {
-    const { createdAt, bound } = getDateRangeFilterCompare(query.dateRange);
+    const { createdAt, bound, groupby } = getDateRangeFilterCompare(
+      query.dateRange,
+    );
     const filter: FindOptions<SaleItem> = {
       where: {
         [Op.and]: [
@@ -116,27 +123,24 @@ export class DashboardService {
           user.department && { departmentId: user.department },
         ],
       },
-      attributes: ['quantity', 'createdAt'],
-      include: [
-        {
-          model: Item,
-          attributes: [],
-          include: [{ model: ItemCategory, attributes: [] }],
-        },
+      attributes: [
+        [fn('SUM', col('quantity')), 'quantity'],
+        [fn('DATE_TRUNC', groupby, col('created_at')), groupby],
       ],
-      group: ['createdAt', 'quantity'],
-      order: [['createdAt', 'asc']],
+      group: [groupby],
+      order: [[groupby, 'asc']],
     };
     const sales = await this.saleItemRepo.findAll(filter);
     const res = new DailySalesDto();
 
     sales.map((s) => {
-      if (s.dataValues.createdAt >= bound) {
-        res.sales[1].dates.push(s.dataValues.createdAt);
-        res.sales[1].quantities.push(s.dataValues.quantity);
+      const date = s.dataValues[groupby];
+      if (date >= bound) {
+        res.sales[1].dates.push(date);
+        res.sales[1].quantities.push(Number(s.dataValues.quantity));
       } else {
-        res.sales[0].dates.push(s.dataValues.createdAt);
-        res.sales[0].quantities.push(s.dataValues.quantity);
+        res.sales[0].dates.push(date);
+        res.sales[0].quantities.push(Number(s.dataValues.quantity));
       }
     });
     return res;

@@ -31,5 +31,5 @@ GET {{baseUrl}}/dashboard/sales-trend?facilityId={{facilityId}}&startDate=2024-1
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/dashboard/sales/daily?dateRange=today
+GET {{baseUrl}}/dashboard/sales/daily?dateRange=this_month
 Authorization: Bearer {{accessToken}}

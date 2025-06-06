@@ -68,7 +68,9 @@ export const getDateRangeFilter = (
 
 export const getDateRangeFilterCompare = (
   dateRange: DateRange,
-): { createdAt: { [Op.between]: [Date, Date] }; bound: Date } | undefined => {
+):
+  | { createdAt: { [Op.between]: [Date, Date] }; bound: Date; groupby: string }
+  | undefined => {
   const now = new Date();
 
   switch (dateRange) {
@@ -78,6 +80,7 @@ export const getDateRangeFilterCompare = (
           [Op.between]: [startOfYesterday(), endOfDay(now)],
         },
         bound: startOfDay(now),
+        groupby: 'hour',
       };
     case DateRange.THIS_WEEK:
       return {
@@ -87,6 +90,7 @@ export const getDateRangeFilterCompare = (
             endOfWeek(now),
           ],
         },
+        groupby: 'day',
         bound: startOfWeek(now),
       };
     case DateRange.LAST_MONTH:
@@ -95,6 +99,7 @@ export const getDateRangeFilterCompare = (
         createdAt: {
           [Op.between]: [startOfMonth(subMonths(now, 1)), endOfMonth(now)],
         },
+        groupby: 'day',
         bound: startOfMonth(now),
       };
     case DateRange.LAST_THREE_MONTHS: {
@@ -103,6 +108,7 @@ export const getDateRangeFilterCompare = (
         createdAt: {
           [Op.between]: [startOfMonth(lastThreeMonths), endOfMonth(now)],
         },
+        groupby: 'week',
         bound: null,
       };
     }
@@ -111,6 +117,7 @@ export const getDateRangeFilterCompare = (
         createdAt: {
           [Op.between]: [startOfYear(subYears(now, 1)), endOfYear(now)],
         },
+        groupby: 'month',
         bound: startOfYear(now),
       };
     default:
