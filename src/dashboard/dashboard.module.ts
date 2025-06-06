@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Sale } from 'src/sales/models/sales.model';
+import { SaleItem } from 'src/sales/models/sale-items.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Sale])],
+  imports: [SequelizeModule.forFeature([SaleItem])],
   controllers: [DashboardController],
   providers: [DashboardService],
 })

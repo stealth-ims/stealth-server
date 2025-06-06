@@ -2,7 +2,6 @@
 
 const faker = require('@faker-js/faker').faker;
 const { v4: uuidv4 } = require('uuid');
-const { createdAt } = require('../migration-base');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -26,14 +25,14 @@ module.exports = {
       let total = 0;
 
       for (let si = 0; si < 5; si++) {
-        const item = items[faker.number.int(items.length - 1)];
+        const item = items[faker.number.int(items.length % 10)];
         total += item.selling_price;
         saleItems.push({
           id: uuidv4(),
           sale_id: saleId,
           item_id: item.id,
           batch_id: item.batchid,
-          quantity: faker.number.int(item.quantity % 10),
+          quantity: faker.number.int(item.quantity % 10) + 1,
           facility_id: item.facility_id,
           created_at: createdAt,
           updated_at: updatedAt,

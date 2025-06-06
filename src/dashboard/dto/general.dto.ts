@@ -131,10 +131,10 @@ export class ItemSalesAnalyticsDto {
   items: { names: string[]; quantities: number[] };
 
   constructor() {
-    this.average = 84;
+    this.average = 0;
     this.items = {
-      names: ['paracetamol', 'eyeDrop', 'condom', 'painKiller', 'inhaler'],
-      quantities: [90, 100, 50, 30, 150],
+      names: [],
+      quantities: [],
     };
   }
 }

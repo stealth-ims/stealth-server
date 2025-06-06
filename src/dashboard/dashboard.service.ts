@@ -9,15 +9,19 @@ import {
   SalesTrendDto,
   TopSellingCategoriesDto,
 } from './dto';
-import { FindOptions } from 'sequelize';
-import { Sale } from 'src/sales/models/sales.model';
+import { FindOptions, Sequelize } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
+import { SaleItem } from 'src/sales/models/sale-items.model';
+import { Item } from 'src/inventory/items/models';
+import { getDateRangeFilter } from 'src/core/shared/factory';
+import { IUserPayload } from 'src/auth/interface/payload.interface';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class DashboardService {
   constructor(
-    @InjectModel(Sale)
-    private saleRepository: typeof Sale,
+    @InjectModel(SaleItem)
+    private saleItemRepo: typeof SaleItem,
   ) {}
   async findAll(_query: FindGeneralAnalyticsQueryDto) {
     const analytics = new GeneralAnalyticsDto();
@@ -30,11 +34,35 @@ export class DashboardService {
     return new ItemSalesAnalyticsDto();
   }
 
-  async findLeastSellingItems(_query: FindAnalyticsQueryDto) {
-    const filter: FindOptions<Sale> = {};
-    const response = await this.saleRepository.findAndCountAll(filter);
-    // const res  = new ItemSalesAnalyticsDto();
-    return response;
+  async findLeastSellingItems(
+    query: FindAnalyticsQueryDto,
+    user: IUserPayload,
+  ) {
+    const { createdAt } = getDateRangeFilter(query.dateRange);
+    const filter: FindOptions<SaleItem> = {
+      where: {
+        [Op.and]: [
+          { createdAt },
+          [user.facility && { facilityId: user.facility }],
+          [user.department && { departmentId: user.department }],
+        ],
+      },
+      attributes: ['quantity', [Sequelize.col('item.brand_name'), 'name']],
+      include: { model: Item, attributes: [] },
+      group: ['item_id', 'item.brand_name', 'quantity'],
+      order: [['quantity', 'asc']],
+      limit: 10,
+    };
+    const items = await this.saleItemRepo.findAll(filter);
+    const res = new ItemSalesAnalyticsDto();
+    let sum = 0;
+    items.map((i) => {
+      res.items.names.push(i.dataValues.name);
+      res.items.quantities.push(i.dataValues.quantity);
+      sum += i.dataValues.quantity;
+    });
+    res.average = sum / items.length;
+    return res;
   }
 
   async getSalesTrend(query: FindAnalyticsQueryDto) {

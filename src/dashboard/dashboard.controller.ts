@@ -13,6 +13,8 @@ import {
 } from './dto';
 import { throwError } from '../core/shared/responses/error.response';
 import { ApiSuccessResponseDto } from '../core/shared/responses/success.response';
+import { GetUser } from 'src/auth/decorator';
+import { IUserPayload } from 'src/auth/interface/payload.interface';
 
 @Controller('dashboard')
 export class DashboardController {
@@ -60,9 +62,15 @@ export class DashboardController {
     message: 'least selling items sent successfully',
   })
   @Get('items/least-selling')
-  async findLeastSellingItems(@Query() query: FindAnalyticsQueryDto) {
+  async findLeastSellingItems(
+    @Query() query: FindAnalyticsQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.dashboardService.findLeastSellingItems(query);
+      const response = await this.dashboardService.findLeastSellingItems(
+        query,
+        user,
+      );
       return new ApiSuccessResponseDto(
         response,
         HttpStatus.OK,

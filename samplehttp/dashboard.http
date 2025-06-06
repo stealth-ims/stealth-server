@@ -17,6 +17,7 @@ GET {{baseUrl}}/dashboard/top-selling-items?facilityId={{facilityId}}
 Authorization: Bearer {{accessToken}}
 
 ###
+# @name least-selling
 GET {{baseUrl}}/dashboard/items/least-selling?dateRange=today
 Authorization: Bearer {{accessToken}}
 
