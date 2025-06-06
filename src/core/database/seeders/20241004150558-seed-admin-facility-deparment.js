@@ -9,25 +9,25 @@ const { createdAt, updatedAt, ...baseModelColumnsWithoutId } = baseModelColumns;
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, _Sequelize) {
-    const adminId = uuidv4();
-    const existingUser = await queryInterface.rawSelect(
-      'users',
-      {
-        where: {
-          email: 'example@email.com',
+    let existingUser = (
+      await queryInterface.sequelize.query(
+        'SELECT id FROM users where email = ?;',
+        {
+          replacements: ['example@email.com'],
+          type: queryInterface.sequelize.QueryTypes.SELECT,
         },
-      },
-      ['id'],
-    );
+      )
+    )[0]?.id;
 
     if (!existingUser) {
+      existingUser = uuidv4();
       const saltRounds = 10;
       const plainPassword = 'XT(v2EiTqQZ';
       const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
 
       await queryInterface.bulkInsert('users', [
         {
-          id: adminId,
+          id: uuidv4(),
           full_name: 'Foster Asare',
           email: 'asare4ster@gmail.com',
           phone_number: '0244335567',
@@ -55,7 +55,7 @@ module.exports = {
           ...baseModelColumnsWithoutId,
         },
         {
-          id: uuidv4(),
+          id: existingUser,
           full_name: 'Jack Frost',
           email: 'example@email.com',
           phone_number: '0244335567',
@@ -85,23 +85,22 @@ module.exports = {
       ]);
     }
 
-    const existingFacility = await queryInterface.rawSelect(
-      'facilities',
-      {
-        where: {
-          name: 'Facility A',
+    let existingFacility = (
+      await queryInterface.sequelize.query(
+        'SELECT id FROM facilities where name = ?;',
+        {
+          replacements: ['Facility A'],
+          type: queryInterface.sequelize.QueryTypes.SELECT,
         },
-      },
-      ['id'],
-    );
+      )
+    )[0]?.id;
 
-    let facilityId;
     if (!existingFacility) {
-      facilityId = uuidv4();
+      existingFacility = uuidv4();
 
       await queryInterface.bulkInsert('facilities', [
         {
-          id: facilityId,
+          id: existingFacility,
           name: 'Facility A',
           region: 'North',
           location: '123 Main St',
@@ -110,37 +109,38 @@ module.exports = {
           ...baseModelColumns,
         },
       ]);
-    } else {
-      facilityId = existingFacility;
     }
 
-    const existingDepartment = await queryInterface.rawSelect(
-      'departments',
-      {
-        where: {
-          name: 'Department A',
+    let existingDepartment = (
+      await queryInterface.sequelize.query(
+        'SELECT id FROM departments where name = ?;',
+        {
+          replacements: ['Department A'],
+          type: queryInterface.sequelize.QueryTypes.SELECT,
         },
-      },
-      ['id'],
-    );
+      )
+    )[0]?.id;
 
-    let departmentId;
     if (!existingDepartment) {
-      departmentId = uuidv4();
+      existingDepartment = uuidv4();
 
       await queryInterface.bulkInsert('departments', [
         {
-          id: departmentId,
+          id: existingDepartment,
           name: 'Department A',
-          facility_id: facilityId,
+          facility_id: existingFacility,
           created_by_id: existingUser,
           updated_by_id: null,
           ...baseModelColumns,
         },
       ]);
-    } else {
-      departmentId = existingDepartment;
     }
+
+    await queryInterface.bulkUpdate(
+      'users',
+      { facility_id: existingFacility },
+      { email: 'example@email.com' },
+    );
   },
 
   async down(queryInterface, _Sequelize) {

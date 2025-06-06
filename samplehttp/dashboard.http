@@ -13,12 +13,13 @@ GET {{baseUrl}}/dashboard/usage?facilityId={{facilityId}}
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/dashboard/top-selling-items?facilityId={{facilityId}}
+# @name top-selling
+GET {{baseUrl}}/dashboard/items/top-selling?dateRange=this_year
 Authorization: Bearer {{accessToken}}
 
 ###
 # @name least-selling
-GET {{baseUrl}}/dashboard/items/least-selling?dateRange=today
+GET {{baseUrl}}/dashboard/items/least-selling?dateRange=this_year
 Authorization: Bearer {{accessToken}}
 
 ###

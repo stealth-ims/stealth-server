@@ -44,9 +44,16 @@ export class DashboardController {
     message: 'top selling items sent successfully',
   })
   @Get('items/top-selling')
-  async findTopSellingItems(@Query() query: FindAnalyticsQueryDto) {
+  async findTopSellingItems(
+    @Query() query: FindAnalyticsQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.dashboardService.findTopSellingItems(query);
+      const response = await this.dashboardService.findSellingItems(
+        query,
+        user,
+        'desc',
+      );
       return new ApiSuccessResponseDto(
         response,
         HttpStatus.OK,
@@ -67,9 +74,10 @@ export class DashboardController {
     @GetUser() user: IUserPayload,
   ) {
     try {
-      const response = await this.dashboardService.findLeastSellingItems(
+      const response = await this.dashboardService.findSellingItems(
         query,
         user,
+        'asc',
       );
       return new ApiSuccessResponseDto(
         response,

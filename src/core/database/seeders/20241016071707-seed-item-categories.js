@@ -21,7 +21,7 @@ module.exports = {
     ];
 
     const facilities = await queryInterface.sequelize.query(
-      'SELECT id, name FROM facilities',
+      'SELECT id FROM facilities',
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
     const seedData = itemCategories.map((category) => ({

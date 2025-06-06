@@ -29,28 +29,24 @@ export class DashboardService {
     return analytics;
   }
 
-  async findTopSellingItems(query: FindAnalyticsQueryDto) {
-    const _response = query;
-    return new ItemSalesAnalyticsDto();
-  }
-
-  async findLeastSellingItems(
+  async findSellingItems(
     query: FindAnalyticsQueryDto,
     user: IUserPayload,
+    direction: 'desc' | 'asc',
   ) {
     const { createdAt } = getDateRangeFilter(query.dateRange);
     const filter: FindOptions<SaleItem> = {
       where: {
         [Op.and]: [
           { createdAt },
-          [user.facility && { facilityId: user.facility }],
-          [user.department && { departmentId: user.department }],
+          user.facility && { facilityId: user.facility },
+          user.department && { departmentId: user.department },
         ],
       },
-      attributes: ['quantity', [Sequelize.col('item.brand_name'), 'name']],
+      attributes: ['quantity', [Sequelize.col('item.name'), 'name']],
       include: { model: Item, attributes: [] },
-      group: ['item_id', 'item.brand_name', 'quantity'],
-      order: [['quantity', 'asc']],
+      group: ['item.name', 'quantity'],
+      order: [['quantity', direction]],
       limit: 10,
     };
     const items = await this.saleItemRepo.findAll(filter);

@@ -19,13 +19,13 @@ module.exports = {
 
     for (let s = 0; s < 50; s++) {
       const saleId = uuidv4();
-      const lastMonth = Date.UTC(2025, new Date().getMonth(), 1);
+      const lastMonth = Date.UTC(2025, new Date().getMonth() - 1, 1);
       const createdAt = faker.date.between({ from: lastMonth, to: new Date() });
       const updatedAt = faker.date.between({ from: lastMonth, to: new Date() });
       let total = 0;
 
       for (let si = 0; si < 5; si++) {
-        const item = items[faker.number.int(items.length % 10)];
+        const item = items[faker.number.int(items.length - 1)];
         total += item.selling_price;
         saleItems.push({
           id: uuidv4(),

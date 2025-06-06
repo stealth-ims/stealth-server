@@ -1,13 +1,13 @@
-GET {{baseUrl}}/items?facilityId={{facilityId}}
+GET {{baseUrl}}/items
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/items?facilityId={{facilityId}}
+GET {{baseUrl}}/items
 Authorization: Bearer {{accessToken}}
 
 ###
 # @name search
-GET {{baseUrl}}/items?pageSize=3&search=2
+GET {{baseUrl}}/items?pageSize=3
 Authorization: Bearer {{accessToken}}
 
 ###

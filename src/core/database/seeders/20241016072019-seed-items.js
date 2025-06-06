@@ -3,6 +3,7 @@
 
 const { v4: uuidv4 } = require('uuid');
 const baseModelColumns = require('../seed-base.js');
+const faker = require('@faker-js/faker').faker;
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -14,23 +15,24 @@ module.exports = {
     );
 
     // Get all facilities
-    const facilities = await queryInterface.sequelize.query(
-      'SELECT id, name FROM facilities;',
-      { type: queryInterface.sequelize.QueryTypes.SELECT },
-    );
-    const existingUser = await queryInterface.rawSelect(
-      'users',
-      {
-        where: {
-          email: 'example@email.com',
+    const facilityId = (
+      await queryInterface.sequelize.query('SELECT id FROM facilities;', {
+        type: queryInterface.sequelize.QueryTypes.SELECT,
+      })
+    )[0]?.id;
+    const existingUser = (
+      await queryInterface.sequelize.query(
+        'SELECT id FROM users where email = ?;',
+        {
+          replacements: ['example@email.com'],
+          type: queryInterface.sequelize.QueryTypes.SELECT,
         },
-      },
-      ['id'],
-    );
+      )
+    )[0].id;
 
     // Get all suppliers
     const suppliers = await queryInterface.sequelize.query(
-      'SELECT id, name FROM suppliers;',
+      'SELECT id FROM suppliers;',
       { type: queryInterface.sequelize.QueryTypes.SELECT },
     );
 
@@ -41,16 +43,14 @@ module.exports = {
     for (const category of categories) {
       for (let i = 1; i <= 5; i++) {
         const itemId = uuidv4();
-        const randomIndex = Math.floor(Math.random() * facilities.length);
-        const facilityId = facilities[randomIndex].id;
 
         items.push({
           id: itemId,
-          name: `${category.name} Item ${i}`,
-          brand_name: `Brand ${category.name} ${i}`,
+          name: faker.commerce.product(),
+          brand_name: faker.commerce.department(),
           dosage_form: Math.random() > 0.5 ? 'SOLIDS' : 'LIQUIDS',
-          cost_price: parseFloat((Math.random() * 100 + 1).toFixed(2)),
-          selling_price: parseFloat((Math.random() * 200 + 50).toFixed(2)),
+          cost_price: faker.commerce.price(),
+          selling_price: faker.commerce.price(),
           code: `${category.name.substring(0, 3).toUpperCase()}${i.toString().padStart(3, '0')}`,
           fda_approval: 'Approved',
           ISO: 'ISO9001',
@@ -58,10 +58,12 @@ module.exports = {
           strength: `${Math.floor(Math.random() * 1000) + 1}mg`,
           unit_of_measurement: Math.random() > 0.5 ? 'tablet' : 'ml',
           storage_req: 'Store in a cool, dry place',
-          reorder_point: Math.floor(Math.random() * 100) + 50,
-          status: ['LOW', 'STOCKED', 'OUT_OF_STOCK'][
-            Math.floor(Math.random() * 3)
-          ],
+          reorder_point: faker.number.int({ min: 50, max: 100 }),
+          status: faker.helpers.arrayElement([
+            'LOW',
+            'STOCKED',
+            'OUT_OF_STOCK',
+          ]),
           created_by_id: existingUser,
           category_id: category.id,
           facility_id: facilityId,
@@ -73,16 +75,11 @@ module.exports = {
           batches.push({
             id: uuidv4(),
             item_id: itemId,
-            validity: new Date(
-              new Date().setFullYear(
-                new Date().getFullYear() + Math.floor(Math.random() * 5) + 1,
-              ),
-            ),
+            validity: faker.date.future(),
             batch_number: `BATCH${itemId.substring(0, 4)}${j}`,
             quantity: Math.floor(Math.random() * 1000) + 100,
             created_by_id: existingUser,
-            supplier_id:
-              suppliers[Math.floor(Math.random() * suppliers.length)].id,
+            supplier_id: suppliers[faker.number.int(suppliers.length - 1)].id,
             ...baseModelColumns,
           });
         }
