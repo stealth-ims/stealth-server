@@ -12,6 +12,7 @@ export enum ReportCategories {
   INVENTORY_VALUATION_REPORT = 'inventory_valuation_report',
   PERIODIC_SALES_REPORT = 'periodic_sales_report',
   TOP_SELLING_PRODUCTS = 'top_selling_products',
+  AUDIT_TRAIL_REPORT = 'audit_trail_report',
 }
 export class CreateReportDto {
   @ApiProperty({

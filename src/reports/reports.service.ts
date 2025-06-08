@@ -108,8 +108,22 @@ export class ReportsService {
       }
       case ReportCategories.TOP_SELLING_PRODUCTS: {
         const { rows, count } = await this.salesService.fetchSellingProducts(
-          facility,
-          department,
+          {
+            facilityId: facility,
+            departmentId: department,
+            whereOptions: whereConditions,
+          },
+          query.limit || 10,
+        );
+        return { count, rows };
+      }
+      case ReportCategories.AUDIT_TRAIL_REPORT: {
+        const { rows, count } = await this.salesService.fetchSellingProducts(
+          {
+            facilityId: facility,
+            departmentId: department,
+            whereOptions: whereConditions,
+          },
           query.limit || 10,
         );
         return { count, rows };

@@ -74,14 +74,18 @@ export class SalesService {
   }
 
   async fetchSellingProducts(
-    facilityId: string,
-    departmentId: string,
+    paramOptions: {
+      facilityId: string;
+      departmentId: string;
+      whereOptions: Record<string, any>;
+    },
     limit?: number,
   ) {
     const rows = await this.saleItemRepository.findAll({
       where: {
-        facilityId,
-        departmentId,
+        facilityId: paramOptions.facilityId,
+        departmentId: paramOptions.departmentId,
+        ...paramOptions.whereOptions,
       },
       attributes: [
         'itemId',
@@ -92,11 +96,8 @@ export class SalesService {
       ...(limit && { limit }),
     });
 
-    this.logger.log(rows);
-
     const finalData = await Promise.all(
       rows.map(async (saleItem) => {
-        this.logger.log('totalQuantity', saleItem.totalQuantity);
         const item = await this.itemService.findOne(saleItem.itemId, [
           'id',
           'name',
