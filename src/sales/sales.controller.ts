@@ -20,6 +20,8 @@ import {
   CreateSaleResponseDto,
   GetSaleDto,
   GetSalesItemsDto,
+  FetchSalesReportDataQueryDto,
+  FetchTopSellingReportDataQueryDto,
 } from './dto/';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators';
@@ -35,6 +37,7 @@ import {
   Features,
   PermissionLevel,
 } from '../core/shared/enums/permissions.enum';
+import { GetReportDataDto } from '../reports/dto';
 
 @ApiTags('Sales')
 @Controller('sales')
@@ -106,6 +109,53 @@ export class SalesController {
         response,
         HttpStatus.OK,
         'Sales retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['authorize', 'success'], {
+    type: GetReportDataDto,
+    message: 'Periodic sales data retrieved successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('report/periodic-sales')
+  async getPeriodicSales(
+    @Query() query: FetchSalesReportDataQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response = await this.salesService.fetchPeriodicSales(query, user);
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Periodic sales data retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['authorize', 'success'], {
+    type: GetReportDataDto,
+    message: 'Top selling items data retrieved successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('report/top-selling')
+  async getTopSellingItemsData(
+    @Query() query: FetchTopSellingReportDataQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response = await this.salesService.fetchTopSellingItemsData(
+        query,
+        user,
+      );
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Top selling items data retrieved successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

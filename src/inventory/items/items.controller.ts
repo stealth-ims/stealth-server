@@ -47,7 +47,9 @@ import {
   BatchResponseDto,
   UpdateBatchDto,
   FetchBatchesQueryDto,
+  FetchStockLevelReportDataQueryDto,
 } from './batches/dto';
+import { GetReportDataDto } from '../../reports/dto';
 
 @ApiTags('Items')
 @Controller('items')
@@ -223,6 +225,47 @@ export class ItemController {
         items,
         HttpStatus.OK,
         'Items retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetReportDataDto,
+    message: 'Stock level data retrieved successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('report/stock-level')
+  async findStockLevelData(
+    @Query() query: FetchStockLevelReportDataQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const items = await this.batchService.fetchStockLevelData(query, user);
+      return new ApiSuccessResponseDto(
+        items,
+        HttpStatus.OK,
+        'Stock level data retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['success', 'authorize'], {
+    type: GetReportDataDto,
+    message: 'Expiry data retrieved successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('report/expiry')
+  async findExpiryData(@GetUser() user: IUserPayload) {
+    try {
+      const items = await this.batchService.fetchExpiryData(user);
+      return new ApiSuccessResponseDto(
+        items,
+        HttpStatus.OK,
+        'Expiry data retrieved successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

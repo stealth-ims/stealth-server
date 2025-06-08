@@ -108,11 +108,7 @@ export class ReportsService {
       }
       case ReportCategories.TOP_SELLING_PRODUCTS: {
         const { rows, count } = await this.salesService.fetchSellingProducts(
-          {
-            facilityId: facility,
-            departmentId: department,
-            whereOptions: whereConditions,
-          },
+          whereConditions,
           query.limit || 10,
         );
         return { count, rows };

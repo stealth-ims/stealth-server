@@ -4,6 +4,8 @@ import {
   CreateSaleDto,
   UpdateSalesDto,
   FindItemDto,
+  FetchSalesReportDataQueryDto,
+  FetchTopSellingReportDataQueryDto,
 } from './dto/';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sale } from './models/sales.model';
@@ -15,7 +17,7 @@ import { Patient } from '../patient/models/patient.model';
 import { Batch, Item } from '../inventory/items/models';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { PatientService } from '../patient/patient.service';
-import { endOfToday, startOfToday } from 'date-fns';
+import { endOfDay, endOfToday, startOfDay, startOfToday } from 'date-fns';
 import { generateFilter } from '../core/shared/factory';
 import { SaleItem } from './models/sale-items.model';
 import { Sequelize } from 'sequelize-typescript';
@@ -74,18 +76,12 @@ export class SalesService {
   }
 
   async fetchSellingProducts(
-    paramOptions: {
-      facilityId: string;
-      departmentId: string;
-      whereOptions: Record<string, any>;
-    },
+    whereOptions: Record<string, any>,
     limit?: number,
   ) {
     const rows = await this.saleItemRepository.findAll({
       where: {
-        facilityId: paramOptions.facilityId,
-        departmentId: paramOptions.departmentId,
-        ...paramOptions.whereOptions,
+        ...whereOptions,
       },
       attributes: [
         'itemId',
@@ -112,6 +108,37 @@ export class SalesService {
     );
 
     return { rows: finalData, count: finalData.length };
+  }
+
+  async fetchTopSellingItemsData(
+    query: FetchTopSellingReportDataQueryDto,
+    user: IUserPayload,
+  ) {
+    const { facility, department } = user;
+    const whereConditions: Record<string, any> = {
+      facilityId: facility,
+      ...(department && { departmentId: department }),
+    };
+
+    if (query.startDate && query.endDate) {
+      whereConditions.createdAt = {
+        [Op.between]: [query.startDate, query.endDate],
+      };
+    }
+
+    if (query.specificDate) {
+      const specificDateStart = startOfDay(query.specificDate);
+      const specificDateEnd = endOfDay(query.specificDate);
+      whereConditions.createdAt = {
+        [Op.between]: [specificDateStart, specificDateEnd],
+      };
+    }
+
+    const { rows, count } = await this.fetchSellingProducts(
+      whereConditions,
+      query.limit || 10,
+    );
+    return { count, rows };
   }
 
   async create(dto: CreateSaleDto, user: IUserPayload) {
@@ -324,6 +351,34 @@ export class SalesService {
     });
 
     return { rows: modRows, count };
+  }
+
+  async fetchPeriodicSales(
+    query: FetchSalesReportDataQueryDto,
+    user: IUserPayload,
+  ) {
+    const { facility, department } = user;
+    const whereConditions: Record<string, any> = {
+      facilityId: facility,
+      ...(department && { departmentId: department }),
+    };
+
+    if (query.startDate && query.endDate) {
+      whereConditions.createdAt = {
+        [Op.between]: [query.startDate, query.endDate],
+      };
+    }
+
+    if (query.specificDate) {
+      const specificDateStart = startOfDay(query.specificDate);
+      const specificDateEnd = endOfDay(query.specificDate);
+      whereConditions.createdAt = {
+        [Op.between]: [specificDateStart, specificDateEnd],
+      };
+    }
+
+    const { rows, count } = await this.fetchData(whereConditions);
+    return { count, rows };
   }
 
   async fetchOne(id: string) {

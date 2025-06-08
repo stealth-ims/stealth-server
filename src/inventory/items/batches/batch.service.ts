@@ -10,13 +10,20 @@ import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../../suppliers/suppliers.service';
 import { FindAndCountOptions, IncludeOptions, Op, QueryTypes } from 'sequelize';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CreateBatchDto, FetchBatchesQueryDto, UpdateBatchDto } from './dto';
+import {
+  CreateBatchDto,
+  FetchBatchesQueryDto,
+  FetchStockLevelReportDataQueryDto,
+  UpdateBatchDto,
+} from './dto';
 import { generateFilter } from '../../../core/shared/factory';
 import { User } from '../../../auth/models/user.model';
 import { QueryOptionsDto } from '../../../core/shared/dto/query-options.dto';
 import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { buildQuery } from '../../../core/shared/factory/query-builder.factory';
+import { IUserPayload } from '../../../auth/interface/payload.interface';
+import { addDays, endOfDay, startOfDay, startOfToday } from 'date-fns';
 
 @Injectable()
 export class BatchService {
@@ -114,6 +121,49 @@ export class BatchService {
   async findAndCount(options?: QueryOptionsDto<Batch>) {
     const queryOptions = buildQuery<Batch>(options, this.populates);
     return this.batchRepo.findAndCountAll(queryOptions);
+  }
+
+  async fetchStockLevelData(
+    query: FetchStockLevelReportDataQueryDto,
+    user: IUserPayload,
+  ) {
+    const { facility, department } = user;
+    const whereConditions: Record<string, any> = {
+      facilityId: facility,
+      ...(department && { departmentId: department }),
+    };
+
+    if (query.startDate && query.endDate) {
+      whereConditions.createdAt = {
+        [Op.between]: [query.startDate, query.endDate],
+      };
+    }
+
+    if (query.specificDate) {
+      const specificDateStart = startOfDay(query.specificDate);
+      const specificDateEnd = endOfDay(query.specificDate);
+      whereConditions.createdAt = {
+        [Op.between]: [specificDateStart, specificDateEnd],
+      };
+    }
+
+    const { rows, count } = await this.findAndCount({
+      query: whereConditions,
+      fields: ['id', 'batchNumber', 'createdAt', 'validity'],
+      populate: ['item', 'department', 'facility'],
+      sort: '-createdAt',
+    });
+
+    return { count, rows };
+  }
+
+  async fetchExpiryData(user: IUserPayload) {
+    const { facility, department } = user;
+    const { rows, count } = await this.fetchStockNearingExpiry(
+      facility,
+      department,
+    );
+    return { count, rows };
   }
 
   async getAggregatedBatches(from: Date, to: Date) {
@@ -295,5 +345,60 @@ export class BatchService {
     this.eventEmitter.emit('quantity.changed', { itemId: batch.itemId });
     await batch.destroy();
     this.logger.log(`Batch deleted successfully. ID: ${id}`);
+  }
+
+  private async findBatchesByValidity(
+    ownershipQuery: Record<string, any>,
+    validityCondition: Record<string, any>,
+  ) {
+    return this.findAndCount({
+      query: {
+        ...ownershipQuery,
+        validity: validityCondition,
+      },
+      fields: ['id', 'batchNumber', 'createdAt', 'validity'],
+      populate: ['item', 'department', 'facility'],
+      sort: 'validity',
+    });
+  }
+
+  async fetchStockNearingExpiry(
+    facilityId: string,
+    departmentId: string,
+  ): Promise<{ rows: Record<string, any>; count: number }> {
+    const rows: Record<string, any> = {};
+    const ownershipQuery = {
+      facilityId,
+      ...(departmentId && { departmentId }),
+    };
+
+    const today = startOfToday();
+    const nDaysFromNow = (days: number) => addDays(new Date(), days);
+
+    const expired = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.lt]: today,
+    });
+    const critical = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [today, nDaysFromNow(30)],
+    });
+    const highRisk = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [nDaysFromNow(30), nDaysFromNow(60)],
+    });
+    const approaching = await this.findBatchesByValidity(ownershipQuery, {
+      [Op.between]: [nDaysFromNow(60), nDaysFromNow(90)],
+    });
+
+    rows.expired = expired;
+    rows.critical = critical;
+    rows.highRisk = highRisk;
+    rows.approaching = approaching;
+
+    const totalCount =
+      (expired.count || 0) +
+      (critical.count || 0) +
+      (highRisk.count || 0) +
+      (approaching.count || 0);
+
+    return { rows, count: totalCount };
   }
 }
