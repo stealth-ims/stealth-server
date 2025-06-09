@@ -9,27 +9,49 @@ import {
   SalesTrendDto,
   TopSellingCategoriesDto,
 } from './dto';
-import { col, FindOptions, fn, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
+import { WhereOptions } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
-import { SaleItem } from 'src/sales/models/sale-items.model';
-import { Item } from 'src/inventory/items/models';
+import { Batch } from 'src/inventory/items/models';
 import {
   getDateRangeFilter,
   getDateRangeFilterCompare,
 } from 'src/core/shared/factory';
 import { IUserPayload } from 'src/auth/interface/payload.interface';
 import { Op } from 'sequelize';
-import { ItemCategory } from 'src/inventory/items-category/models/items-category.model';
 import { Sale } from 'src/sales/models/sales.model';
+import { addYears } from 'date-fns';
+import sequelize from 'sequelize';
 
 @Injectable()
 export class DashboardService {
   constructor(
-    @InjectModel(SaleItem)
-    private saleItemRepo: typeof SaleItem,
+    @InjectModel(Sale)
+    private salesRepo: typeof Sale,
+    @InjectModel(Batch)
+    private batchRepo: typeof Batch,
+    private sql: Sequelize,
   ) {}
-  async findAll(_query: FindGeneralAnalyticsQueryDto) {
+  async findAll(_query: FindGeneralAnalyticsQueryDto, _user: IUserPayload) {
+    const soonToExpireWhere: WhereOptions<Batch> = {
+      validity: { [Op.lte]: addYears(new Date(), 1) },
+    };
     const analytics = new GeneralAnalyticsDto();
+    const customers = await this.salesRepo.count({
+      col: 'patient_id',
+      distinct: true,
+    });
+    const revenue = await this.salesRepo.aggregate('total', 'SUM');
+    const transactions = await this.salesRepo.count({ col: 'id' });
+    const soonToExpire = await this.batchRepo.count({
+      col: 'item_id',
+      distinct: true,
+      where: soonToExpireWhere,
+    });
+    analytics.customers.total = customers;
+    analytics.totalRevenue.total = revenue as number;
+    analytics.totalTransactions.total = transactions;
+    analytics.soonToExpireItems.total = soonToExpire;
     // analytics.totalItemsSold=
     return analytics;
   }
@@ -40,61 +62,56 @@ export class DashboardService {
     direction: 'desc' | 'asc',
   ) {
     const { createdAt } = getDateRangeFilter(query.dateRange);
-    const filter: FindOptions<SaleItem> = {
-      where: {
-        [Op.and]: [
-          { createdAt },
-          user.facility && { facilityId: user.facility },
-          user.department && { departmentId: user.department },
-        ],
-      },
-      attributes: [
-        [fn('SUM', col('quantity')), 'quantity'],
-        [col('item.name'), 'name'],
-      ],
-      include: { model: Item, attributes: [] },
-      group: ['item.name', 'quantity'],
-      order: [['quantity', direction]],
-      limit: 10,
-    };
-    const items = await this.saleItemRepo.findAll(filter);
-    const res = new ItemSalesAnalyticsDto();
-    let sum = 0;
-    items.map((i) => {
-      res.items.names.push(i.dataValues.name);
-      res.items.quantities.push(Number(i.dataValues.quantity));
-      sum += i.dataValues.quantity;
-    });
-    res.average = sum / items.length;
-    return res;
+    const {
+      result: { names, quantities, avg },
+    }: any = await this.sql.query(
+      `WITH filtered_sales AS (
+    SELECT
+        i.name as name,
+        sum(si.quantity) as total_quantity
+    FROM sale_items si
+    JOIN items i ON i.id = si.item_id
+		${this.applyWhere(createdAt, user)}
+		    GROUP BY i.id, i.name
+    ORDER BY total_quantity ${direction}
+    LIMIT 5
+		)
+		SELECT jsonb_build_object(
+    'names', jsonb_agg(name),
+    'quantities', jsonb_agg(total_quantity),
+		'avg', avg(total_quantity)
+		) as result
+		FROM filtered_sales;`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
+
+    return new ItemSalesAnalyticsDto(names, quantities, avg);
   }
 
   async getSalesTrend(query: FindAnalyticsQueryDto, user: IUserPayload) {
     const { createdAt, groupby } = getDateRangeFilter(query.dateRange);
-    const filter: FindOptions<SaleItem> = {
-      where: {
-        [Op.and]: [
-          { createdAt },
-          user.facility && { facilityId: user.facility },
-          user.department && { departmentId: user.department },
-        ],
-      },
-      attributes: [
-        [fn('SUM', col('quantity')), 'quantity'],
-        [fn('DATE_TRUNC', groupby, col('created_at')), groupby],
-      ],
-      group: [groupby],
-      order: [[groupby, 'asc']],
-    };
+    const {
+      result: { dates, quantities },
+    }: any = await this.sql.query(
+      `WITH filtered_sales AS (
+    SELECT
+        DATE_TRUNC('${groupby}', created_at) as ${groupby},
+        sum(si.quantity) as total_quantity
+    FROM sale_items si
+		${this.applyWhere(createdAt, user)}
+		GROUP BY ${groupby}
+    ORDER BY ${groupby} asc
+    LIMIT 5
+		)
+		SELECT jsonb_build_object(
+    'dates', jsonb_agg(${groupby}),
+    'quantities', jsonb_agg(total_quantity)
+		) as result
+		FROM filtered_sales;`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
 
-    const sales = await this.saleItemRepo.findAll(filter);
-    const res = new SalesTrendDto();
-
-    sales.map((i) => {
-      res.trend.dates.push(i.dataValues[groupby]);
-      res.trend.quantities.push(Number(i.dataValues.quantity));
-    });
-    return res;
+    return new SalesTrendDto(dates, quantities);
   }
 
   async findTopSellingItemCategories(
@@ -102,72 +119,78 @@ export class DashboardService {
     user: IUserPayload,
   ) {
     const { createdAt } = getDateRangeFilter(query.dateRange);
-    const filter: FindOptions<SaleItem> = {
-      where: {
-        [Op.and]: [
-          { createdAt },
-          user.facility && { facilityId: user.facility },
-          user.department && { departmentId: user.department },
-        ],
-      },
-      attributes: [
-        [fn('SUM', col('quantity')), 'quantity'],
-        [Sequelize.col('item.category.name'), 'name'],
-      ],
-      include: [
-        {
-          model: Item,
-          attributes: [],
-          include: [{ model: ItemCategory, attributes: [] }],
-        },
-      ],
-      group: ['item.category.name', 'quantity'],
-      order: [['quantity', 'desc']],
-      limit: 10,
-    };
-    const cats = await this.saleItemRepo.findAll(filter);
-    const res = new TopSellingCategoriesDto();
 
-    cats.map((i) => {
-      res.topSelling.categories.push(i.dataValues.name);
-      res.topSelling.quantities.push(Number(i.dataValues.quantity));
-    });
-    return res;
+    const {
+      result: { categories, quantities },
+    }: any = await this.sql.query(
+      `WITH category_sales AS (
+    SELECT
+        ic.name as category,
+        sum(si.quantity) as total_quantity
+    FROM sale_items si
+    JOIN items i ON i.id = si.item_id
+    JOIN item_categories ic ON ic.id = i.category_id
+		${this.applyWhere(createdAt, user)}
+		    GROUP BY ic.id, ic.name
+    ORDER BY total_quantity DESC
+    LIMIT 5
+		)
+		SELECT jsonb_build_object(
+    'categories', jsonb_agg(category),
+    'quantities', jsonb_agg(total_quantity)
+		) as result
+		FROM category_sales;`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
+    return new TopSellingCategoriesDto(categories, quantities);
   }
 
   async getDailySales(query: FindAnalyticsQueryDto, user: IUserPayload) {
-    const { createdAt, bound, groupby } = getDateRangeFilterCompare(
-      query.dateRange,
-    );
-    const filter: FindOptions<SaleItem> = {
-      where: {
-        [Op.and]: [
-          { createdAt },
-          user.facility && { facilityId: user.facility },
-          user.department && { departmentId: user.department },
-        ],
+    const { bound, groupby } = getDateRangeFilterCompare(query.dateRange);
+    const [
+      {
+        result: { fdates, f_quantities },
       },
-      attributes: [
-        [fn('SUM', col('quantity')), 'quantity'],
-        [fn('DATE_TRUNC', groupby, col('created_at')), groupby],
-      ],
-      group: [groupby],
-      order: [[groupby, 'asc']],
-    };
-    const sales = await this.saleItemRepo.findAll(filter);
-    const res = new DailySalesDto();
-
-    sales.map((s) => {
-      const date = s.dataValues[groupby];
-      if (date >= bound) {
-        res.sales[1].dates.push(date);
-        res.sales[1].quantities.push(Number(s.dataValues.quantity));
-      } else {
-        res.sales[0].dates.push(date);
-        res.sales[0].quantities.push(Number(s.dataValues.quantity));
-      }
-    });
-    return res;
+      {
+        result: { sdates, s_quantities },
+      },
+    ]: any = await this.sql.query(
+      `WITH first AS (
+    SELECT
+        date_trunc('${groupby}', created_at) as ${groupby},
+        SUM(quantity) as f_quantity
+    FROM sale_items
+    WHERE created_at < '${bound.toDateString()}'
+    ${user.facility ? `AND facility_id = '${user.facility}'` : ''}
+		${user.department ? `AND department_id = '${user.department}'` : ''}
+    GROUP BY ${groupby}
+		ORDER by ${groupby}
+		),
+		second AS (
+    SELECT
+        date_trunc('${groupby}', created_at) as ${groupby},
+        SUM(quantity) as s_quantity
+    FROM sale_items
+    WHERE created_at  >= '${bound.toDateString()}'
+    ${user.facility ? `AND facility_id = '${user.facility}'` : ''}
+		${user.department ? `AND department_id = '${user.department}'` : ''}
+    GROUP BY ${groupby}
+		ORDER by ${groupby}
+		)
+		SELECT jsonb_build_object(
+    'fdates', jsonb_agg(to_char(${groupby}, 'YYYY-MM-DD HH24:MI')),
+    'f_quantity', jsonb_agg(f_quantity)
+) as result
+FROM first
+union
+	SELECT jsonb_build_object(
+    'sdates', jsonb_agg(to_char(${groupby}, 'YYYY-MM-DD HH24:MI')),
+    's_quantity', jsonb_agg(s_quantity)
+) as result
+FROM second;`,
+      { raw: true, type: sequelize.QueryTypes.SELECT },
+    );
+    return new DailySalesDto(fdates, f_quantities, sdates, s_quantities);
   }
 
   async getSalesPaymentMethods(
@@ -175,35 +198,29 @@ export class DashboardService {
     user: IUserPayload,
   ) {
     const { createdAt } = getDateRangeFilter(query.dateRange);
-    const filter: FindOptions<SaleItem> = {
-      where: {
-        [Op.and]: [
-          { createdAt },
-          user.facility && { facilityId: user.facility },
-          user.department && { departmentId: user.department },
-        ],
-      },
-      attributes: [
-        [fn('SUM', col('quantity')), 'quantity'],
-        [Sequelize.col('sale.payment_type'), 'name'],
-      ],
-      include: [
-        {
-          model: Sale,
-          attributes: [],
-        },
-      ],
-      group: ['name'],
-      order: [['quantity', 'desc']],
-    };
-    const cats = await this.saleItemRepo.findAll(filter);
+    const {
+      result: { categories, quantities },
+    }: any = await this.sql.query(
+      `WITH filtered_sales AS (
+    SELECT
+        s.payment_type as name,
+        sum(si.quantity) as total_quantity
+    FROM sale_items si
+		JOIN sales s on s.id = si.sale_id
+		${this.applyWhere(createdAt, user)}
+		GROUP BY name
+    ORDER BY total_quantity desc
+    LIMIT 5
+		)
+		SELECT jsonb_build_object(
+    'categories', jsonb_agg(name),
+    'quantities', jsonb_agg(total_quantity)
+		) as result
+		FROM filtered_sales;`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
 
-    const res = new SalesPaymentMethodDto();
-    cats.map((i) => {
-      res.topSelling.categories.push(i.dataValues.name);
-      res.topSelling.quantities.push(Number(i.dataValues.quantity));
-    });
-    return res;
+    return new SalesPaymentMethodDto(categories, quantities);
   }
 
   private computeItemStockLevel(startDate: Date, endDate: Date) {
@@ -240,5 +257,14 @@ export class DashboardService {
 
   private computeTotalItemsReturned(startDate: Date, endDate: Date) {
     return `${startDate.toISOString()} ${endDate.toISOString()}`;
+  }
+  private applyWhere(
+    { [Op.between]: [startDate, endDate] }: { [Op.between]: [Date, Date] },
+    user: IUserPayload,
+  ) {
+    return `WHERE si.created_at BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'
+		${user.facility ? `AND si.facility_id = '${user.facility}'` : ''}
+		${user.department ? `AND si.department_id = '${user.department}'` : ''}
+`;
   }
 }

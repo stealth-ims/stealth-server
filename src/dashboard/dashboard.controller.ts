@@ -26,9 +26,12 @@ export class DashboardController {
     message: 'general analytics sent successfully',
   })
   @Get('general')
-  async findAll(@Query() query: FindGeneralAnalyticsQueryDto) {
+  async findAll(
+    @Query() query: FindGeneralAnalyticsQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
     try {
-      const response = await this.dashboardService.findAll(query);
+      const response = await this.dashboardService.findAll(query, user);
       return new ApiSuccessResponseDto(
         response,
         HttpStatus.OK,

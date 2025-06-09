@@ -15,11 +15,8 @@ export class SalesTrendDto {
   })
   trend: { dates: Date[]; quantities: number[] };
 
-  constructor() {
-    this.trend = {
-      dates: [],
-      quantities: [],
-    };
+  constructor(dates: Date[], quantities: number[]) {
+    this.trend = { dates, quantities };
   }
 }
 
@@ -32,11 +29,8 @@ export class TopSellingCategoriesDto {
   })
   topSelling: { categories: string[]; quantities: number[] };
 
-  constructor() {
-    this.topSelling = {
-      categories: [],
-      quantities: [],
-    };
+  constructor(categories: string[], quantities: number[]) {
+    this.topSelling = { categories, quantities };
   }
 }
 
@@ -57,10 +51,15 @@ export class DailySalesDto {
   })
   sales: { dates: Date[]; quantities: number[] }[];
 
-  constructor() {
+  constructor(
+    dates1: Date[],
+    first: number[],
+    dates2: Date[],
+    second: number[],
+  ) {
     this.sales = [
-      { dates: [], quantities: [] },
-      { dates: [], quantities: [] },
+      { dates: dates1, quantities: first },
+      { dates: dates2, quantities: second },
     ];
   }
 }
@@ -74,11 +73,8 @@ export class SalesPaymentMethodDto {
   })
   topSelling: { categories: string[]; quantities: number[] };
 
-  constructor() {
-    this.topSelling = {
-      categories: [],
-      quantities: [],
-    };
+  constructor(categories: string[], quantities: number[]) {
+    this.topSelling = { categories, quantities };
   }
 }
 

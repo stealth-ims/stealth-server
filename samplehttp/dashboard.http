@@ -1,15 +1,10 @@
-GET {{baseUrl}}/items/analytics?facilityId={{facilityId}}
-Authorization: Bearer {{accessToken}}
-
-GET {{baseUrl}}/dashboard/stat?facilityId={{facilityId}}
-Authorization: Bearer {{accessToken}}
-
 ###
 GET {{baseUrl}}/dashboard/soon-to-expire?facilityId={{facilityId}}
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/dashboard/usage?facilityId={{facilityId}}
+# @name general
+GET {{baseUrl}}/dashboard/general?startDate=2025-05-01&endDate=2025-06-06
 Authorization: Bearer {{accessToken}}
 
 ###
@@ -29,7 +24,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @name sales trend
-GET {{baseUrl}}/dashboard/sales/trend?dateRange=this_week
+GET {{baseUrl}}/dashboard/sales/trend?dateRange=this_month
 Authorization: Bearer {{accessToken}}
 
 ###
@@ -39,5 +34,5 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @name sales payment-methods
-GET {{baseUrl}}/dashboard/sales/payment-methods?dateRange=today
+GET {{baseUrl}}/dashboard/sales/payment-methods?dateRange=this_month
 Authorization: Bearer {{accessToken}}
