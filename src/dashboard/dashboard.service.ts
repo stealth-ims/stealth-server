@@ -10,50 +10,135 @@ import {
   TopSellingCategoriesDto,
 } from './dto';
 import { Sequelize } from 'sequelize-typescript';
-import { WhereOptions } from 'sequelize';
-import { InjectModel } from '@nestjs/sequelize';
-import { Batch } from 'src/inventory/items/models';
 import {
   getDateRangeFilter,
   getDateRangeFilterCompare,
 } from 'src/core/shared/factory';
 import { IUserPayload } from 'src/auth/interface/payload.interface';
 import { Op } from 'sequelize';
-import { Sale } from 'src/sales/models/sales.model';
-import { addYears } from 'date-fns';
 import sequelize from 'sequelize';
+import { differenceInDays, subDays } from 'date-fns';
 
 @Injectable()
 export class DashboardService {
-  constructor(
-    @InjectModel(Sale)
-    private salesRepo: typeof Sale,
-    @InjectModel(Batch)
-    private batchRepo: typeof Batch,
-    private sql: Sequelize,
-  ) {}
-  async findAll(_query: FindGeneralAnalyticsQueryDto, _user: IUserPayload) {
-    const soonToExpireWhere: WhereOptions<Batch> = {
-      validity: { [Op.lte]: addYears(new Date(), 1) },
-    };
-    const analytics = new GeneralAnalyticsDto();
-    const customers = await this.salesRepo.count({
-      col: 'patient_id',
-      distinct: true,
-    });
-    const revenue = await this.salesRepo.aggregate('total', 'SUM');
-    const transactions = await this.salesRepo.count({ col: 'id' });
-    const soonToExpire = await this.batchRepo.count({
-      col: 'item_id',
-      distinct: true,
-      where: soonToExpireWhere,
-    });
-    analytics.customers.total = customers;
-    analytics.totalRevenue.total = revenue as number;
-    analytics.totalTransactions.total = transactions;
-    analytics.soonToExpireItems.total = soonToExpire;
-    // analytics.totalItemsSold=
-    return analytics;
+  constructor(private sql: Sequelize) {}
+  async findAll(query: FindGeneralAnalyticsQueryDto, user: IUserPayload) {
+    const { startDate, endDate } = query;
+    const comparisonStartDate = subDays(
+      startDate,
+      differenceInDays(endDate, startDate),
+    );
+    const comparisonEndDate = subDays(startDate, 1);
+    const { res }: any = await this.sql.query(
+      `
+with current as (
+select
+	count(distinct patient_id ) customers,
+	count(distinct s.id) transactions,
+	sum(total) revenue,
+	count(distinct si.item_id) unique_items,
+	sum(si.quantity) items_sold,
+	count(distinct case when sa.type = 'INCREMENT' then sa.quantity end) items_returned
+from sales s
+JOIN sale_items si ON s.id = si.sale_id
+left join stock_adjustments sa on sa.item_id = si.item_id
+WHERE s.created_at BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'
+${user.facility ? `AND si.facility_id = '${user.facility}'` : ''}
+${user.department ? `AND si.department_id = '${user.department}'` : ''}
+),
+previous as (
+select
+	count(distinct patient_id ) customers,
+	count(distinct s.id ) transactions,
+	sum(total) revenue,
+	count(distinct si.item_id) unique_items,
+	sum(si.quantity) items_sold,
+	count(distinct case when sa.type = 'INCREMENT' then sa.quantity end) items_returned
+from sales s
+JOIN sale_items si ON s.id = si.sale_id
+left join stock_adjustments sa on sa.item_id = si.item_id
+WHERE s.created_at BETWEEN '${comparisonStartDate.toISOString()}' AND '${comparisonEndDate.toISOString()}'
+${user.facility ? `AND si.facility_id = '${user.facility}'` : ''}
+${user.department ? `AND si.department_id = '${user.department}'` : ''}
+),
+inventory as (
+ SELECT
+        COUNT(i.id)  total_items,
+        SUM(b.quantity) total_stock,
+        COUNT(CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
+    FROM items i
+    JOIN batches b ON b.item_id = i.id
+WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
+${user.department ? `AND i.department_id = '${user.department}'` : ''}
+),
+calculations as (
+	select
+		round((c.items_sold - p.items_sold) / coalesce(nullif(p.items_sold, 0), 1)* 100, 2) itemChange,
+		round((c.customers - p.customers) / coalesce(nullif(p.customers, 0), 1)* 100, 2) customersChange,
+		round((c.items_returned - p.items_returned) / coalesce(nullif(p.items_returned, 0), 1) * 100, 2) returnedChange,
+		round((c.transactions  - p.transactions ) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
+		round((c.revenue - p.revenue  / p.revenue)::numeric  * 100, 2) revenueChange,
+		c.items_sold  itemsTotal,
+		c.transactions transTotal,
+		c.items_returned totalItemsReturned,
+		c.customers totalCustomers,
+		round(c.revenue::numeric, 2) totalRevenue
+	from current c, previous p
+)
+select jsonb_build_object(
+	'itemStockLevel', (select jsonb_build_object(
+		'total', total_items,
+		'percentageChange', 0, -- TODO
+		'changeType', 'NONE',
+		'totalStock', total_stock
+		) from inventory),
+	'totalItemsSold',json_build_object(
+		'total', itemsTotal,
+		'percentageChange', itemChange,
+		'changeType', case when itemChange > 0  then 'INCREMENT' else 'DECREMENT' end
+	),
+	'totalTransactions', json_build_object(
+		'total', transTotal,
+		'percentageChange', transChange,
+		'changeType', case when transChange > 0  then 'INCREMENT' else 'DECREMENT' end
+	),
+	'totalRevenue',json_build_object(
+		'total', totalRevenue,
+		'percentageChange', totalRevenue,
+		'changeType', case when revenueChange > 0  then 'INCREMENT' else 'DECREMENT' end
+	),
+	'customers', json_build_object(
+		'total', totalCustomers,
+		'percentageChange', customersChange,
+		'changeType', case when customersChange > 0  then 'INCREMENT' else 'DECREMENT' end
+	) ,
+	'soonToExpireItems', jsonb_build_object(
+        'total', (SELECT soon_expiring FROM inventory),
+        'percentageChange', 0,
+        'changeType', 'NONE'
+    ),
+    'itemsReturned', jsonb_build_object(
+        'total', totalItemsReturned,
+        'percentageChange', returnedChange,
+		'changeType', case when returnedChange > 0  then 'INCREMENT' else 'DECREMENT' end
+    ),
+    'inventoryTurnoverRate', jsonb_build_object(
+        'total', totalItemsReturned,
+        'percentageChange', returnedChange,
+		'changeType', case when returnedChange > 0  then 'INCREMENT' else 'DECREMENT' end
+    ),
+    'averageItemsPerTransaction', jsonb_build_object(
+        'total', totalItemsReturned,
+        'percentageChange', returnedChange,
+		'changeType', case when returnedChange > 0  then 'INCREMENT' else 'DECREMENT' end
+    )
+) as res
+from calculations;
+`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
+
+    return res as GeneralAnalyticsDto;
   }
 
   async findSellingItems(
