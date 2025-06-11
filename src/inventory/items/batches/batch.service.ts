@@ -14,6 +14,7 @@ import {
   CreateBatchDto,
   FetchBatchesQueryDto,
   FetchStockLevelReportDataQueryDto,
+  StockBatchDto,
   UpdateBatchDto,
 } from './dto';
 import { generateFilter } from '../../../core/shared/factory';
@@ -31,6 +32,7 @@ export class BatchService {
 
   constructor(
     @InjectModel(Batch) private readonly batchRepo: typeof Batch,
+    @InjectModel(Item) private readonly itemRepo: typeof Item,
     private readonly supplierService: SuppliersService,
     private eventEmitter: EventEmitter2,
   ) {
@@ -80,6 +82,58 @@ export class BatchService {
     }
     this.eventEmitter.emit('quantity.increased', {
       itemId: createBatchDto.itemId,
+    });
+    return batch;
+  }
+
+  async stock(dto: StockBatchDto): Promise<Batch> {
+    if (dto.supplierName) {
+      const supplier = await this.supplierService.exists(dto.supplierName);
+      if (!supplier) {
+        throw new NotFoundException(`Supplier: ${dto.supplierName} not found`);
+      }
+      dto.supplierId = supplier.id;
+    }
+
+    const item = await this.itemRepo.findOne({
+      where: {
+        name: { [Op.iLike]: `%${dto.itemName}%` },
+      },
+    });
+    if (!item) {
+      throw new NotFoundException(`Item: ${dto.itemName} not found`);
+    }
+    dto.itemId = item.id;
+
+    let batch: Batch;
+    batch = await this.batchRepo.findOne<Batch>({
+      where: {
+        [Op.or]: [
+          {
+            batchNumber: {
+              [Op.iLike]: `%${dto.batchNumber}%`,
+            },
+            itemId: dto.itemId,
+            facilityId: dto.facilityId,
+            departmentId: dto.departmentId,
+          },
+          { deletedAt: { [Op.not]: null } },
+        ],
+      },
+    });
+
+    if (batch) {
+      if (batch.deletedAt) {
+        await batch.restore();
+      } else {
+        dto.quantity = batch.quantity + dto.quantity;
+      }
+      await batch.update({ ...dto, createdAt: new Date() });
+    } else {
+      batch = await this.batchRepo.create({ ...dto });
+    }
+    this.eventEmitter.emit('quantity.increased', {
+      itemId: dto.itemId,
     });
     return batch;
   }

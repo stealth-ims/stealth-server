@@ -127,7 +127,7 @@ module.exports = {
       batchNumber: {
         type: Sequelize.STRING,
         field: 'batch_number',
-        unique: true,
+        allowNull: false,
       },
       quantity: {
         type: Sequelize.INTEGER,
@@ -150,7 +150,6 @@ module.exports = {
       },
       supplierId: {
         type: Sequelize.UUID,
-        allowNull: false,
         references: {
           model: 'suppliers',
           key: 'id',

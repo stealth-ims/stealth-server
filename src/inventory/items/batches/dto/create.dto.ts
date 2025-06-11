@@ -2,6 +2,7 @@ import { ApiProperty, ApiResponseProperty, PickType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   Min,
@@ -61,5 +62,46 @@ export class CreateBatchDto extends PickType(CreateItemDto, ['createdById']) {
   @ApiResponseProperty({
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
+  facilityId: string;
+}
+export class StockBatchDto {
+  @IsOptional()
+  @IsString()
+  supplierName?: string;
+
+  @IsOptional()
+  @IsString()
+  supplierId?: string;
+
+  @IsOptional()
+  @IsString()
+  batchNumber: string;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  quantity: number;
+
+  @IsOptional()
+  @Type(() => Date)
+  @MinDate(new Date())
+  validity?: Date;
+
+  @IsString()
+  itemName: string;
+
+  @IsString()
+  itemId?: string;
+
+  @IsOptional()
+  @IsString()
+  createdById: string;
+
+  @IsOptional()
+  @IsString()
+  departmentId: string;
+
+  @IsOptional()
+  @IsString()
   facilityId: string;
 }

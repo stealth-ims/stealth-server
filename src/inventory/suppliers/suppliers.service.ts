@@ -103,9 +103,9 @@ export class SuppliersService {
     return [modifiedSuppliers, suppliers.count];
   }
 
-  async exists(id: string): Promise<boolean> {
+  async exists(id: string) {
     const supplier = await this.supplierRepo.findByPk(id);
-    return !!supplier;
+    return supplier;
   }
 
   async findOne(id: string): Promise<Supplier> {

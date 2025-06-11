@@ -8,6 +8,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IncludeOptions } from 'sequelize';
 
 export class QueryOptionsDto<T> {
   @ApiPropertyOptional({
@@ -17,7 +18,7 @@ export class QueryOptionsDto<T> {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  populate?: (keyof T)[];
+  populate?: (keyof T | IncludeOptions)[];
 
   @ApiPropertyOptional({ type: [String], description: 'Fields to return' })
   @IsOptional()

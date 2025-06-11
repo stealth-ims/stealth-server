@@ -107,7 +107,7 @@ export class TwilioWebhookDto {
   @ApiProperty({
     description: 'Sender number (with or without whatsapp prefix)',
     name: 'From',
-    example: 'whatsapp:+14155551234',
+    example: 'whatsapp:+233244335567',
   })
   @IsString()
   @Expose({ name: 'From' })

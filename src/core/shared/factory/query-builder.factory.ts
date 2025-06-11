@@ -33,7 +33,12 @@ export function buildQuery<T>(
 
   if (params.populate) {
     queryOptions.include = params.populate.map(
-      (item) => populates[item as string],
+      (item: keyof T | IncludeOptions) => {
+        if (typeof item === 'object' && item !== null) {
+          return item;
+        }
+        return populates[item as string];
+      },
     );
   }
 
