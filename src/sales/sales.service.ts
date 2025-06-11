@@ -266,6 +266,7 @@ export class SalesService {
             {
               model: Batch,
               attributes: ['batchNumber'],
+              paranoid: false,
             },
           ],
         },
