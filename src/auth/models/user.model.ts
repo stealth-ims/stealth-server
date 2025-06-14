@@ -8,6 +8,7 @@ import {
   HasMany,
   HasOne,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { Facility } from '../../admin/facility/models/facility.model';
@@ -35,6 +36,7 @@ export class User extends BaseModel {
   @Column({ unique: true })
   email: string;
 
+  @Unique
   @Column
   phoneNumber: string;
 

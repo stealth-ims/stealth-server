@@ -217,6 +217,8 @@ export class ImsStockQlService {
     const salesAction: SellActionOptions = {
       action: 'SELL',
       saleItems: [],
+      patientCardId: null,
+      paymentType: null,
     };
 
     const parseItemsString = (input: string) => {
@@ -237,19 +239,23 @@ export class ImsStockQlService {
     };
 
     const parsePatientString = (input: string) => {
-      const match = input.match(/^TO\s*["']?(.*?)["']?$/);
-      if (match && match.length > 1) {
-        salesAction.patientCardId = match[1];
+      if (input) {
+        const match = input.match(/^TO\s*["']?(.*?)["']?$/);
+        if (match && match.length > 1) {
+          salesAction.patientCardId = match[1];
+        }
+        return;
       }
-      return;
     };
 
     const parsePaymentString = (input: string) => {
-      const match = input.match(/USING\s*["']?(.+?)["']?$/);
-      if (match && match.length > 1) {
-        salesAction.paymentType = match[1].toUpperCase() as SalePaymentType;
+      if (input) {
+        const match = input.match(/USING\s*["']?(.+?)["']?$/);
+        if (match && match.length > 1) {
+          salesAction.paymentType = match[1].toUpperCase() as SalePaymentType;
+        }
+        return;
       }
-      return;
     };
 
     for (const query of salesQuery) {

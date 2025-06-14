@@ -17,5 +17,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   controllers: [SmsController],
   providers: [SmsService],
+  exports: [SmsService],
 })
 export class SmsModule {}

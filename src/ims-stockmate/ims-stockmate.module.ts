@@ -7,9 +7,17 @@ import { UserModule } from '../user/user.module';
 import { ImsStockQlService } from './ims-stockql.service';
 import { SalesModule } from '../sales/sales.module';
 import { PatientModule } from '../patient/patient.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  imports: [SmsModule, InventoryModule, UserModule, SalesModule, PatientModule],
+  imports: [
+    SmsModule,
+    InventoryModule,
+    UserModule,
+    SalesModule,
+    PatientModule,
+    NotificationModule,
+  ],
   controllers: [ImsStockmateController],
   providers: [ImsStockmateService, ImsStockQlService],
 })

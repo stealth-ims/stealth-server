@@ -48,9 +48,9 @@ export class UserService {
   async fetchOne(options?: QueryOptionsDto<User>) {
     const queryOptions = buildQuery<User>(options, this.populates);
     const user = await this.userRepository.findOne(queryOptions);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    // if (!user) {
+    //   throw new NotFoundException('User not found');
+    // }
     return user;
   }
 

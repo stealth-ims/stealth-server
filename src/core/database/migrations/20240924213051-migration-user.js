@@ -12,7 +12,11 @@ module.exports = {
         unique: true,
       },
 
-      phoneNumber: { type: Sequelize.STRING, field: 'phone_number' },
+      phoneNumber: {
+        type: Sequelize.STRING,
+        field: 'phone_number',
+        unique: true,
+      },
 
       role: Sequelize.STRING,
 

@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ParsedImsStockQlCommand, TwilioWebhookDto } from './dto';
+import { AtskWebhookDto, ParsedImsStockQlCommand } from './dto';
 import { ItemService } from '../inventory/items/items.service';
 import * as yaml from 'js-yaml';
 import { addDays, format, startOfToday } from 'date-fns';
@@ -12,6 +12,7 @@ import { BatchService } from '../inventory/items/batches/batch.service';
 import { SalesService } from '../sales/sales.service';
 import { SalePaymentType } from '../sales/models/sales.model';
 import { PatientService } from '../patient/patient.service';
+import { SmsService } from '../notification/sms/sms.service';
 
 @Injectable()
 export class ImsStockmateService {
@@ -22,9 +23,16 @@ export class ImsStockmateService {
     private userService: UserService,
     private salesService: SalesService,
     private patientService: PatientService,
+    private smsService: SmsService,
   ) {}
 
-  async create(dto: TwilioWebhookDto) {
+  async sendSmsResponse(dto: AtskWebhookDto) {
+    console.log(dto);
+    const data = await this.create(dto);
+    console.log('data length', data.length);
+    await this.smsService.sendSms({ to: dto.from, body: data });
+  }
+  async create(dto: AtskWebhookDto) {
     const regex = /\+\d*/;
     dto.from = dto.from.match(regex)[0];
     const user = await this.userService.fetchOne({
@@ -33,12 +41,18 @@ export class ImsStockmateService {
       },
       fields: ['id', 'facilityId', 'departmentId'],
     });
+
+    if (!user) {
+      const userNotFound = { errorCode: 404, message: 'User not found' };
+      const serializedOutput = yaml.dump({ error: userNotFound });
+      return serializedOutput;
+    }
     const ownershipQuery = {
       facilityId: user.facilityId,
       departmentId: user.departmentId,
     };
     // const serializedBody = new IMSQuery(dto.body);
-    const parsedCommands = this.imsStockQlService.parse(dto.body);
+    const parsedCommands = this.imsStockQlService.parse(dto.text);
 
     const responses = await Promise.all(
       parsedCommands.map(async (cmd) => {
@@ -52,12 +66,12 @@ export class ImsStockmateService {
         } catch (error) {
           if (error instanceof HttpException) {
             return {
-              statusCode: error.getStatus(),
+              errorCode: error.getStatus(),
               message: error.message,
             };
           } else {
             return {
-              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+              errorCode: HttpStatus.INTERNAL_SERVER_ERROR,
               message: error.message,
             };
           }
@@ -197,10 +211,24 @@ export class ImsStockmateService {
             ...searchOptions,
             fields: ['name'],
             sort: 'name',
+            pageSize: 10,
           });
           const itemsJson = {
-            count: items.count,
-            rows: items.rows.map((row) => row.toJSON()),
+            total: items.count,
+            items: items.rows.map((row) => {
+              const itemJson = row.toJSON();
+              if (itemJson.batches) {
+                for (const batch of itemJson.batches) {
+                  if (batch.validity) {
+                    batch.validity = format(
+                      batch.validity,
+                      'EEEE, MMMM do, yyyy',
+                    );
+                  }
+                }
+              }
+              return itemJson;
+            }),
           };
           return itemsJson;
         } else if (cmd.listType === 'BATCHES') {

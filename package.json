@@ -58,6 +58,7 @@
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/websockets": "^11.0.11",
     "@sendgrid/mail": "^8.1.4",
+    "africastalking": "^0.7.3",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -74,12 +75,14 @@
     "rxjs": "^7.8.2",
     "sequelize": "^6.37.6",
     "sequelize-typescript": "^2.1.6",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "twilio": "^5.7.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.5",
     "@nestjs/schematics": "^11.0.2",
     "@nestjs/testing": "^11.0.11",
+    "@types/africastalking": "^0.6.2",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
