@@ -20,20 +20,34 @@ export abstract class BaseModel extends Model {
   @Column({ type: DataType.DATE, field: 'created_at' })
   createdAt: Date;
 
+  // @ForeignKey(() => User)
+  // @Column({ field: 'created_by_id' })
+  // createdById: string;
+
+  // @BelongsTo(() => User)
+  // createdBy: User;
+
   @UpdatedAt
   @Column({ type: DataType.DATE, field: 'updated_at' })
   updatedAt: Date;
+
+  // @AllowNull
+  // @ForeignKey(() => User)
+  // @Column({ field: 'updated_by_id })
+  // updatedById: string;
+
+  // @BelongsTo(() => User)
+  // updatedBy: User;
+
+  // @DeletedAt
+  // @Column({ type: DataType.DATE, field: 'deleted_at' })
+  // deletedAt: Date;
+
+  // @AllowNull
+  // @ForeignKey(() => User)
+  // @Column({ field: 'deleted_by_id })
+  // deletedById: string;
+
+  // @BelongsTo(() => User)
+  // deletedBy: User;
 }
-
-// @DeletedAt
-// @Column({ type: DataType.DATE, field: 'deleted_at' })
-// deletedAt: Date;
-
-// @Column({ type: DataType.STRING, field: 'deleted_by' })
-// deletedBy: string;
-
-// @Column({ type: DataType.STRING, field: 'created_by' , allowNull: true})
-// createdBy: string;
-
-// @Column({ type: DataType.STRING, field: 'updated_by', allowNull: true })
-// updatedBy: string;

@@ -45,6 +45,11 @@ module.exports = {
         field: 'total',
       },
 
+      insured: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+      },
+
       notes: {
         type: Sequelize.TEXT,
         allowNull: true,

@@ -5,11 +5,12 @@ import {
   DataType,
   DeletedAt,
   ForeignKey,
+  HasOne,
   Table,
 } from 'sequelize-typescript';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/core/shared/models/base.model';
-import { Item } from '.';
+import { Item, Markup } from '.';
 import { User } from '../../../auth/models/user.model';
 import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
@@ -93,6 +94,9 @@ export class Batch extends BaseModel {
 
   @BelongsTo(() => Facility)
   facility: Facility;
+
+  @HasOne(() => Markup)
+  markup: Markup;
 
   @DeletedAt
   @Column({ type: DataType.DATE, field: 'deleted_at' })

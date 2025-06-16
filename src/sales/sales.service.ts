@@ -23,7 +23,10 @@ import { generateFilter } from '../core/shared/factory';
 import { SaleItem } from './models/sale-items.model';
 import { Sequelize } from 'sequelize-typescript';
 import { ItemService } from '../inventory/items/items.service';
+import { MarkupService } from '../inventory/items/markup/markup.service';
+import { AmountType } from '../inventory/items/markup/dto';
 
+type BatchSellingPrice = { batchId: string; sellingPrice: number };
 @Injectable()
 export class SalesService {
   private logger: Logger = new Logger(SalesService.name);
@@ -36,6 +39,7 @@ export class SalesService {
     private batchService: BatchService,
     private patientService: PatientService,
     private itemService: ItemService,
+    private markupService: MarkupService,
   ) {}
 
   async fetchItems(query: FindItemDto, user: IUserPayload) {
@@ -151,6 +155,7 @@ export class SalesService {
         );
         dto.patientId = patient.id;
       }
+      const batchSellingPrices: BatchSellingPrice[] = [];
 
       const saleItems = await Promise.all(
         dto.saleItems.map(async (saleItem, index) => {
@@ -162,6 +167,15 @@ export class SalesService {
             saleItem.quantity,
           );
           const modBatch = batch.get({ plain: true });
+
+          // batchSellingPrices[index].batchId = saleItem.batchId;
+          // batchSellingPrices[index].sellingPrice = modBatch.item.sellingPrice;
+
+          batchSellingPrices.push({
+            batchId: saleItem.batchId,
+            sellingPrice: modBatch.item.sellingPrice,
+          });
+
           dto.saleItems[index].itemId = modBatch.item.id;
           return {
             ...modBatch,
@@ -176,7 +190,13 @@ export class SalesService {
 
       dto.saleNumber = `S-${new Date().getTime()}`;
       dto.subTotal = parseFloat(subTotal.toFixed(2));
-      dto.total = parseFloat(subTotal.toFixed(2));
+      if (dto.insured) {
+        const totalMarkup = await this.calculateTotal(batchSellingPrices);
+        const total = totalMarkup + dto.subTotal;
+        dto.total = parseFloat(total.toFixed(2));
+      } else {
+        dto.total = parseFloat(subTotal.toFixed(2));
+      }
 
       const sale = await this.saleRepository.create(
         {
@@ -207,6 +227,36 @@ export class SalesService {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  async calculateTotal(payload: BatchSellingPrice[]) {
+    const cappedPrices = await Promise.all(
+      payload.map(async (item) => {
+        const markup = await this.markupService.fetchOne({
+          query: { batchId: item.batchId, type: 'NHIS' },
+        });
+        if (!markup) {
+          return 0;
+        }
+        switch (markup.amountType) {
+          case AmountType.PERCENTAGE: {
+            const newCapPercentage = item.sellingPrice * (markup.amount / 100);
+            return item.sellingPrice + newCapPercentage;
+          }
+          case AmountType.PRICE: {
+            return item.sellingPrice + markup.amount;
+          }
+          default:
+            return 0;
+        }
+      }),
+    );
+
+    const finalTotal = cappedPrices.reduce(
+      (accum, current) => current + accum,
+      0,
+    );
+    return finalTotal;
   }
 
   async smsSale(dto: SmsCreateSale) {

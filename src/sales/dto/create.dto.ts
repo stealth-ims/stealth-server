@@ -9,6 +9,7 @@ import {
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -55,6 +56,14 @@ export class CreateSaleDto {
   @IsNotEmpty()
   @IsEnum(SalePaymentType)
   paymentType: SalePaymentType;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Is the patient insured',
+  })
+  @IsNotEmpty()
+  @IsBoolean()
+  insured: boolean;
 
   @ApiProperty({
     type: [CreateSaleItemsDto],

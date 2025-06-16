@@ -14,11 +14,50 @@ const baseModelColumns = {
     field: 'created_at',
   },
 
+  // createdById: {
+  //   references: {
+  //     model: 'users',
+  //     key: 'id',
+  //   },
+  //   type: Sequelize.UUID,
+  //   field: 'created_by_id',
+  //   onUpdate: 'CASCADE',
+  //   onDelete: 'SET NULL',
+  // },
+
   updatedAt: {
     type: Sequelize.DATE,
     allowNull: false,
     field: 'updated_at',
   },
+
+  // updatedById: {
+  //   references: {
+  //     model: 'users',
+  //     key: 'id',
+  //   },
+  //   type: Sequelize.UUID,
+  //   field: 'updated_by_id',
+  //   onUpdate: 'CASCADE',
+  //   onDelete: 'SET NULL',
+  // },
+
+  // deletedAt: {
+  //   type: Sequelize.DATE,
+  //   field: 'deleted_at',
+  // },
+
+  // deletedById: {
+  //   references: {
+  //     model: 'users',
+  //     key: 'id',
+  //   },
+  //   type: Sequelize.UUID,
+  //   allowNull: true,
+  //   field: 'deleted_by_id',
+  //   onUpdate: 'CASCADE',
+  //   onDelete: 'SET NULL',
+  // },
 };
 
 module.exports = baseModelColumns;

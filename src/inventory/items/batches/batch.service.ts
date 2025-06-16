@@ -5,10 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Batch, Item } from '../models';
+import { Batch, Item, Markup } from '../models';
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { SuppliersService } from '../../suppliers/suppliers.service';
-import { FindAndCountOptions, IncludeOptions, Op, QueryTypes } from 'sequelize';
+import { FindAndCountOptions, IncludeOptions, Op } from 'sequelize';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   CreateBatchDto,
@@ -49,6 +49,11 @@ export class BatchService {
     department: { model: Department, attributes: ['id', 'name'] },
 
     facility: { model: Facility, attributes: ['id', 'name'] },
+
+    markup: {
+      model: Markup,
+      attributes: ['id', 'amountType', 'amount'],
+    },
   };
 
   async create(createBatchDto: CreateBatchDto): Promise<Batch> {
@@ -226,28 +231,6 @@ export class BatchService {
       department,
     );
     return { count, rows };
-  }
-
-  async getAggregatedBatches(from: Date, to: Date) {
-    const sequelize = this.batchRepo.sequelize;
-
-    const [results] = await sequelize.query(
-      `
-        SELECT 
-          DATE("updated_at") as day, 
-          SUM("quantity") as totalQuantity
-        FROM "sales"
-        WHERE "updated_at" BETWEEN :from AND :to
-        GROUP BY day
-        ORDER BY day ASC
-        `,
-      {
-        replacements: { from, to },
-        type: QueryTypes.SELECT,
-      },
-    );
-
-    return results;
   }
 
   async fetchAllPaginate(
