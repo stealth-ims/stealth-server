@@ -194,9 +194,10 @@ export class ItemController {
   async updateBatch(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateItemDto: UpdateBatchDto,
+    @GetUser() user: IUserPayload,
   ) {
     try {
-      await this.batchService.update(id, updateItemDto);
+      await this.batchService.update(id, updateItemDto, user);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Batch updated successfully',
