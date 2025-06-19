@@ -65,11 +65,23 @@ inventory as (
  SELECT
         COUNT(i.id)  total_items,
         SUM(b.quantity) total_stock,
+        COUNT(case when i."status" = 'STOCKED' THEN i.id END) stocked,
+		    COUNT(case when i."status" = 'OUT_OF_STOCK' THEN i.id END) outOfStock,
+		    COUNT(case when i."status" = 'LOW' THEN i.id END) lowStocked,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
     FROM items i
     JOIN batches b ON b.item_id = i.id
 WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
 ${user.department ? `AND i.department_id = '${user.department}'` : ''}
+),
+doh as (SELECT
+	SUM(b.quantity) * MIN(i.selling_price) sum_s_sales,
+	SUM(si.quantity) * MIN(i.cost_price) sum_c_sales
+FROM sale_items si
+JOIN batches b on si.item_id = b.item_id
+JOIN items i on si.item_id = i.id
+WHERE si.created_at >= now() - INTERVAL '90 days'
+GROUP BY si.item_id
 ),
 calculations as (
 	select
@@ -90,10 +102,16 @@ calculations as (
 )
 select jsonb_build_object(
 	'itemStockLevel', (select jsonb_build_object(
-		'total', total_items,
-		'percentageChange', 0, -- TODO
-		'changeType', 'NONE',
-		'totalStock', total_stock
+     'stock', jsonb_build_object(
+		    'total', total_items,
+		    'totalStock', total_stock,
+        'outOfStock', outOfStock,
+         'highStocked', stocked,
+         'lowStocked', lowStocked,
+         'stockDaysOnHand', (select round((AVG(sum_s_sales) / (SUM(sum_c_sales) /90))::numeric, 2) from doh)
+     ),
+		'percentageChange', 100,
+		'changeType', 'INCREMENT'
 		) from inventory),
 	'totalItemsSold',json_build_object(
 		'total', itemsTotal,
@@ -117,8 +135,8 @@ select jsonb_build_object(
 	) ,
 	'soonToExpireItems', jsonb_build_object(
         'total', (SELECT soon_expiring FROM inventory),
-        'percentageChange', 0,
-        'changeType', 'NONE'
+        'percentageChange', 100,
+        'changeType', 'INCREMENT'
     ),
     'itemsReturned', jsonb_build_object(
         'total', totalItemsReturned,
@@ -127,8 +145,8 @@ select jsonb_build_object(
     ),
     'inventoryTurnoverRate', jsonb_build_object(
         'total', turnover_rate,
-        'percentageChange', 0,
-		    'changeType', 'NONE'
+        'percentageChange', 100,
+		    'changeType', 'INCREMENT'
     ),
 		'averageItemsPerTransaction', jsonb_build_object(
         'total', avg_trans,
