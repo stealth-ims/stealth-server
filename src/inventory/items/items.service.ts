@@ -227,9 +227,13 @@ export class ItemService {
    * @throws {NotFoundException} If the item with the specified ID is not found.
    * @returns A Promise that resolves to void.
    */
-  async update(id: string, updateItemDto: UpdateItemDto): Promise<void> {
+  async update(
+    id: string,
+    updateItemDto: UpdateItemDto,
+    userId?: string,
+  ): Promise<void> {
     const result = await this.itemRepo.update(
-      { ...updateItemDto },
+      { ...updateItemDto, ...(userId && { updatedById: userId }) },
       { where: { id: id } },
     );
     if (result[0] == 0) {
@@ -245,7 +249,8 @@ export class ItemService {
    * @param id - The ID of the item to be removed.
    * @throws {NotFoundException} If the item with the given ID is not found.
    */
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
+    await this.itemRepo.update({ deletedById: userId }, { where: { id: id } });
     const res = await this.itemRepo.destroy({ where: { id: id } });
     if (res == 0) {
       throw new NotFoundException(`item with id ${id} not found`);

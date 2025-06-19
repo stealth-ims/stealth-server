@@ -20,6 +20,8 @@ export enum ItemCategoryStatus {
 @Table({
   tableName: 'item_categories',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class ItemCategory extends BaseModel {
   @Column

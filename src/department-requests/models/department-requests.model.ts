@@ -4,7 +4,6 @@ import {
   DataType,
   ForeignKey,
   BelongsTo,
-  DeletedAt,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { Item } from 'src/inventory/items/models/item.model';
@@ -23,6 +22,8 @@ export type DepartmentRequestStatusType = keyof typeof DepartmentRequestStatus;
 @Table({
   tableName: 'department_requests',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class DepartmentRequest extends BaseModel {
   @ForeignKey(() => Item)
@@ -60,11 +61,4 @@ export class DepartmentRequest extends BaseModel {
 
   @Column({ type: DataType.TEXT, field: 'additional_notes' })
   additionalNotes: string;
-
-  @DeletedAt
-  @Column({ type: DataType.DATE, field: 'deleted_at' })
-  deletedAt: Date;
-
-  @Column({ type: DataType.STRING, field: 'deleted_by' })
-  deletedBy: string;
 }

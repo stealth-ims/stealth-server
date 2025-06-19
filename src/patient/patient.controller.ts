@@ -116,9 +116,10 @@ export class PatientController {
   async editPatient(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdatePatientDto,
+    @GetUser('sub', ParseUUIDPipe) updatedBy: string,
   ) {
     try {
-      const _response = await this.patientService.update(id, dto);
+      const _response = await this.patientService.update(id, dto, updatedBy);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Patient updated successfully',
@@ -135,7 +136,7 @@ export class PatientController {
   @Delete(':id')
   async deletePatient(
     @Param('id', ParseUUIDPipe) id: string,
-    @GetUser('stamp') deletedBy: string,
+    @GetUser('sub', ParseUUIDPipe) deletedBy: string,
   ) {
     try {
       const _response = await this.patientService.remove(id, deletedBy);

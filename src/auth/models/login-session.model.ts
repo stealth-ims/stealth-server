@@ -18,6 +18,8 @@ export enum StatusType {
 @Table({
   tableName: 'login_sessions',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class LoginSession extends BaseModel {
   @ForeignKey(() => User)

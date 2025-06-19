@@ -10,6 +10,8 @@ import { StockAdjustment } from 'src/inventory/models/stock-adjustment.model';
 @Table({
   tableName: 'facilities',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Facility extends BaseModel {
   @ApiProperty({
@@ -54,12 +56,6 @@ export class Facility extends BaseModel {
 
   @HasMany(() => User)
   workers: User[];
-
-  @Column({ field: 'created_by', allowNull: true })
-  createdBy: string;
-
-  @Column({ field: 'updated_by', allowNull: true })
-  updatedBy: string;
 
   @HasMany(() => StockAdjustment)
   stockAdjustments: StockAdjustment[];

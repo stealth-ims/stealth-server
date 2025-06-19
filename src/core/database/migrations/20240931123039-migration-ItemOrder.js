@@ -77,28 +77,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 'draft',
       },
-      createdById: {
-        type: Sequelize.UUID,
-        allowNull: true,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        field: 'created_by_id',
-      },
-      updatedById: {
-        type: Sequelize.UUID,
-        allowNull: true,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        field: 'updated_by_id',
-      },
     });
   },
 

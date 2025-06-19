@@ -14,8 +14,6 @@ export class DepartmentService {
   constructor(
     @InjectModel(Department)
     private readonly departmentRepo: typeof Department,
-    @InjectModel(User)
-    private readonly userRepo: typeof User,
     private readonly notificationService: NotificationService,
   ) {
     this.logger = new Logger(DepartmentService.name);
@@ -34,18 +32,14 @@ export class DepartmentService {
     facilityId: string,
     adminId: string,
   ): Promise<Department> {
-    const user = await this.userRepo.findByPk(adminId, {
-      attributes: ['id', 'fullName'],
-    });
-
     const department = await this.departmentRepo.create({
       ...createDepartmentDto,
       facilityId,
-      createdBy: user,
+      createdById: adminId,
     });
     this.notificationService.notifyAdmin({
       message: 'Department has been created successfully',
-      url: 'https://ims-frontend-xi.vercel.app/suppliers',
+      url: '/settings/departments',
     });
     return department;
   }
@@ -134,11 +128,8 @@ export class DepartmentService {
     adminId: string,
   ) {
     this.logger.log(`Updating department`);
-    const user = await this.userRepo.findByPk(adminId, {
-      attributes: ['id', 'fullName'],
-    });
     const result = await this.departmentRepo.update(
-      { ...updateDepartmentDto, updatedBy: user },
+      { ...updateDepartmentDto, updatedById: adminId },
       { where: { id } },
     );
     const affected = result[0];
@@ -157,7 +148,10 @@ export class DepartmentService {
    */
   async remove(id: string) {
     this.logger.log(`Removing department with ID: ${id}`);
-    const res = await this.departmentRepo.destroy({ where: { id: id } });
+    const res = await this.departmentRepo.destroy({
+      where: { id: id },
+      force: true,
+    });
 
     if (res == 0) {
       throw new NotFoundException(`Department with id ${id} not found`);

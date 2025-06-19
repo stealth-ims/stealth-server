@@ -63,24 +63,6 @@ module.exports = {
       },
 
       ...baseModelColumns,
-
-      updatedBy: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: 'updated_by',
-      },
-
-      deletedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        field: 'deleted_at',
-      },
-
-      deletedBy: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: 'deleted_by',
-      },
     });
   },
 

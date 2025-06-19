@@ -10,17 +10,6 @@ module.exports = {
       password: { type: Sequelize.STRING },
       region: { type: Sequelize.STRING, allowNull: true },
       location: { type: Sequelize.STRING, allowNull: true },
-      createdBy: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: 'created_by',
-      },
-
-      updatedBy: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: 'updated_by',
-      },
     });
 
     await queryInterface.addColumn('users', 'facility_id', {

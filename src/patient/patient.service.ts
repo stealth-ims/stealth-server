@@ -81,10 +81,13 @@ export class PatientService {
     return patient;
   }
 
-  async update(id: string, dto: UpdatePatientDto) {
-    const updatedPatient = await this.patientRepository.update(dto, {
-      where: { id },
-    });
+  async update(id: string, dto: UpdatePatientDto, updatedBy: string) {
+    const updatedPatient = await this.patientRepository.update(
+      { ...dto, updatedById: updatedBy },
+      {
+        where: { id },
+      },
+    );
     if (updatedPatient[0] == 0) {
       throw new NotFoundException('Patient not found');
     }
@@ -92,7 +95,10 @@ export class PatientService {
   }
 
   async remove(id: string, deletedBy: string) {
-    await this.patientRepository.update({ deletedBy }, { where: { id } });
+    await this.patientRepository.update(
+      { deletedById: deletedBy },
+      { where: { id } },
+    );
     const deletedPatient = await this.patientRepository.destroy({
       where: { id },
     });

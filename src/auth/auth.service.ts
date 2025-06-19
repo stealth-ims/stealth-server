@@ -80,6 +80,8 @@ export class AuthService {
       status: AccountState.UNVERIFIED,
     });
 
+    await facility.update({ createdById: user.id });
+
     const token = await this.generateTokens(user, null);
     await this.sendVerificationEmail(user.email, req);
     const expiresAt: number = this.configService.get<number>(

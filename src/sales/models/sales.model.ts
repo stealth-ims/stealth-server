@@ -4,7 +4,6 @@ import {
   Column,
   DataType,
   Default,
-  DeletedAt,
   ForeignKey,
   HasMany,
   Table,
@@ -15,7 +14,6 @@ import { Patient } from '../../patient/models/patient.model';
 import { Department } from '../../admin/department/models/department.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { SaleItem } from './sale-items.model';
-import { User } from '../../auth/models/user.model';
 
 export enum PaymentStatus {
   PAID = 'PAID',
@@ -31,6 +29,8 @@ export enum SalePaymentType {
 @Table({
   tableName: 'sales',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Sale extends BaseModel {
   @Unique
@@ -60,13 +60,6 @@ export class Sale extends BaseModel {
   @Column
   status: string;
 
-  @DeletedAt
-  @Column(DataType.DATE)
-  deletedAt: Date;
-
-  @Column
-  deletedBy: string;
-
   @ForeignKey(() => Patient)
   @AllowNull
   @Column(DataType.UUID)
@@ -74,14 +67,6 @@ export class Sale extends BaseModel {
 
   @BelongsTo(() => Patient)
   patient: Patient;
-
-  @ForeignKey(() => User)
-  @AllowNull
-  @Column
-  createdById: string;
-
-  @BelongsTo(() => User)
-  createdBy: User;
 
   @ForeignKey(() => Department)
   @AllowNull

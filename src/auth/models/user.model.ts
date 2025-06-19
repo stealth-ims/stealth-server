@@ -3,7 +3,6 @@ import {
   Column,
   DataType,
   Default,
-  DeletedAt,
   ForeignKey,
   HasMany,
   HasOne,
@@ -27,6 +26,7 @@ export enum AccountState {
 @Table({
   tableName: 'users',
   underscored: true,
+  timestamps: true,
   paranoid: true,
 })
 export class User extends BaseModel {
@@ -90,16 +90,6 @@ export class User extends BaseModel {
 
   @Column({ allowNull: true })
   resetCodeExpires: Date;
-
-  @Column({ type: DataType.STRING, allowNull: true })
-  updatedBy: string;
-
-  @DeletedAt
-  @Column({ type: DataType.DATE })
-  deletedAt: Date;
-
-  @Column({ type: DataType.STRING })
-  deletedBy: string;
 
   @HasOne(() => Settings)
   settings: Settings;

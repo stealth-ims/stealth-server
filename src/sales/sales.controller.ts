@@ -9,6 +9,7 @@ import {
   Query,
   HttpStatus,
   Logger,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import {
@@ -167,9 +168,13 @@ export class SalesController {
   })
   @Permission(Features.SALES, PermissionLevel.READ_WRITE)
   @Patch('/:id')
-  async updateSale(@Body() dto: UpdateSalesDto, @Param('id') id: string) {
+  async updateSale(
+    @Body() dto: UpdateSalesDto,
+    @Param('id') id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.salesService.update(id, dto);
+      await this.salesService.update(id, dto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Sale updated successfully',
@@ -203,9 +208,12 @@ export class SalesController {
   })
   @Permission(Features.SALES, PermissionLevel.READ_WRITE_DELETE)
   @Delete('/:id')
-  async deleteSale(@Param('id') id: string) {
+  async deleteSale(
+    @Param('id') id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.salesService.removeOne(id);
+      await this.salesService.removeOne(id, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Sale deleted successfully',

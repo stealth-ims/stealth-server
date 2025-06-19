@@ -33,7 +33,7 @@ export class FacilityService {
       ...createFacilityDto,
       location: null,
       region: null,
-      createdBy: adminId || 'system',
+      createdById: adminId,
     });
     return facility;
   }
@@ -99,7 +99,7 @@ export class FacilityService {
   ) {
     this.logger.log('Updating facility');
     const result = await this.facilityRepo.update(
-      { ...updateFacilityDto, updatedBy: adminId },
+      { ...updateFacilityDto, updatedById: adminId },
       { where: { id } },
     );
     const affected = result[0];
@@ -118,7 +118,10 @@ export class FacilityService {
    */
   async remove(id: string) {
     this.logger.log('Removing facility by ID');
-    const res = await this.facilityRepo.destroy({ where: { id: id } });
+    const res = await this.facilityRepo.destroy({
+      where: { id: id },
+      force: true,
+    });
 
     if (res == 0) {
       throw new NotFoundException(`Facility with id ${id} not found`);

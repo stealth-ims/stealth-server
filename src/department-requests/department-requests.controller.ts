@@ -70,11 +70,13 @@ export class DepartmentRequestsController {
   async updateRequest(
     @Body() data: UpdateRequestStatusDto,
     @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
       const _response = await this.departmentRequestsService.updateStatus(
         id,
         data,
+        userId,
       );
 
       return new ApiSuccessResponseNoData(
@@ -109,9 +111,12 @@ export class DepartmentRequestsController {
     message: 'Request deleted successfully',
   })
   @Delete(':id')
-  async deleteRequest(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteRequest(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      const _response = await this.departmentRequestsService.remove(id);
+      const _response = await this.departmentRequestsService.remove(id, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Request deleted successfully',

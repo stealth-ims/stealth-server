@@ -1,7 +1,6 @@
 import {
   Column,
   Table,
-  DeletedAt,
   AllowNull,
   ForeignKey,
   BelongsTo,
@@ -13,6 +12,8 @@ import { Department } from '../../admin/department/models/department.model';
 @Table({
   tableName: 'reports',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Report extends BaseModel {
   @Column
@@ -36,15 +37,6 @@ export class Report extends BaseModel {
   @AllowNull
   @Column
   specificDate: Date;
-
-  @DeletedAt
-  @AllowNull
-  @Column
-  deletedAt: Date;
-
-  @AllowNull
-  @Column
-  deletedBy: string;
 
   @ForeignKey(() => Department)
   @AllowNull

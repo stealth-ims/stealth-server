@@ -194,9 +194,10 @@ export class ItemController {
   async updateBatch(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateItemDto: UpdateBatchDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      await this.batchService.update(id, updateItemDto);
+      await this.batchService.update(id, updateItemDto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Batch updated successfully',
@@ -380,9 +381,10 @@ export class ItemController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateItemDto: UpdateItemDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      await this.itemsService.update(id, updateItemDto);
+      await this.itemsService.update(id, updateItemDto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item updated successfully',
@@ -400,9 +402,10 @@ export class ItemController {
   async adjustPrice(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: AdjustPriceDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      await this.itemsService.update(id, dto);
+      await this.itemsService.update(id, dto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item prices adjusted successfully',
@@ -417,9 +420,12 @@ export class ItemController {
   })
   @Permission(Features.ITEMS, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.itemsService.remove(id);
+      await this.itemsService.remove(id, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item deleted successfully',

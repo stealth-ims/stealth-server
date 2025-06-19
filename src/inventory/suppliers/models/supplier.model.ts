@@ -19,6 +19,8 @@ export enum StatusType {
 @Table({
   tableName: 'suppliers',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Supplier extends BaseModel {
   @Column

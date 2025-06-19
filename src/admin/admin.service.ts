@@ -32,9 +32,9 @@ export class AdminService {
     this.logger = new Logger(AdminService.name);
   }
 
-  async createPersonnel(dto: CreateUserDto, facilityId: string) {
+  async createPersonnel(dto: CreateUserDto, admin: IUserPayload) {
     dto.status = AccountState.PENDING;
-    const facility = await this.facilityService.findOne(facilityId);
+    const facility = await this.facilityService.findOne(admin.facility);
     const hashPassword = await bcrypt.hash(
       facility.password,
       this.SALT_OR_ROUNDS,
@@ -43,7 +43,8 @@ export class AdminService {
       ...dto,
       password: hashPassword,
       status: dto.status,
-      facilityId,
+      facilityId: admin.facility,
+      createdById: admin.sub,
     });
     if (user.id) {
       this.sendUserCreatedMail(user, facility.password);
@@ -142,7 +143,7 @@ export class AdminService {
 
     personnel.role = dto.role;
     personnel.permissions = dto.permissions;
-    personnel.updatedBy = adminId;
+    personnel.updatedById = adminId;
     await personnel.save();
 
     this.sendChangeRoleConfirmationMail(
@@ -179,19 +180,18 @@ export class AdminService {
       adminId,
       'activated',
     );
+    await user.save();
     this.sendActivatedAccountConfirmation(user.email);
     return;
   }
 
   async removeUser(personnelId: string) {
     const user = await this.userRepository.findByPk(personnelId);
-    const destroyedRows = await this.userRepository.destroy({
-      where: { id: personnelId },
-    });
-
-    if (destroyedRows == 0) {
+    if (!user) {
       throw new NotFoundException('personnel not found');
     }
+    await user.destroy({ force: true });
+
     const deletedAt = new Date().toUTCString();
     this.sendDeletedAccountConfirmation(user.email, deletedAt);
     return;
@@ -211,7 +211,7 @@ export class AdminService {
       throw new BadRequestException(`account cannot be ${changedState}`);
     }
     personnel.status = status;
-    personnel.updatedBy = adminId;
+    personnel.updatedById = adminId;
     await personnel.save();
     return personnel;
   }

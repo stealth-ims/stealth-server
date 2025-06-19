@@ -44,12 +44,9 @@ export class AdminController {
   })
   @Permission(Features.USERS, PermissionLevel.READ_WRITE)
   @Post('user')
-  async createUser(
-    @Body() dto: CreateUserDto,
-    @GetUser('facility', ParseUUIDPipe) facilityId: string,
-  ) {
+  async createUser(@Body() dto: CreateUserDto, @GetUser() user: IUserPayload) {
     try {
-      const response = await this.adminService.createPersonnel(dto, facilityId);
+      const response = await this.adminService.createPersonnel(dto, user);
       return new ApiSuccessResponseDto(
         response,
         HttpStatus.CREATED,

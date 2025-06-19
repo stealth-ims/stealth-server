@@ -15,6 +15,8 @@ import { Department } from '../../admin/department/models/department.model';
 @Table({
   tableName: 'sale_items',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class SaleItem extends BaseModel {
   @ForeignKey(() => Sale)

@@ -10,12 +10,13 @@ import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { Batch } from './batch.model';
 import { Item } from '.';
-import { User } from '../../../auth/models/user.model';
 import { AmountType, MarkupType } from '../markup/dto';
 
 @Table({
   tableName: 'markups',
   underscored: true,
+  paranoid: true,
+  timestamps: true,
 })
 export class Markup extends BaseModel {
   @Column
@@ -37,13 +38,6 @@ export class Markup extends BaseModel {
   @ForeignKey(() => Item)
   @Column
   itemId: string;
-
-  @ForeignKey(() => User)
-  @Column({ field: 'created_by_id' })
-  createdById: string;
-
-  @BelongsTo(() => User)
-  createdBy: User;
 
   @AllowNull
   @ForeignKey(() => Department)

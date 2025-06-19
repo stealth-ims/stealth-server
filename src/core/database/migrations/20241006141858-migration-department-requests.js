@@ -62,18 +62,6 @@ module.exports = {
         field: 'additional_notes',
         allowNull: true,
       },
-
-      deletedAt: {
-        field: 'deleted_at',
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-
-      deletedBy: {
-        field: 'deleted_by',
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
     });
   },
 

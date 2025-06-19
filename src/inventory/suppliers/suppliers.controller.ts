@@ -36,6 +36,7 @@ import {
   PermissionLevel,
 } from '../../core/shared/enums/permissions.enum';
 import { GetNoPaginateDto } from '../../core/shared/dto/get-no_paginate.dto';
+import { IUserPayload } from '../../auth/interface/payload.interface';
 
 @ApiTags('Suppliers')
 @Controller('suppliers')
@@ -53,12 +54,12 @@ export class SuppliersController {
   @Post()
   async create(
     @Body() createSupplierDto: CreateSupplierDto,
-    @GetUser('facility', ParseUUIDPipe) facilityId: string,
+    @GetUser() user: IUserPayload,
   ) {
     try {
       const supplier = await this.suppliersService.create(
         createSupplierDto,
-        facilityId,
+        user,
       );
       return new ApiSuccessResponseDto(
         supplier,
@@ -148,9 +149,10 @@ export class SuppliersController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateSupplierDto: UpdateSupplierDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      await this.suppliersService.update(id, updateSupplierDto);
+      await this.suppliersService.update(id, updateSupplierDto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'supplier updated successfully',
@@ -165,9 +167,16 @@ export class SuppliersController {
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ_WRITE)
   @Patch(':id/deactivate')
-  async deactivateSupplier(@Param('id', ParseUUIDPipe) id: string) {
+  async deactivateSupplier(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.suppliersService.changeStatus(id, StatusType.DEACTIVATED);
+      await this.suppliersService.changeStatus(
+        id,
+        StatusType.DEACTIVATED,
+        userId,
+      );
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Supplier deactivated successfully',
@@ -182,9 +191,12 @@ export class SuppliersController {
   })
   @Permission(Features.SUPPLIERS, PermissionLevel.READ_WRITE)
   @Patch(':id/activate')
-  async activateSupplier(@Param('id', ParseUUIDPipe) id: string) {
+  async activateSupplier(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.suppliersService.changeStatus(id, StatusType.ACTIVE);
+      await this.suppliersService.changeStatus(id, StatusType.ACTIVE, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Supplier activated successfully',

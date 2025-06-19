@@ -43,17 +43,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
       },
-      createdById: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        field: 'created_by_id',
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      },
       departmentId: {
         type: Sequelize.UUID,
         references: {

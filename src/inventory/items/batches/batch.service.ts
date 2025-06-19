@@ -94,7 +94,12 @@ export class BatchService {
     });
     if (batch) {
       await batch.restore();
-      await batch.update({ ...createBatchDto, createdAt: new Date() });
+      await batch.update({
+        ...createBatchDto,
+        createdAt: new Date(),
+        updatedById: null,
+        deletedById: null,
+      });
       this.logger.log(`Batch reinstated successfully. ID: ${batch.id}`);
     } else {
       batch = await this.batchRepo.create({ ...createBatchDto });
@@ -149,15 +154,24 @@ export class BatchService {
           { deletedAt: { [Op.not]: null } },
         ],
       },
+      paranoid: false,
     });
 
     if (batch) {
       if (batch.deletedAt) {
         await batch.restore();
+        await batch.update({
+          deletedById: null,
+        });
       } else {
         dto.quantity = batch.quantity + dto.quantity;
       }
-      await batch.update({ ...dto, createdAt: new Date() });
+      await batch.update({
+        ...dto,
+        createdAt: new Date(),
+        updatedById: dto.createdById,
+        deletedById: null,
+      });
     } else {
       batch = await this.batchRepo.create({ ...dto });
     }
@@ -167,7 +181,7 @@ export class BatchService {
     return batch;
   }
 
-  async update(id: string, dto: UpdateBatchDto) {
+  async update(id: string, dto: UpdateBatchDto, userId: string) {
     const batch = await this.findOne(id);
     if (dto.quantity) {
       if (dto.quantity > batch.quantity) {
@@ -177,12 +191,16 @@ export class BatchService {
       }
     }
 
-    const _result = await batch.update({ ...dto });
+    const _result = await batch.update({ ...dto, updatedById: userId });
 
     if (dto.markup) {
       dto.markup.itemId = batch.itemId;
 
-      const _markup = await this.markupService.update(batch.id, dto.markup);
+      const _markup = await this.markupService.update(
+        batch.id,
+        dto.markup,
+        userId,
+      );
     }
 
     this.logger.log(`Updated item with ID: ${id}`);
@@ -388,7 +406,7 @@ export class BatchService {
     return batch;
   }
 
-  async removeStock(id: string, qty: number): Promise<void> {
+  async removeStock(id: string, qty: number, userId: string): Promise<void> {
     const batch = await this.findOne(id);
     const itemId = batch.itemId;
     if (batch.quantity - qty < 0)
@@ -396,27 +414,31 @@ export class BatchService {
 
     batch.quantity -= qty;
     if (batch.quantity == 0) {
+      batch.deletedById = userId;
       await batch.destroy();
     } else {
+      batch.updatedById = userId;
       await batch.save();
     }
     this.eventEmitter.emit('quantity.changed', { itemId: itemId });
     this.logger.log(`Stock removed from batch. ID: ${id}`);
   }
 
-  async increaseStock(id: string, qty: number): Promise<void> {
+  async increaseStock(id: string, qty: number, userId: string): Promise<void> {
     const batch = await this.findOne(id);
     const itemId = batch.itemId;
 
     batch.quantity += qty;
+    batch.updatedById = userId;
     await batch.save();
     this.eventEmitter.emit('quantity.increased', { itemId: itemId });
     this.logger.log(`Stock added to batch. ID: ${id}`);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId: string): Promise<void> {
     const batch = await this.findOne(id);
     this.eventEmitter.emit('quantity.changed', { itemId: batch.itemId });
+    batch.deletedById = userId;
     await batch.destroy();
     this.logger.log(`Batch deleted successfully. ID: ${id}`);
   }

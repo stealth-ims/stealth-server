@@ -126,9 +126,14 @@ export class StockAdjustmentsController {
   async editStock(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateStockAdjustmentDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      const _response = await this.stockAdjustmentsService.edit(id, dto);
+      const _response = await this.stockAdjustmentsService.edit(
+        id,
+        dto,
+        userId,
+      );
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'stock adjustment edited successfully',
@@ -182,9 +187,12 @@ export class StockAdjustmentsController {
   })
   @Permission(Features.STOCK_ADJUSTMENT, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.stockAdjustmentsService.remove(id);
+      await this.stockAdjustmentsService.remove(id, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Stock adjustment deleted successfully',

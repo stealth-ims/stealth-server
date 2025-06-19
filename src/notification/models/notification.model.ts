@@ -14,6 +14,8 @@ import { NotificationStatus } from '../enum';
 @Table({
   tableName: 'notifications',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class NotificationModel extends BaseModel {
   @Column

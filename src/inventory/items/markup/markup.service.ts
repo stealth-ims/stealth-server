@@ -63,14 +63,14 @@ export class MarkupService {
     return markup;
   }
 
-  async update(batchId: string, dto: UpdateMarkupDto) {
+  async update(batchId: string, dto: UpdateMarkupDto, userId: string) {
     const markup = await this.findOne(batchId);
     const batch = await this.batchRepo.findByPk(batchId, {
       attributes: ['id', 'itemId'],
     });
     dto.itemId = batch.itemId;
 
-    await markup.update({ ...dto });
+    await markup.update({ ...dto, updatedById: userId });
     return markup;
   }
 

@@ -32,6 +32,7 @@ import {
   PermissionLevel,
 } from '../../core/shared/enums/permissions.enum';
 import { GetNoPaginateDto } from '../../core/shared/dto/get-no_paginate.dto';
+import { IUserPayload } from '../../auth/interface/payload.interface';
 
 @ApiTags('Item Category')
 @Controller('item-categories')
@@ -49,13 +50,10 @@ export class ItemCategoryController {
   @Post()
   async create(
     @Body() dto: CreateItemsCategoryDto,
-    @GetUser('facility', ParseUUIDPipe) facilityId: string,
+    @GetUser() user: IUserPayload,
   ) {
     try {
-      const createdCategory = await this.itemCategoryService.create(
-        dto,
-        facilityId,
-      );
+      const createdCategory = await this.itemCategoryService.create(dto, user);
       return new ApiSuccessResponseDto(
         createdCategory,
         HttpStatus.CREATED,
@@ -146,9 +144,10 @@ export class ItemCategoryController {
   async changeName(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateItemCategoryDto,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {
-      await this.itemCategoryService.changeName(id, dto);
+      await this.itemCategoryService.changeName(id, dto, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item updated successfully',
@@ -163,9 +162,9 @@ export class ItemCategoryController {
   // })
   // @Permission(Features.ITEMS_CATEGORIES, PermissionLevel.READ_WRITE)
   // @Patch(':id/status')
-  // async toggleStatus(@Param('id', ParseUUIDPipe) id: string) {
+  // async toggleStatus(@Param('id', ParseUUIDPipe) id: string, @GetUser('sub', ParseUUIDPipe) userId: string) {
   //   try {
-  //     await this.itemCategoryService.toggleStatus(id);
+  //     await this.itemCategoryService.toggleStatus(id, userId);
   //     return new ApiSuccessResponseNoData(
   //       HttpStatus.OK,
   //       'Item category status updated successfully',

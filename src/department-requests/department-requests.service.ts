@@ -48,6 +48,7 @@ export class DepartmentRequestsService {
       ...dto,
       departmentId: user.department,
       facilityId: user.facility,
+      createdById: user.sub,
     });
 
     return result;
@@ -161,9 +162,9 @@ export class DepartmentRequestsService {
     return response;
   }
 
-  async update(id: string, dto: UpdateDepartmentRequestDto) {
+  async update(id: string, dto: UpdateDepartmentRequestDto, userId: string) {
     const updatedRequest = await this.departmentRequestRepository.update(
-      { ...dto },
+      { ...dto, updatedById: userId },
       { where: { id } },
     );
 
@@ -173,9 +174,9 @@ export class DepartmentRequestsService {
     return;
   }
 
-  async updateStatus(id: string, dto: UpdateRequestStatusDto) {
+  async updateStatus(id: string, dto: UpdateRequestStatusDto, userId: string) {
     const updatedRequest = await this.departmentRequestRepository.update(
-      { ...dto },
+      { ...dto, updatedById: userId },
       { where: { id } },
     );
 
@@ -196,7 +197,11 @@ export class DepartmentRequestsService {
     return request;
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
+    await this.departmentRequestRepository.update(
+      { deletedById: userId },
+      { where: { id } },
+    );
     const deletedRequest = await this.departmentRequestRepository.destroy({
       where: { id },
     });

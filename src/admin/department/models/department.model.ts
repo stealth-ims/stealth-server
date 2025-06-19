@@ -1,7 +1,6 @@
-import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
-  AllowNull,
   BelongsTo,
   Column,
   ForeignKey,
@@ -18,6 +17,8 @@ import { StockAdjustment } from 'src/inventory/models/stock-adjustment.model';
 @Table({
   tableName: 'departments',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Department extends BaseModel {
   @ApiProperty({
@@ -50,31 +51,4 @@ export class Department extends BaseModel {
 
   @HasMany(() => DepartmentRequest)
   departmentRequests: DepartmentRequest[];
-
-  @ForeignKey(() => User)
-  @AllowNull
-  @Column
-  createdById: string;
-
-  @ApiResponseProperty({
-    type: () => User,
-    example: {
-      id: 'b7a3fb48-6b76-4998-9cd3-4de5b8a18837',
-      name: 'Some Admin',
-    },
-  })
-  @BelongsTo(() => User, 'createdById')
-  createdBy: User;
-
-  @ForeignKey(() => User)
-  @AllowNull
-  @Column
-  updatedById: string;
-
-  @ApiResponseProperty({
-    type: () => User,
-    example: null,
-  })
-  @BelongsTo(() => User, 'updatedById')
-  updatedBy: User;
 }

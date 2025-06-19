@@ -26,30 +26,6 @@ module.exports = {
         allowNull: false,
         field: 'date_of_birth',
       },
-
-      createdById: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-        field: 'created_by_id',
-      },
-
-      deletedAt: {
-        type: Sequelize.DATE,
-        allowNull: true,
-        field: 'deleted_at',
-      },
-
-      deletedBy: {
-        type: Sequelize.STRING,
-        allowNull: true,
-        field: 'deleted_by',
-      },
     });
   },
 

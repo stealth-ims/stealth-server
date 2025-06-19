@@ -28,11 +28,6 @@ module.exports = {
         type: Sequelize.ENUM('SUBMITTED', 'ADJUSTED', 'REJECTED'),
         allowNull: false,
       },
-      createdById: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: 'created_by_id',
-      },
 
       // relationships
       itemId: {

@@ -3,7 +3,6 @@ import {
   BelongsTo,
   Column,
   DataType,
-  DeletedAt,
   ForeignKey,
   HasOne,
   Table,
@@ -11,7 +10,6 @@ import {
 import { Supplier } from 'src/inventory/suppliers/models/supplier.model';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { Item, Markup } from '.';
-import { User } from '../../../auth/models/user.model';
 import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { differenceInDays, startOfToday } from 'date-fns';
@@ -65,13 +63,6 @@ export class Batch extends BaseModel {
   @Column({ type: DataType.INTEGER, allowNull: false })
   quantity: number;
 
-  @ForeignKey(() => User)
-  @Column({ field: 'created_by_id', allowNull: true })
-  createdById: string;
-
-  @BelongsTo(() => User)
-  createdBy: User;
-
   @AllowNull
   @ForeignKey(() => Supplier)
   @Column
@@ -97,8 +88,4 @@ export class Batch extends BaseModel {
 
   @HasOne(() => Markup)
   markup: Markup;
-
-  @DeletedAt
-  @Column({ type: DataType.DATE, field: 'deleted_at' })
-  deletedAt: Date;
 }

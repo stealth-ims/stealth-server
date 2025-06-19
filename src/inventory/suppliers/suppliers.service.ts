@@ -5,6 +5,7 @@ import { CreateSupplierDto, GetSupplierDto, UpdateSupplierDto } from './dto';
 import { FindAndCountOptions, literal, Op } from 'sequelize';
 import { Batch } from '../items/models';
 import { generateFilter } from '../../core/shared/factory';
+import { IUserPayload } from '../../auth/interface/payload.interface';
 
 @Injectable()
 export class SuppliersService {
@@ -16,11 +17,12 @@ export class SuppliersService {
   }
   async create(
     createSupplierDto: CreateSupplierDto,
-    facilityId: string,
+    user: IUserPayload,
   ): Promise<Supplier> {
     const supplier = await this.supplierRepo.create({
       ...createSupplierDto,
-      facilityId,
+      facilityId: user.facility,
+      createdById: user.sub,
     });
 
     this.logger.log(`Created supplier with ID: ${supplier.id}`);
@@ -133,9 +135,9 @@ export class SuppliersService {
     return modifiedSupplier;
   }
 
-  async update(id: string, dto: UpdateSupplierDto) {
+  async update(id: string, dto: UpdateSupplierDto, userId: string) {
     const updatedSupplier = await this.supplierRepo.update(
-      { ...dto },
+      { ...dto, updatedById: userId },
       { where: { id } },
     );
 
@@ -145,9 +147,9 @@ export class SuppliersService {
     return;
   }
 
-  async changeStatus(id: string, status: StatusType) {
+  async changeStatus(id: string, status: StatusType, userId: string) {
     const updatedSupplier = await this.supplierRepo.update(
-      { status },
+      { status, updatedById: userId },
       { where: { id } },
     );
 
@@ -160,6 +162,7 @@ export class SuppliersService {
   async remove(id: string) {
     const supplier = await this.supplierRepo.destroy({
       where: { id },
+      force: true,
     });
     if (supplier == 0) {
       throw new NotFoundException('Supplier not found');
@@ -170,6 +173,7 @@ export class SuppliersService {
   async removeBulk(ids: string[]) {
     const supplier = await this.supplierRepo.destroy({
       where: { id: ids },
+      force: true,
     });
     if (supplier == 0) {
       throw new NotFoundException('Suppliers not found');

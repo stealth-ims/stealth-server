@@ -7,7 +7,6 @@ import {
   Min,
 } from 'class-validator';
 import {
-  AfterFind,
   BelongsTo,
   Column,
   DataType,
@@ -19,7 +18,6 @@ import { Facility } from 'src/admin/facility/models/facility.model';
 import { Batch, Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { User } from '../../auth/models/user.model';
 
 export enum StockAdjustmentType {
   REDUCTION = 'REDUCTION',
@@ -36,6 +34,7 @@ export enum StockAdjustmentStatus {
   tableName: 'stock_adjustments',
   underscored: true,
   timestamps: true,
+  paranoid: true,
 })
 export class StockAdjustment extends BaseModel {
   @ApiProperty({
@@ -113,15 +112,6 @@ export class StockAdjustment extends BaseModel {
   @Column
   status: StockAdjustmentStatus;
 
-  @Column
-  createdById: string;
-
-  @ApiResponseProperty({
-    example: 'John Doe,58dceb42-02bb-465f-bd5d-4b52ef181a18',
-  })
-  @Column(DataType.VIRTUAL)
-  createdBy: string;
-
   @ApiResponseProperty({
     example: 'af7c1fe6-d669-414e-b066-e9733f0de7a8',
   })
@@ -147,36 +137,4 @@ export class StockAdjustment extends BaseModel {
 
   @BelongsTo(() => Department)
   department: Department;
-
-  @AfterFind
-  static async addCreatedByUser(
-    stockAdjustments: StockAdjustment | StockAdjustment[],
-  ) {
-    if (!stockAdjustments) return;
-    const records = Array.isArray(stockAdjustments)
-      ? stockAdjustments
-      : [stockAdjustments];
-
-    if (!records.length) return;
-
-    const createdByNotExist = records.every((record) => !record.createdById);
-    if (createdByNotExist) return;
-
-    const userIds = records.map((record) => record.createdById);
-
-    const users = await User.findAll({
-      where: {
-        id: userIds,
-      },
-      attributes: ['id', 'fullName', 'email'],
-    });
-
-    const userMap = new Map(users.map((user) => [user.id, user]));
-
-    for (const record of records) {
-      const user = userMap.get(record.createdById) || null;
-
-      record.createdBy = `${user.fullName},${user.id}`;
-    }
-  }
 }

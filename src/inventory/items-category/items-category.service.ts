@@ -14,6 +14,7 @@ import { ApiSuccessResponseNoData } from 'src/core/shared/responses/success.resp
 import { FindAndCountOptions, Op } from 'sequelize';
 import { Item } from '../items/models/item.model';
 import { generateFilter } from '../../core/shared/factory';
+import { IUserPayload } from '../../auth/interface/payload.interface';
 
 @Injectable()
 export class ItemCategoryService {
@@ -35,11 +36,12 @@ export class ItemCategoryService {
    */
   async create(
     createitemsCategoryDto: CreateItemsCategoryDto,
-    facilityId: string,
+    user: IUserPayload,
   ): Promise<ItemCategoryResponse> {
     const category = await this.itemCategoryRepo.create({
       ...createitemsCategoryDto,
-      facilityId,
+      facilityId: user.facility,
+      createdById: user.sub,
     });
     this.logger.log(`Created items category with ID: ${category.id}`);
     return category;
@@ -140,9 +142,10 @@ export class ItemCategoryService {
   async changeName(
     id: string,
     changeNameDto: UpdateItemCategoryDto,
+    userId: string,
   ): Promise<ApiSuccessResponseNoData> {
     const result = await this.itemCategoryRepo.update(
-      { ...changeNameDto },
+      { ...changeNameDto, updatedById: userId },
       { where: { id } },
     );
     const affected = result[0];
@@ -153,12 +156,13 @@ export class ItemCategoryService {
     return;
   }
 
-  async toggleStatus(id: string): Promise<void> {
+  async toggleStatus(id: string, userId: string): Promise<void> {
     const category = await this.findOne(id);
     category.status =
       category.status == ItemCategoryStatus.ACTIVE
         ? ItemCategoryStatus.DEACTIVATED
         : ItemCategoryStatus.ACTIVE;
+    category.updatedById = userId;
     await category.save();
     this.logger.log(`Updated items category with ID: ${id}`);
     return;
@@ -173,7 +177,10 @@ export class ItemCategoryService {
    */
   async remove(id: string): Promise<void> {
     this.logger.log(`Removing items category with ID: ${id}`);
-    const res = await this.itemCategoryRepo.destroy({ where: { id: id } });
+    const res = await this.itemCategoryRepo.destroy({
+      where: { id: id },
+      force: true,
+    });
 
     if (res == 0) {
       throw new NotFoundException(`Category with id ${id} not found`);

@@ -64,15 +64,6 @@ module.exports = {
         type: Sequelize.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'),
         allowNull: false,
       },
-      created_by_id: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        field: 'created_by_id',
-      },
-      updatedBy: {
-        type: Sequelize.STRING,
-        field: 'updated_by',
-      },
       categoryId: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -132,21 +123,6 @@ module.exports = {
       quantity: {
         type: Sequelize.INTEGER,
         allowNull: false,
-      },
-      created_by_id: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        field: 'created_by_id',
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
-      },
-      deletedAt: {
-        type: Sequelize.DATE,
-        field: 'deleted_at',
       },
       supplierId: {
         type: Sequelize.UUID,

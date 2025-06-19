@@ -33,6 +33,7 @@ export class ReportsService {
       ...dto,
       facilityId: user.facility,
       departmentId: user.department,
+      createdById: user.sub,
     });
 
     return report;
@@ -193,9 +194,9 @@ export class ReportsService {
     return report;
   }
 
-  async update(id: string, dto: UpdateReportDto) {
+  async update(id: string, dto: UpdateReportDto, userId: string) {
     const [rowsUpdated] = await this.reportRepository.update(
-      { ...dto },
+      { ...dto, updatedById: userId },
       {
         where: { id },
       },
@@ -208,7 +209,13 @@ export class ReportsService {
     return;
   }
 
-  async removeOne(id: string) {
+  async removeOne(id: string, userId: string) {
+    await this.reportRepository.update(
+      { deletedById: userId },
+      {
+        where: { id },
+      },
+    );
     const destroyedRows = await this.reportRepository.destroy({
       where: { id },
     });

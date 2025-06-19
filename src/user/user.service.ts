@@ -196,6 +196,7 @@ export class UserService {
       await this.settingsRepository.create({
         ...dto,
         userId,
+        createdById: userId,
       });
     }
 

@@ -62,18 +62,6 @@ module.exports = {
         field: 'status',
       },
 
-      deletedAt: {
-        field: 'deleted_at',
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-
-      deletedBy: {
-        field: 'deleted_by',
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
       departmentId: {
         type: Sequelize.UUID,
         allowNull: true,
@@ -96,17 +84,6 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
-      },
-      createdById: {
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        type: Sequelize.UUID,
-        allowNull: true,
-        field: 'created_by_id',
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
       },
     });
   },

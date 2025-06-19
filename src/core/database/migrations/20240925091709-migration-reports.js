@@ -37,18 +37,6 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE,
       },
-
-      deletedAt: {
-        field: 'deleted_at',
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      deletedBy: {
-        field: 'deleted_by',
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
       departmentId: {
         type: Sequelize.UUID,
         allowNull: true,

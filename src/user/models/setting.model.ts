@@ -11,6 +11,8 @@ import { User } from '../../auth/models/user.model';
 @Table({
   tableName: 'settings',
   underscored: true,
+  timestamps: true,
+  paranoid: true,
 })
 export class Settings extends BaseModel {
   @Default(false)

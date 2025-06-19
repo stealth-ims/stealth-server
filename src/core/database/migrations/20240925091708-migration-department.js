@@ -17,30 +17,6 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
-
-      createdById: {
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        type: Sequelize.UUID,
-        allowNull: true,
-        field: 'created_by_id',
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
-      },
-
-      updatedById: {
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        type: Sequelize.UUID,
-        allowNull: true,
-        field: 'updated_by_id',
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
-      },
     });
 
     await queryInterface.addColumn('users', 'department_id', {

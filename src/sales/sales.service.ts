@@ -169,6 +169,7 @@ export class SalesService {
           await this.batchService.removeStock(
             saleItem.batchId,
             saleItem.quantity,
+            user.sub,
           );
           const modBatch = batch.get({ plain: true });
 
@@ -213,6 +214,7 @@ export class SalesService {
       const refinedSaleItems = dto.saleItems.map((saleItem) => ({
         saleId: sale.id,
         departmentId: user.department,
+        createdById: user.sub,
         facilityId: user.facility,
         ...saleItem,
       }));
@@ -291,6 +293,7 @@ export class SalesService {
           await this.batchService.removeStock(
             modBatch.batchId,
             saleItem.quantity,
+            dto.createdById,
           );
           dto.saleItems[index].batchId = modBatch.batchId;
           dto.saleItems[index].itemId = modBatch.itemId;
@@ -549,7 +552,7 @@ export class SalesService {
     return refinedSale;
   }
 
-  async update(id: string, dto: UpdateSalesDto) {
+  async update(id: string, dto: UpdateSalesDto, userId: string) {
     const saleItemsBody: any = {};
 
     if (dto.saleItems) {
@@ -567,12 +570,17 @@ export class SalesService {
             if (savedSaleItem.quantity !== saleItem.quantity) {
               if (saleItem.quantity > savedSaleItem.quantity) {
                 const deductBy = saleItem.quantity - savedSaleItem.quantity;
-                await this.batchService.removeStock(saleItem.batchId, deductBy);
+                await this.batchService.removeStock(
+                  saleItem.batchId,
+                  deductBy,
+                  userId,
+                );
               } else {
                 const increaseBy = savedSaleItem.quantity - saleItem.quantity;
                 await this.batchService.increaseStock(
                   saleItem.batchId,
                   increaseBy,
+                  userId,
                 );
               }
             }
@@ -580,6 +588,7 @@ export class SalesService {
               {
                 ...saleItem,
                 itemId: batch.item.id,
+                updatedById: userId,
               },
               {
                 where: {
@@ -591,11 +600,13 @@ export class SalesService {
             await this.batchService.removeStock(
               saleItem.batchId,
               saleItem.quantity,
+              userId,
             );
             saleItem.itemId = batch.item.id;
             await this.saleItemRepository.create({
               ...saleItem,
               saleId: id,
+              createdById: userId,
               departmentId: sale.departmentId,
               facilityId: sale.facilityId,
             });
@@ -628,7 +639,7 @@ export class SalesService {
       dto.patientId = patient.id;
     }
     const [rowsUpdated] = await this.saleRepository.update(
-      { ...dto, ...saleItemsBody },
+      { ...dto, ...saleItemsBody, updatedById: userId },
       {
         where: { id },
       },
@@ -641,7 +652,14 @@ export class SalesService {
     return;
   }
 
-  async removeOne(id: string) {
+  async removeOne(id: string, userId: string) {
+    await this.saleRepository.update(
+      { updatedById: userId },
+      {
+        where: { id },
+      },
+    );
+
     const destroyedRows = await this.saleRepository.destroy({
       where: { id },
     });

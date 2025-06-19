@@ -145,9 +145,10 @@ export class ItemOrdersController {
   async changeItemOrderState(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: ChangeOrderStatusDto,
+    @GetUser('sub') userId: string,
   ) {
     try {
-      const _result = await this.orderService.changeState(dto, id);
+      const _result = await this.orderService.changeState(dto, id, userId);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
         'Item order state changed successfully',

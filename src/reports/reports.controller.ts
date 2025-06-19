@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -149,9 +150,13 @@ export class ReportsController {
   @HttpCode(HttpStatus.OK)
   @Permission(Features.REPORTS, PermissionLevel.READ_WRITE)
   @Patch(':id')
-  async editReport(@Body() dto: UpdateReportDto, @Param('id') id: string) {
+  async editReport(
+    @Body() dto: UpdateReportDto,
+    @Param('id') id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.reportsService.update(id, dto);
+      await this.reportsService.update(id, dto, userId);
 
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
@@ -168,9 +173,12 @@ export class ReportsController {
   })
   @Permission(Features.REPORTS, PermissionLevel.READ_WRITE_DELETE)
   @Delete(':id')
-  async delete(@Param('id') id: string) {
+  async delete(
+    @Param('id') id: string,
+    @GetUser('sub', ParseUUIDPipe) userId: string,
+  ) {
     try {
-      await this.reportsService.removeOne(id);
+      await this.reportsService.removeOne(id, userId);
 
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,

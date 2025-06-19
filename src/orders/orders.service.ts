@@ -148,9 +148,9 @@ export class ItemOrdersService {
     return;
   }
 
-  async changeState(dto: ChangeOrderStatusDto, id: string) {
+  async changeState(dto: ChangeOrderStatusDto, id: string, userId: string) {
     const itemOrder = await this.itemOrderModel.update(
-      { ...dto },
+      { ...dto, updatedById: userId },
       { where: { id } },
     );
     const affected = itemOrder[0];
@@ -162,7 +162,10 @@ export class ItemOrdersService {
 
   // Delete a specific item order by ID
   async deleteItemOrder(id: string) {
-    const rows = await this.itemOrderModel.destroy({ where: { id } });
+    const rows = await this.itemOrderModel.destroy({
+      where: { id },
+      force: true,
+    });
     if (rows == 0) {
       throw new NotFoundException('Item Order not found');
     }
