@@ -20,7 +20,11 @@ export class PatientService {
   ) {}
 
   private populate: Record<string, IncludeOptions> = {
-    createdBy: { model: User, attributes: ['id', 'fullName', 'email'] },
+    createdBy: {
+      model: User,
+      as: 'createdBy',
+      attributes: ['id', 'fullName', 'email'],
+    },
     sales: { model: Sale, attributes: ['id', 'saleNumber', 'status'] },
   };
   async create(dto: CreatePatientDto, createdBy: string) {
@@ -57,7 +61,12 @@ export class PatientService {
     const patient = await this.patientRepository.findByPk(id, {
       include: [
         ...includeOption.include,
-        { model: User, attributes: ['id', 'fullName'], paranoid: false },
+        {
+          model: User,
+          as: 'createdBy',
+          attributes: ['id', 'fullName'],
+          paranoid: false,
+        },
       ],
     });
     if (!patient) {

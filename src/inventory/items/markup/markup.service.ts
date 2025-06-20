@@ -20,7 +20,11 @@ export class MarkupService {
   private populates: Record<string, IncludeOptions> = {
     batch: { model: Batch, attributes: ['id', 'batchNumber'] },
 
-    createdBy: { model: User, attributes: ['id', 'fullName', 'email'] },
+    createdBy: {
+      model: User,
+      as: 'createdBy',
+      attributes: ['id', 'fullName', 'email'],
+    },
 
     item: { model: Item, attributes: ['id', 'name'] },
 

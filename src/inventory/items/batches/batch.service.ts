@@ -44,7 +44,11 @@ export class BatchService {
   private populates: Record<string, IncludeOptions> = {
     supplier: { model: Supplier, attributes: ['id', 'name'] },
 
-    createdBy: { model: User, attributes: ['id', 'fullName', 'email'] },
+    createdBy: {
+      model: User,
+      as: 'createdBy',
+      attributes: ['id', 'fullName', 'email'],
+    },
 
     item: { model: Item, attributes: ['id', 'name'] },
 
@@ -379,7 +383,13 @@ export class BatchService {
       };
     } else {
       options = {
-        include: [{ model: User, attributes: ['id', 'fullName', 'email'] }],
+        include: [
+          {
+            model: User,
+            as: 'createdBy',
+            attributes: ['id', 'fullName', 'email'],
+          },
+        ],
       };
     }
     const batch = await this.batchRepo.findByPk(id, {
