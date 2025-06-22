@@ -85,12 +85,12 @@ GROUP BY si.item_id
 ),
 calculations as (
 	select
-		round((c.items_sold - p.items_sold) / coalesce(nullif(p.items_sold, 0), 1)* 100, 2) itemChange,
-		round((c.customers - p.customers) / coalesce(nullif(p.customers, 0), 1)* 100, 2) customersChange,
-		round((c.items_returned - p.items_returned) / coalesce(nullif(p.items_returned, 0), 1) * 100, 2) returnedChange,
-		round((c.transactions  - p.transactions ) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
+		round((c.items_sold - coalesce(p.items_sold, 0)) / coalesce(nullif(p.items_sold, 0), 1)* 100, 2) itemChange,
+		round((c.customers - coalesce(p.customers, 0)) / coalesce(nullif(p.customers, 0), 1)* 100, 2) customersChange,
+		round((c.items_returned - coalesce(p.items_returned, 0)) / coalesce(nullif(p.items_returned, 0), 1) * 100, 2) returnedChange,
+		round((c.transactions  - coalesce(p.transactions, 0)) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
 		round((c.revenue - p.revenue  / p.revenue)::numeric  * 100, 2) revenueChange,
-		round((c.avg_items_per_trans - p.avg_items_per_trans) / coalesce(nullif(p.avg_items_per_trans, 0), 1)* 100, 2) avgChange,
+		round((c.avg_items_per_trans - coalesce(p.avg_items_per_trans, 0)) / coalesce(nullif(p.avg_items_per_trans, 0), 1)* 100, 2) avgChange,
 		round(c.items_sold /  (SELECT total_stock FROM inventory)::numeric, 2) turnover_rate,
 		c.items_sold  itemsTotal,
 		c.transactions transTotal,
