@@ -85,12 +85,12 @@ GROUP BY si.item_id
 ),
 calculations as (
 	select
-		round((c.items_sold - p.items_sold) / coalesce(nullif(p.items_sold, 0), 1)* 100, 2) itemChange,
-		round((c.customers - p.customers) / coalesce(nullif(p.customers, 0), 1)* 100, 2) customersChange,
-		round((c.items_returned - p.items_returned) / coalesce(nullif(p.items_returned, 0), 1) * 100, 2) returnedChange,
-		round((c.transactions  - p.transactions ) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
+		round((c.items_sold - coalesce(p.items_sold, 0)) / coalesce(nullif(p.items_sold, 0), 1)* 100, 2) itemChange,
+		round((c.customers - coalesce(p.customers, 0)) / coalesce(nullif(p.customers, 0), 1)* 100, 2) customersChange,
+		round((c.items_returned - coalesce(p.items_returned, 0)) / coalesce(nullif(p.items_returned, 0), 1) * 100, 2) returnedChange,
+		round((c.transactions  - coalesce(p.transactions, 0)) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
 		round((c.revenue - p.revenue  / p.revenue)::numeric  * 100, 2) revenueChange,
-		round((c.avg_items_per_trans - p.avg_items_per_trans) / coalesce(nullif(p.avg_items_per_trans, 0), 1)* 100, 2) avgChange,
+		round((c.avg_items_per_trans - coalesce(p.avg_items_per_trans, 0)) / coalesce(nullif(p.avg_items_per_trans, 0), 1)* 100, 2) avgChange,
 		round(c.items_sold /  (SELECT total_stock FROM inventory)::numeric, 2) turnover_rate,
 		c.items_sold  itemsTotal,
 		c.transactions transTotal,
@@ -116,22 +116,22 @@ select jsonb_build_object(
 	'totalItemsSold',json_build_object(
 		'total', itemsTotal,
 		'percentageChange', itemChange,
-		'changeType', case when itemChange > 0  then 'INCREMENT' else 'DECREMENT' end
+		'changeType', case when itemChange < 0  then 'DECREMENT' else 'INCREMENT' end
 	),
 	'totalTransactions', json_build_object(
 		'total', transTotal,
 		'percentageChange', transChange,
-		'changeType', case when transChange > 0  then 'INCREMENT' else 'DECREMENT' end
+		'changeType', case when transChange < 0  then 'DECREMENT' else 'INCREMENT' end
 	),
 	'totalRevenue',json_build_object(
 		'total', totalRevenue,
 		'percentageChange', totalRevenue,
-		'changeType', case when revenueChange > 0  then 'INCREMENT' else 'DECREMENT' end
+		'changeType', case when revenueChange < 0  then 'DECREMENT' else 'INCREMENT' end
 	),
 	'customers', json_build_object(
 		'total', totalCustomers,
 		'percentageChange', customersChange,
-		'changeType', case when customersChange > 0  then 'INCREMENT' else 'DECREMENT' end
+		'changeType', case when customersChange < 0  then 'DECREMENT' else 'INCREMENT' end
 	) ,
 	'soonToExpireItems', jsonb_build_object(
         'total', (SELECT soon_expiring FROM inventory),
@@ -141,7 +141,7 @@ select jsonb_build_object(
     'itemsReturned', jsonb_build_object(
         'total', totalItemsReturned,
         'percentageChange', returnedChange,
-		'changeType', case when returnedChange < 0  then 'DECREMENT' else 'INCREMENT' end
+		'changeType', case when returnedChange  < 0  then 'DECREMENT' else 'INCREMENT' end
     ),
     'inventoryTurnoverRate', jsonb_build_object(
         'total', turnover_rate,
@@ -151,7 +151,7 @@ select jsonb_build_object(
 		'averageItemsPerTransaction', jsonb_build_object(
         'total', avg_trans,
         'percentageChange', avgChange,
-		'changeType', case when avgChange > 0  then 'INCREMENT' else 'DECREMENT' end
+		'changeType', case when avgChange < 0  then 'DECREMENT' else 'INCREMENT' end
     )
 ) as res
 from calculations;
