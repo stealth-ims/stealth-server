@@ -29,7 +29,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 # @name daily sales
-GET {{baseUrl}}/dashboard/sales/daily?dateRange=this_month
+GET {{baseUrl}}/dashboard/sales/daily?startDate=2025-05-23&endDate=2025-06-03
 Authorization: Bearer {{accessToken}}
 
 ###

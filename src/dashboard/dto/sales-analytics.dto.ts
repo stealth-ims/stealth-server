@@ -1,4 +1,5 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
+import { MetricDto } from './general.dto';
 
 export class SalesTrendDto {
   @ApiResponseProperty({
@@ -35,33 +36,18 @@ export class TopSellingCategoriesDto {
 }
 
 export class DailySalesDto {
+  @ApiResponseProperty({ type: () => MetricDto })
+  metrics: MetricDto;
   @ApiResponseProperty({
     example: [
       {
-        dates: [
-          '2025-03-05T00:00:00.000Z',
-          '2025-03-10T00:00:00.000Z',
-          '2025-03-15T00:00:00.000Z',
-          '2025-03-20T00:00:00.000Z',
-          '2025-03-25T00:00:00.000Z',
-        ],
-        quantities: [54071, 161466, 81981, 67889],
+        hours: ['01:00', '03:00', '08:00', '11:00', '15:00'],
+        '2025-05-04': [54071, 161466, 81981, 67889],
+        '2025-05-02': [54071, 161466, 81981, 67889],
       },
     ],
   })
-  sales: { dates: Date[]; quantities: number[] }[];
-
-  constructor(
-    dates1: Date[],
-    first: number[],
-    dates2: Date[],
-    second: number[],
-  ) {
-    this.sales = [
-      { dates: dates1, quantities: first },
-      { dates: dates2, quantities: second },
-    ];
-  }
+  sales: { hours: Date[]; quantities1: number[]; quantities2: number[] };
 }
 
 export class SalesPaymentMethodDto {

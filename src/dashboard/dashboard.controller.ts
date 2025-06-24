@@ -143,7 +143,7 @@ export class DashboardController {
   })
   @Get('sales/daily')
   async getDailySales(
-    @Query() query: FindAnalyticsQueryDto,
+    @Query() query: FindGeneralAnalyticsQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {

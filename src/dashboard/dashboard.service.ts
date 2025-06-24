@@ -10,14 +10,11 @@ import {
   TopSellingCategoriesDto,
 } from './dto';
 import { Sequelize } from 'sequelize-typescript';
-import {
-  getDateRangeFilter,
-  getDateRangeFilterCompare,
-} from 'src/core/shared/factory';
+import { getDateRangeFilter } from 'src/core/shared/factory';
 import { IUserPayload } from 'src/auth/interface/payload.interface';
 import { Op } from 'sequelize';
 import sequelize from 'sequelize';
-import { differenceInDays, subDays } from 'date-fns';
+import { differenceInDays, formatDate, subDays } from 'date-fns';
 
 @Injectable()
 export class DashboardService {
@@ -251,52 +248,46 @@ from calculations;
     return new TopSellingCategoriesDto(categories, quantities);
   }
 
-  async getDailySales(query: FindAnalyticsQueryDto, user: IUserPayload) {
-    const { bound, groupby } = getDateRangeFilterCompare(query.dateRange);
-    const [
-      {
-        result: { fdates, f_quantities },
-      },
-      {
-        result: { sdates, s_quantities },
-      },
-    ]: any = await this.sql.query(
-      `WITH first AS (
+  async getDailySales(
+    { startDate, endDate }: FindGeneralAnalyticsQueryDto,
+    user: IUserPayload,
+  ) {
+    const start = formatDate(startDate, 'yyyy-MM-dd');
+    const end = formatDate(endDate, 'yyyy-MM-dd');
+    const { result }: any = await this.sql.query(
+      `WITH hourly_sales AS (
     SELECT
-        date_trunc('${groupby}', created_at) as ${groupby},
-        SUM(quantity) as f_quantity
+        to_char(date_trunc('hour', created_at), 'HH24:MI') as hour,
+        SUM(CASE WHEN '${start}' = date_trunc('day', created_at) THEN quantity ELSE 0 END) as f_quantity,
+        SUM(CASE WHEN '${end}' = date_trunc('day', created_at) THEN quantity ELSE 0 END) as s_quantity
     FROM sale_items
-    WHERE created_at < '${bound.toDateString()}'
-    ${user.facility ? `AND facility_id = '${user.facility}'` : ''}
-		${user.department ? `AND department_id = '${user.department}'` : ''}
-    GROUP BY ${groupby}
-		ORDER by ${groupby}
-		),
-		second AS (
-    SELECT
-        date_trunc('${groupby}', created_at) as ${groupby},
-        SUM(quantity) as s_quantity
-    FROM sale_items
-    WHERE created_at  >= '${bound.toDateString()}'
-    ${user.facility ? `AND facility_id = '${user.facility}'` : ''}
-		${user.department ? `AND department_id = '${user.department}'` : ''}
-    GROUP BY ${groupby}
-		ORDER by ${groupby}
-		)
-		SELECT jsonb_build_object(
-    'fdates', jsonb_agg(to_char(${groupby}, 'YYYY-MM-DD HH24:MI')),
-    'f_quantity', jsonb_agg(f_quantity)
-			) as result
-		FROM first
-		union
-		SELECT jsonb_build_object(
-    'sdates', jsonb_agg(to_char(${groupby}, 'YYYY-MM-DD HH24:MI')),
-    's_quantity', jsonb_agg(s_quantity)
-) as result
-FROM second;`,
-      { raw: true, type: sequelize.QueryTypes.SELECT },
+    WHERE created_at::date = '${start}' or created_at::date ='${end}'
+       ${user.facility ? `AND facility_id = '${user.facility}'` : ''}
+		   ${user.department ? `AND department_id = '${user.department}'` : ''}
+    GROUP BY hour
+    ORDER BY hour
+    ),
+	  total as (
+	    SELECT
+		    SUM(f_quantity) ftotal,
+		    SUM(s_quantity) stotal
+	    FROM hourly_sales
+      )
+    SELECT jsonb_build_object(
+	    'metrics', (SELECT jsonb_build_object(
+	       'total', ftotal + stotal,
+	       'percentageChange', round((ftotal - stotal)/ coalesce(nullif(stotal, 0), 1) * 100, 2),
+	       'changeType', CASE WHEN ftotal < stotal THEN 'DECREMENT' ELSE 'INCREMENT' END
+	        ) FROM total),
+      'sales', jsonb_build_object(
+	       'hours', jsonb_agg(hour),
+         '${start}', jsonb_agg(f_quantity),
+         '${end}', jsonb_agg(s_quantity)
+	)) as result
+    FROM hourly_sales`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
     );
-    return new DailySalesDto(fdates, f_quantities, sdates, s_quantities);
+    return result as DailySalesDto;
   }
 
   async getSalesPaymentMethods(
