@@ -60,10 +60,6 @@ module.exports = {
         allowNull: false,
         field: 'reorder_point',
       },
-      status: {
-        type: Sequelize.ENUM('LOW', 'STOCKED', 'OUT_OF_STOCK'),
-        allowNull: false,
-      },
       categoryId: {
         type: Sequelize.UUID,
         allowNull: false,

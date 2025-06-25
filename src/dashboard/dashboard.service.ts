@@ -60,16 +60,15 @@ ${user.department ? `AND si.department_id = '${user.department}'` : ''}
 ),
 inventory as (
  SELECT
-        COUNT(distinct i.id)  total_items,
-        SUM(b.quantity) total_stock,
-        COUNT(distinct case when i."status" = 'STOCKED' THEN i.id END) stocked,
-		    COUNT(distinct case when i."status" = 'OUT_OF_STOCK' THEN i.id END) outOfStock,
-		    COUNT(distinct case when i."status" = 'LOW' THEN i.id END) lowStocked,
+        i.id,
+		    i.reorder_point,
+        SUM(b.quantity) item_quantitiy,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
     FROM items i
     JOIN batches b ON b.item_id = i.id
 WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
 ${user.department ? `AND i.department_id = '${user.department}'` : ''}
+	  group by i.id
 ),
 doh as (SELECT
 	SUM(b.quantity) * MIN(i.selling_price) sum_s_sales,
@@ -88,7 +87,7 @@ calculations as (
 		round((c.transactions  - coalesce(p.transactions, 0)) / coalesce(nullif(p.transactions, 0), 1)  * 100, 2) transChange,
 		round((c.revenue - p.revenue  / p.revenue)::numeric  * 100, 2) revenueChange,
 		round((c.avg_items_per_trans - coalesce(p.avg_items_per_trans, 0)) / coalesce(nullif(p.avg_items_per_trans, 0), 1)* 100, 2) avgChange,
-		round(c.items_sold /  (SELECT total_stock FROM inventory)::numeric, 2) turnover_rate,
+		round(c.items_sold /  (SELECT SUM(item_quantitiy) FROM inventory)::numeric, 2) turnover_rate,
 		c.items_sold  itemsTotal,
 		c.transactions transTotal,
 		c.avg_items_per_trans avg_trans,
@@ -100,12 +99,12 @@ calculations as (
 select jsonb_build_object(
 	'itemStockLevel', (select jsonb_build_object(
      'stock', jsonb_build_object(
-		    'total', total_items,
-		    'totalStock', total_stock,
-        'outOfStock', outOfStock,
-         'highStocked', stocked,
-         'lowStocked', lowStocked,
-         'stockDaysOnHand', (select round((AVG(sum_s_sales) / (SUM(sum_c_sales) /90))::numeric, 2) from doh)
+		    'total', COUNT(id),
+		    'totalStock', SUM(item_quantitiy),
+	      'outOfStock', COUNT(case when item_quantitiy = 0 then id end),
+	      'highStocked', COUNT(case when item_quantitiy > reorder_point then id end),
+	      'lowStocked', COUNT(case when item_quantitiy <= reorder_point and item_quantitiy > 0 then id end),
+        'stockDaysOnHand', (select round((AVG(sum_s_sales) / (SUM(sum_c_sales) /90))::numeric, 2) from doh)
      ),
 		'percentageChange', 100,
 		'changeType', 'INCREMENT'
@@ -131,7 +130,7 @@ select jsonb_build_object(
 		'changeType', case when customersChange < 0  then 'DECREMENT' else 'INCREMENT' end
 	) ,
 	'soonToExpireItems', jsonb_build_object(
-        'total', (SELECT soon_expiring FROM inventory),
+        'total', (SELECT SUM(soon_expiring) FROM inventory),
         'percentageChange', 100,
         'changeType', 'INCREMENT'
     ),
