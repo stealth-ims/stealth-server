@@ -2,11 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../auth/models/user.model';
 import { Facility } from '../admin/facility/models/facility.model';
-import { CreateSettingsDto } from './dto';
+import { CreateSettingsDto, FindUserDto } from './dto';
 import { Settings } from './models/setting.model';
 import { buildQuery } from '../core/shared/factory/query-builder.factory';
 import { QueryOptionsDto } from '../core/shared/dto/query-options.dto';
-import { IncludeOptions, Op, QueryTypes } from 'sequelize';
+import { IncludeOptions, Op, QueryTypes, WhereOptions } from 'sequelize';
 import { Department } from '../admin/department/models/department.model';
 import { Sequelize } from 'sequelize-typescript';
 import { ExpiredAlert } from '../inventory/items/batches/dto';
@@ -35,9 +35,23 @@ export class UserService {
     facility: { model: Facility, attributes: ['id', 'name'] },
   };
 
-  async findNoPaginate(facilityId: string, departmentId?: string) {
+  async findNoPaginate(query: FindUserDto) {
+    let whereOptions: WhereOptions<User> = { facilityId: query.facilityId };
+    if (query.departmentId) {
+      whereOptions.departmentId = query.departmentId;
+    }
+    if (query.search) {
+      query.searchFields = ['fullName', 'email', 'phoneNumber'];
+      whereOptions = {
+        [Op.or]: query.searchFields.map((field) => ({
+          [field]: { [Op.iLike]: `%${query.search}%` },
+        })),
+      };
+    }
     const users = await this.userRepository.findAll({
-      where: { facilityId, ...(departmentId && { departmentId }) },
+      where: {
+        ...whereOptions,
+      },
       attributes: ['id', 'fullName', 'email'],
     });
 
