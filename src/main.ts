@@ -55,6 +55,8 @@ async function bootstrap() {
     swaggerOptions: {
       tagsSorter: 'alpha',
     },
+    ui: process.env.NODE_ENV !== 'production',
+    raw: process.env.NODE_ENV !== 'production',
   });
 
   await app.listen(PORT);
