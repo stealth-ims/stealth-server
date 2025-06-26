@@ -11,15 +11,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { PERMISSION_KEY, PermissionBody } from '../decorator';
 import { IUserPayload } from '../interface/payload.interface';
-import { InjectModel } from '@nestjs/sequelize';
-import { User } from '../models/user.model';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    @InjectModel(User) private userRepository: typeof User,
-  ) {}
+  constructor(private reflector: Reflector) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredPermission = this.reflector.getAllAndOverride<PermissionBody>(
       PERMISSION_KEY,
@@ -30,19 +25,14 @@ export class PermissionGuard implements CanActivate {
     }
     const { feature, level } = requiredPermission;
     const user: IUserPayload = context.switchToHttp().getRequest()['user'];
-    const loggedInUser = await this.userRepository.findByPk(user.sub, {
-      attributes: ['id', 'permissions'],
-    });
 
-    const hasPermission = loggedInUser.permissions.some(
-      (permission: string) => {
-        const [permissionFeature, access_level] = permission.split(':');
-        return (
-          (permissionFeature as Features) === feature &&
-          this.isPermissionSufficient(access_level as PermissionLevel, level)
-        );
-      },
-    );
+    const hasPermission = user.permissions.some((permission: string) => {
+      const [permissionFeature, access_level] = permission.split(':');
+      return (
+        (permissionFeature as Features) === feature &&
+        this.isPermissionSufficient(access_level as PermissionLevel, level)
+      );
+    });
 
     if (!hasPermission) {
       throw new ForbiddenException('Insufficient permissions');

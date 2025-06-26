@@ -228,7 +228,6 @@ export class NotificationService {
     const userPayload: IUserPayload = {
       sub: user.id,
       email: user.email,
-      stamp: null,
       facility: user.facilityId,
       department: user.departmentId,
       role: user.role,

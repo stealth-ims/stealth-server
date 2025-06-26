@@ -291,7 +291,6 @@ export class SalesService {
       facility: dto.facilityId,
       department: dto.departmentId,
       email: null,
-      stamp: null,
       role: null,
       permissions: null,
       session: null,

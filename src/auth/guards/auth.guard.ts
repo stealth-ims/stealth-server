@@ -15,6 +15,7 @@ import { AUTHORIZE_KEY, IS_PUBLIC_KEY } from '../decorator';
 import { InjectModel } from '@nestjs/sequelize';
 import { LoginSession } from '../models/login-session.model';
 import { IUserPayload } from '../interface/payload.interface';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -24,6 +25,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     @InjectModel(LoginSession)
     private loginSessionRepository: typeof LoginSession,
+    @InjectModel(User) private userRepository: typeof User,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
@@ -48,9 +50,31 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('TOKEN_ABSENT');
     }
     try {
-      const payload: IUserPayload = await this.jwtService.verifyAsync(token, {
-        secret: this.jwtConfiguration.secret,
+      const decoded: Partial<IUserPayload> = await this.jwtService.verifyAsync(
+        token,
+        {
+          secret: this.jwtConfiguration.secret,
+        },
+      );
+      const loggedInUser = await this.userRepository.findByPk(decoded.sub, {
+        attributes: [
+          'id',
+          'email',
+          'facilityId',
+          'departmentId',
+          'role',
+          'permissions',
+        ],
       });
+      const payload: IUserPayload = {
+        sub: loggedInUser.id,
+        email: loggedInUser.email,
+        facility: loggedInUser.facilityId,
+        department: loggedInUser.departmentId,
+        role: loggedInUser.role,
+        permissions: loggedInUser.permissions,
+        session: decoded.session,
+      };
       request['user'] = payload;
 
       if (payload.session) {

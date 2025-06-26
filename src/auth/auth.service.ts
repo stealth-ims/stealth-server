@@ -553,12 +553,6 @@ export class AuthService {
         user.id,
         this.jwtConfiguration.accessTokenTtl,
         {
-          email: user.email,
-          facility: user.facilityId,
-          stamp: user.fullName + ',' + user.id,
-          department: user.departmentId,
-          role: user.role,
-          permissions: user.permissions,
           session: sessionId,
         },
       ),
