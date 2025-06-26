@@ -59,11 +59,6 @@ module.exports = {
           unit_of_measurement: Math.random() > 0.5 ? 'tablet' : 'ml',
           storage_req: 'Store in a cool, dry place',
           reorder_point: faker.number.int({ min: 50, max: 100 }),
-          status: faker.helpers.arrayElement([
-            'LOW',
-            'STOCKED',
-            'OUT_OF_STOCK',
-          ]),
           created_by_id: existingUser,
           category_id: category.id,
           facility_id: facilityId,
