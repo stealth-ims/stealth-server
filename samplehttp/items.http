@@ -2,7 +2,7 @@ GET {{baseUrl}}/items
 Authorization: Bearer {{accessToken}}
 
 ###
-GET {{baseUrl}}/items
+GET {{baseUrl}}/items?status=OUT_OF_STOCK
 Authorization: Bearer {{accessToken}}
 
 ###

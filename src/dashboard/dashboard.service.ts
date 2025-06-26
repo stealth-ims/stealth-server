@@ -65,7 +65,7 @@ inventory as (
         SUM(b.quantity) item_quantitiy,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
     FROM items i
-    JOIN batches b ON b.item_id = i.id
+    LEFT JOIN batches b ON b.item_id = i.id
 WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
 ${user.department ? `AND i.department_id = '${user.department}'` : ''}
 	  group by i.id
@@ -77,6 +77,8 @@ FROM sale_items si
 JOIN batches b on si.item_id = b.item_id
 JOIN items i on si.item_id = i.id
 WHERE si.created_at >= now() - INTERVAL '90 days'
+${user.facility ? `AND i.facility_id = '${user.facility}'` : ''}
+${user.department ? `AND i.department_id = '${user.department}'` : ''}
 GROUP BY si.item_id
 ),
 calculations as (
@@ -101,7 +103,7 @@ select jsonb_build_object(
      'stock', jsonb_build_object(
 		    'total', COUNT(id),
 		    'totalStock', SUM(item_quantitiy),
-	      'outOfStock', COUNT(case when item_quantitiy = 0 then id end),
+	      'outOfStock', COUNT(case when COALESCE(item_quantitiy, 0) = 0 then id end),
 	      'highStocked', COUNT(case when item_quantitiy > reorder_point then id end),
 	      'lowStocked', COUNT(case when item_quantitiy <= reorder_point and item_quantitiy > 0 then id end),
         'stockDaysOnHand', (select round((AVG(sum_s_sales) / (SUM(sum_c_sales) /90))::numeric, 2) from doh)
