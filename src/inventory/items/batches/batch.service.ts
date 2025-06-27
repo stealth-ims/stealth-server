@@ -113,6 +113,8 @@ export class BatchService {
     }
     this.eventEmitter.emit('quantity.increased', {
       itemId: createBatchDto.itemId,
+      facilityId: createBatchDto.facilityId,
+      departmentId: createBatchDto.departmentId,
     });
     if (createBatchDto.markup) {
       createBatchDto.markup.batchId = batch.id;
@@ -183,6 +185,8 @@ export class BatchService {
     }
     this.eventEmitter.emit('quantity.increased', {
       itemId: dto.itemId,
+      facilityId: dto.facilityId,
+      departmentId: dto.departmentId,
     });
     return batch;
   }
@@ -191,9 +195,17 @@ export class BatchService {
     const batch = await this.findOne(id);
     if (dto.quantity) {
       if (dto.quantity > batch.quantity) {
-        this.eventEmitter.emit('quantity.increased', { itemId: batch.itemId });
+        this.eventEmitter.emit('quantity.increased', {
+          itemId: batch.itemId,
+          facilityId: dto.facilityId,
+          departmentId: dto.departmentId,
+        });
       } else if (dto.quantity < batch.quantity) {
-        this.eventEmitter.emit('quantity.changed', { itemId: batch.itemId });
+        this.eventEmitter.emit('quantity.changed', {
+          itemId: batch.itemId,
+          facilityId: dto.facilityId,
+          departmentId: dto.departmentId,
+        });
       }
     }
 
@@ -437,7 +449,11 @@ export class BatchService {
       batch.updatedById = userId;
       await batch.save();
     }
-    this.eventEmitter.emit('quantity.changed', { itemId: itemId });
+    this.eventEmitter.emit('quantity.changed', {
+      itemId: itemId,
+      facilityId: batch.facilityId,
+      departmentId: batch.departmentId,
+    });
     this.logger.log(`Stock removed from batch. ID: ${id}`);
   }
 
@@ -448,13 +464,21 @@ export class BatchService {
     batch.quantity += qty;
     batch.updatedById = userId;
     await batch.save();
-    this.eventEmitter.emit('quantity.increased', { itemId: itemId });
+    this.eventEmitter.emit('quantity.increased', {
+      itemId: itemId,
+      facilityId: batch.facilityId,
+      departmentId: batch.departmentId,
+    });
     this.logger.log(`Stock added to batch. ID: ${id}`);
   }
 
   async remove(id: string, userId: string): Promise<void> {
     const batch = await this.findOne(id);
-    this.eventEmitter.emit('quantity.changed', { itemId: batch.itemId });
+    this.eventEmitter.emit('quantity.changed', {
+      itemId: batch.itemId,
+      facilityId: batch.facilityId,
+      departmentId: batch.departmentId,
+    });
     batch.deletedById = userId;
     await batch.destroy({ userId } as any);
     this.logger.log(`Batch deleted successfully. ID: ${id}`);

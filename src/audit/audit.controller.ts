@@ -13,7 +13,7 @@ import {
   AuditLogsResponseDto,
   FindAuditLogQueryDto,
 } from './dto';
-import { GetUser } from '../auth/decorator';
+import { GetUser, Permission } from '../auth/decorator';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import {
   ApiSuccessResponseDto,
@@ -21,6 +21,10 @@ import {
 } from '../core/shared/responses/success.response';
 import { throwError } from '../core/shared/responses/error.response';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
+import {
+  Features,
+  PermissionLevel,
+} from '../core/shared/enums/permissions.enum';
 
 @Controller('audits')
 export class AuditsController {
@@ -31,6 +35,7 @@ export class AuditsController {
     type: AuditLogsResponseDto,
     message: 'Audit logs fetched successfully',
   })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
   @Get()
   async findAll(
     @Query() query: FindAuditLogQueryDto,
@@ -60,6 +65,7 @@ export class AuditsController {
     type: AuditLogResponseDto,
     message: 'Audit log fetched successfully',
   })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     try {

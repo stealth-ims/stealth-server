@@ -488,7 +488,7 @@ export class ItemService {
     await this.notificationService.sendNotification(
       notification,
       Features.ITEMS,
-      { facility: item.facilityId, department: item.departmentId },
+      { facility: payload.facilityId, department: payload.departmentId },
     );
   }
 
@@ -506,7 +506,7 @@ export class ItemService {
     await this.notificationService.sendNotification(
       notification,
       Features.ITEMS,
-      { facility: item.facilityId, department: item.departmentId },
+      { facility: payload.facilityId, department: payload.departmentId },
     );
   }
 }
