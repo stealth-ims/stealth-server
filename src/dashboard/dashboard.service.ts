@@ -64,11 +64,12 @@ inventory as (
 		    i.reorder_point,
         SUM(b.quantity) item_quantitiy,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
-    FROM items i
-    LEFT JOIN batches b ON b.item_id = i.id
-WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
-${user.department ? `AND i.department_id = '${user.department}'` : ''}
-	  group by i.id
+  FROM items i
+  LEFT JOIN batches b 
+      ON b.item_id = i.id
+      ${user.department ? `AND i.department_id = '${user.department}'` : 'AND i.department_id IS NULL'}
+  WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
+	GROUP BY i.id
 ),
 doh as (SELECT
 	SUM(b.quantity) * MIN(i.selling_price) sum_s_sales,
