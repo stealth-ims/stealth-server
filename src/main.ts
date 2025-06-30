@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  RequestMethod,
+  ValidationPipe,
+} from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { TelemetryInterceptor } from './core/shared/interceptors';
 import { StealthCustomLogger } from './core/shared/factory';
@@ -32,7 +36,9 @@ async function bootstrap() {
     }),
   );
 
-  app.setGlobalPrefix('/api/v1');
+  app.setGlobalPrefix('/api/v1', {
+    exclude: [{ path: '', method: RequestMethod.GET }],
+  });
   const config = new DocumentBuilder()
     .setTitle('Stealth Services')
     .setDescription('API endpoints to be utilized in the stealth app')

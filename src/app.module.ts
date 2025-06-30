@@ -7,6 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { AuditsModule } from './audit/audit.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -39,5 +40,6 @@ import { AuditsModule } from './audit/audit.module';
     AuditsModule,
     ...IndexModules,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
