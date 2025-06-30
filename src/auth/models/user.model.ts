@@ -98,6 +98,8 @@ export class User extends BaseModel<User> {
   @AfterCreate
   static async afterCreateHook(instance: User) {
     await Settings.create({
+      emailDepartmentRequests: true,
+      emailItemOutOfStock: true,
       userId: instance.id,
       createdById: instance.id,
     });
