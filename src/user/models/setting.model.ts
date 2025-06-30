@@ -22,6 +22,10 @@ export class Settings extends BaseModel<Settings> {
 
   @Default(false)
   @Column
+  emailItemStocked: boolean;
+
+  @Default(false)
+  @Column
   emailItemLowStocks: boolean;
 
   @Default(false)

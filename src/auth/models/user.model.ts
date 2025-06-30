@@ -1,4 +1,5 @@
 import {
+  AfterCreate,
   BelongsTo,
   Column,
   DataType,
@@ -93,4 +94,12 @@ export class User extends BaseModel<User> {
 
   @HasOne(() => Settings)
   settings: Settings;
+
+  @AfterCreate
+  static async afterCreateHook(instance: User) {
+    await Settings.create({
+      userId: instance.id,
+      createdById: instance.id,
+    });
+  }
 }

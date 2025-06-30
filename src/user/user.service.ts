@@ -239,6 +239,7 @@ export class UserService {
       where: { userId },
       attributes: [
         'id',
+        'emailItemStocked',
         'emailDepartmentRequests',
         'emailItemLowStocks',
         'emailItemOutOfStock',

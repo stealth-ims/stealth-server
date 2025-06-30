@@ -13,6 +13,11 @@ module.exports = {
         defaultValue: false,
         field: 'email_department_requests',
       },
+      emailItemStocked: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        field: 'email_item_stocked',
+      },
       emailItemLowStocks: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
