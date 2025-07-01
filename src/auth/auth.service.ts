@@ -60,6 +60,7 @@ export class AuthService {
   }
 
   async register(dto: AdminSignUpDto, req: Request) {
+    dto.facility.email = dto.email;
     const facility = await this.facilityService.create(dto.facility);
     const hashPassword = await bcrypt.hash(dto.password, this.SALT_OR_ROUNDS);
     const { facility: _facility, ...createDto } = dto;
@@ -82,6 +83,8 @@ export class AuthService {
       password: hashPassword,
       status: AccountState.UNVERIFIED,
     });
+
+    console.log(user.toJSON());
 
     await facility.update({ createdById: user.id });
 
@@ -106,14 +109,20 @@ export class AuthService {
     }
     const verificationToken = await this.signToken(user.id, 3600, {});
     const fullUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify?token=${verificationToken}`;
-    this.sendAccountVerficationMail(email, user.fullName, user.role, fullUrl);
+    this.sendAccountVerficationMail(
+      email,
+      user.fullName,
+      user.username,
+      user.role,
+      fullUrl,
+    );
     return;
   }
 
   private async fetchUserByEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
-      attributes: ['id', 'fullName', 'email', 'role', 'status'],
+      attributes: ['id', 'fullName', 'email', 'role', 'status', 'username'],
     });
 
     if (!user) {
@@ -159,7 +168,12 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.userRepository.findOne({
-      where: { email: dto.email },
+      where: {
+        [Op.or]: [
+          { email: dto.accountIdentifier },
+          { username: dto.accountIdentifier },
+        ],
+      },
     });
     if (!user) {
       throw new NotFoundException('User not found. Invalid credentials');
@@ -202,6 +216,7 @@ export class AuthService {
         'id',
         'createdAt',
         'updatedAt',
+        'username',
         'imageUrl',
         'fullName',
         'email',
@@ -597,6 +612,7 @@ export class AuthService {
   private sendAccountVerficationMail(
     mail: string,
     fullName: string,
+    username: string,
     role: string,
     verificationUrl: string,
   ) {
@@ -608,6 +624,7 @@ export class AuthService {
       context: {
         email: mail,
         fullName,
+        username,
         role,
         verificationUrl,
       },

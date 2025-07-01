@@ -1,5 +1,8 @@
 import {
   AfterCreate,
+  AllowNull,
+  BeforeCreate,
+  BeforeUpdate,
   BelongsTo,
   Column,
   DataType,
@@ -15,6 +18,7 @@ import { Facility } from '../../admin/facility/models/facility.model';
 import { Department } from '../../admin/department/models/department.model';
 import { LoginSession } from './login-session.model';
 import { Settings } from '../../user/models/setting.model';
+import { generateUsername } from '../../core/shared/factory';
 
 export enum AccountState {
   PENDING = 'Pending',
@@ -31,13 +35,16 @@ export enum AccountState {
   paranoid: true,
 })
 export class User extends BaseModel<User> {
+  @Unique
+  @Column
+  username: string;
+
   @Column
   fullName: string;
 
-  @Column({ unique: true })
+  @Column
   email: string;
 
-  @Unique
   @Column
   phoneNumber: string;
 
@@ -48,8 +55,9 @@ export class User extends BaseModel<User> {
   @BelongsTo(() => Facility)
   facility: Facility;
 
+  @AllowNull
   @ForeignKey(() => Department)
-  @Column({ allowNull: true })
+  @Column
   departmentId: string;
 
   @BelongsTo(() => Department)
@@ -61,7 +69,7 @@ export class User extends BaseModel<User> {
   @Column
   role: string;
 
-  @Column({ type: DataType.ARRAY(DataType.STRING) })
+  @Column(DataType.ARRAY(DataType.STRING))
   permissions: string[];
 
   @Column
@@ -71,35 +79,54 @@ export class User extends BaseModel<User> {
   @Column
   accountActivated: boolean;
 
-  @Column({ defaultValue: AccountState.PENDING })
+  @Default(AccountState.PENDING)
+  @Column
   status: AccountState;
 
-  @Column({ allowNull: true })
+  @AllowNull
+  @Column
   deactivatedBy: string;
 
-  @Column({ allowNull: true })
+  @AllowNull
+  @Column
   deactivatedAt: Date;
 
-  @Column({ allowNull: true })
+  @AllowNull
+  @Column
   imageId: string;
 
-  @Column({ allowNull: true })
+  @AllowNull
+  @Column
   imageUrl: string;
 
-  @Column({ type: DataType.STRING(400), allowNull: true })
+  @AllowNull
+  @Column(DataType.STRING(400))
   resetCode: string;
 
-  @Column({ allowNull: true })
+  @AllowNull
+  @Column
   resetCodeExpires: Date;
 
   @HasOne(() => Settings)
   settings: Settings;
 
+  @BeforeCreate
+  static async generateUsernameHook(instance: User) {
+    if (!instance.username && instance.fullName) {
+      instance.username = generateUsername(instance.fullName);
+    }
+  }
+
+  @BeforeUpdate
+  static async updateUsername(instance: User) {
+    if (instance.changed('fullName')) {
+      instance.username = generateUsername(instance.fullName);
+    }
+  }
+
   @AfterCreate
   static async afterCreateHook(instance: User) {
     await Settings.create({
-      emailDepartmentRequests: true,
-      emailItemOutOfStock: true,
       userId: instance.id,
       createdById: instance.id,
     });

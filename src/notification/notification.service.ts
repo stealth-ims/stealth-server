@@ -210,6 +210,7 @@ export class NotificationService {
     const user = await this.userRepository.findByPk(userId, {
       attributes: [
         'id',
+        'username',
         'email',
         'facilityId',
         'departmentId',
@@ -228,6 +229,7 @@ export class NotificationService {
     const userPayload: IUserPayload = {
       sub: user.id,
       email: user.email,
+      username: user.username,
       facility: user.facilityId,
       department: user.departmentId,
       role: user.role,

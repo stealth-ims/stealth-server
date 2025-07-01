@@ -1,9 +1,16 @@
 import {
   ApiProperty,
+  ApiPropertyOptional,
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  Matches,
+} from 'class-validator';
 import { GenericResponseDto } from '../../core/shared/dto/base.dto';
 import { CreateFacilityDto } from '../../admin/facility/dto';
 
@@ -26,6 +33,14 @@ export class AdminSignUpDto extends IntersectionType(GenericResponseDto) {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @ApiPropertyOptional({
+    description: 'The primary phone number of the contact person.',
+    example: '+2335555538672',
+  })
+  @IsOptional()
+  @IsPhoneNumber('GH')
+  phoneNumber: string;
 
   // @ApiProperty({
   //   example: 'hospital',

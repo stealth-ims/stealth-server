@@ -26,6 +26,7 @@ export class TokenDto {
 export class LoginTokenDto {
   constructor(user: User, tokens: TokenDto, expiresAt: number) {
     this.id = user.id;
+    this.username = user.username;
     this.email = user.email;
     this.status = user.status;
     this.tokens = tokens;
@@ -35,6 +36,11 @@ export class LoginTokenDto {
     example: '44220956-0962-4dd0-9e65-1564c585563c',
   })
   id: string;
+
+  @ApiResponseProperty({
+    example: 'j.doe3256',
+  })
+  username: string;
 
   @ApiResponseProperty({
     example: 'example@email.com',

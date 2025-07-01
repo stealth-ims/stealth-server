@@ -5,60 +5,81 @@ const baseModelColumns = require('../migration-base.js');
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('users', {
-      fullName: { type: Sequelize.STRING, field: 'full_name' },
+      username: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+
+      fullName: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        field: 'full_name',
+      },
 
       email: {
         type: Sequelize.STRING,
-        unique: true,
+        allowNull: false,
       },
 
       phoneNumber: {
         type: Sequelize.STRING,
         field: 'phone_number',
-        unique: true,
       },
 
-      role: Sequelize.STRING,
+      role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-      permissions: Sequelize.ARRAY(Sequelize.STRING),
+      permissions: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: false,
+      },
 
-      password: Sequelize.STRING,
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
-      accountActivated: { type: Sequelize.BOOLEAN, field: 'account_activated' },
+      accountActivated: {
+        type: Sequelize.BOOLEAN,
+        field: 'account_activated',
+        allowNull: false,
+      },
 
-      status: Sequelize.STRING,
+      status: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
 
       deactivatedBy: {
         type: Sequelize.STRING,
-        allowNull: true,
         field: 'deactivated_by',
       },
 
       deactivatedAt: {
         type: Sequelize.DATE,
-        allowNull: true,
         field: 'deactivated_at',
       },
+
       imageId: {
         type: Sequelize.STRING,
-        allowNull: true,
         field: 'image_id',
       },
+
       imageUrl: {
         type: Sequelize.STRING,
-        allowNull: true,
         field: 'image_url',
       },
 
       resetCode: {
         type: Sequelize.STRING(400),
-        allowNull: true,
         field: 'reset_code',
       },
 
       resetCodeExpires: {
         type: Sequelize.DATE,
-        allowNull: true,
         field: 'reset_code_expires',
       },
 

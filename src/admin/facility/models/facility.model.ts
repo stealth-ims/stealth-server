@@ -30,6 +30,10 @@ export class Facility extends BaseModel<Facility> {
   @Column
   name: string;
 
+  @AllowNull
+  @Column
+  email: string;
+
   @ApiProperty({
     example: '@kRhCnlAtrqe1gr',
     description: 'The password for the facility',

@@ -59,6 +59,7 @@ export class AuthGuard implements CanActivate {
       const loggedInUser = await this.userRepository.findByPk(decoded.sub, {
         attributes: [
           'id',
+          'username',
           'email',
           'facilityId',
           'departmentId',
@@ -69,6 +70,7 @@ export class AuthGuard implements CanActivate {
       const payload: IUserPayload = {
         sub: loggedInUser.id,
         email: loggedInUser.email,
+        username: loggedInUser.username,
         facility: loggedInUser.facilityId,
         department: loggedInUser.departmentId,
         role: loggedInUser.role,

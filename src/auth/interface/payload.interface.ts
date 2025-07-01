@@ -1,6 +1,7 @@
 export interface IUserPayload {
   sub: string;
-  email: string;
+  email?: string;
+  username: string;
   facility: string;
   department: string;
   role: string;

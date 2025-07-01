@@ -6,10 +6,11 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('facilities', {
       ...baseModelColumns,
-      name: { type: Sequelize.STRING, unique: true },
+      name: { type: Sequelize.STRING, allowNull: true, unique: true },
       password: { type: Sequelize.STRING },
       region: { type: Sequelize.STRING, allowNull: true },
       location: { type: Sequelize.STRING, allowNull: true },
+      email: { type: Sequelize.STRING, allowNull: true },
     });
 
     await queryInterface.addColumn('users', 'facility_id', {
