@@ -157,6 +157,7 @@ export class GetSalesItemsDto {
 
   @ApiResponseProperty({
     example: {
+      id: 'e7f7424f-04d6-4027-b9af-a25be14c4703',
       name: 'Some Item',
       brandName: 'Some Item brand',
       sellingPrice: 47.01,

@@ -42,11 +42,11 @@ export class CreateUserDto extends IntersectionType(GenericResponseDto) {
   @IsOptional()
   departmentId: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'example@email.com',
     description: 'The email of the user',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email: string;
 

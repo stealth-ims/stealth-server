@@ -46,7 +46,7 @@ export class AdminService {
       facilityId: admin.facility,
       createdById: admin.sub,
     });
-    if (user.id) {
+    if (user.id && user.email) {
       this.sendUserCreatedMail(user, facility.password);
     }
 
@@ -146,12 +146,14 @@ export class AdminService {
     personnel.updatedById = adminId;
     await personnel.save();
 
-    this.sendChangeRoleConfirmationMail(
-      personnel.email,
-      personnel.fullName,
-      personnel.role,
-      personnel.updatedAt.toUTCString(),
-    );
+    if (personnel.email) {
+      this.sendChangeRoleConfirmationMail(
+        personnel.email,
+        personnel.fullName,
+        personnel.role,
+        personnel.updatedAt.toUTCString(),
+      );
+    }
     return;
   }
 
@@ -165,11 +167,13 @@ export class AdminService {
     user.deactivatedAt = new Date();
     user.deactivatedBy = adminId;
     await user.save();
-    this.sendDeactivatedAccountConfirmation(
-      user.email,
-      user.fullName,
-      user.deactivatedAt.toUTCString(),
-    );
+    if (user.email) {
+      this.sendDeactivatedAccountConfirmation(
+        user.email,
+        user.fullName,
+        user.deactivatedAt.toUTCString(),
+      );
+    }
     return;
   }
 
@@ -181,7 +185,9 @@ export class AdminService {
       'activated',
     );
     await user.save();
-    this.sendActivatedAccountConfirmation(user.email);
+    if (user.email) {
+      this.sendActivatedAccountConfirmation(user.email);
+    }
     return;
   }
 
@@ -193,7 +199,9 @@ export class AdminService {
     await user.destroy({ force: true, userId: deletedBy } as any);
 
     const deletedAt = new Date().toUTCString();
-    this.sendDeletedAccountConfirmation(user.email, deletedAt);
+    if (user.email) {
+      this.sendDeletedAccountConfirmation(user.email, deletedAt);
+    }
     return;
   }
 

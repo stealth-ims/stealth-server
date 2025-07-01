@@ -70,7 +70,7 @@ export class SalesService {
       include: [
         {
           model: Item,
-          attributes: ['name', 'brandName', 'sellingPrice'],
+          attributes: ['id', 'name', 'brandName', 'sellingPrice'],
           where: itemWhereConditions,
         },
         {
