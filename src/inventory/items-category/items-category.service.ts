@@ -15,6 +15,10 @@ import { FindAndCountOptions, Op } from 'sequelize';
 import { Item } from '../items/models/item.model';
 import { generateFilter } from '../../core/shared/factory';
 import { IUserPayload } from '../../auth/interface/payload.interface';
+import { OnEvent } from '@nestjs/event-emitter';
+import * as itemCategories from 'src/core/database/seeders/categories.json';
+import * as items from 'src/core/database/seeders/items.json';
+import { DosageForm } from '../items/dto';
 
 @Injectable()
 export class ItemCategoryService {
@@ -186,6 +190,45 @@ export class ItemCategoryService {
     if (res == 0) {
       throw new NotFoundException(`Category with id ${id} not found`);
     }
+    return;
+  }
+
+  @OnEvent('items.seed')
+  async handleSeedItemsEvent(payload: { userId: string; facilityId: string }) {
+    const categories = itemCategories.categories.map((category) => ({
+      ...category,
+      status: ItemCategoryStatus.ACTIVE,
+      facilityId: payload.facilityId,
+      createdById: payload.userId,
+    }));
+    const createdCategories = await this.itemCategoryRepo.bulkCreate(
+      categories,
+      {
+        individualHooks: true,
+        returning: ['id', 'name'],
+      },
+    );
+    const finalCategories = createdCategories.map((category) =>
+      category.toJSON(),
+    );
+    const finalItems = items.data.map((item) => {
+      const { categoryName, dosageForm, ...others } = item;
+      const creatingItem = {
+        ...others,
+        dosageForm: dosageForm as DosageForm,
+        facilityId: payload.facilityId,
+        createdById: payload.userId,
+        categoryId: null,
+      };
+      const category = finalCategories.find(
+        (category) => category.name == item.categoryName,
+      );
+      creatingItem.categoryId = category.id;
+
+      return creatingItem;
+    });
+
+    await Item.bulkCreate(finalItems, { individualHooks: true });
     return;
   }
 }

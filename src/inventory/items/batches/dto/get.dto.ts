@@ -44,7 +44,7 @@ export class BatchResponseDto extends IntersectionType(
 }
 
 export class BatchesNoPaginate extends IntersectionType(
-  PickType(CreateBatchDto, ['batchNumber', 'quantity']),
+  PickType(CreateBatchDto, ['batchNumber', 'quantity', 'validity']),
   PickType(GenericResponseDto, ['id']),
 ) {}
 

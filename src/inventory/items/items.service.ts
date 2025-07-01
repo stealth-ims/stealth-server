@@ -80,9 +80,9 @@ export class ItemService {
       status: ItemStatus.OUT_OF_STOCK,
     });
 
-    const oneItem = createdItem.toJSON();
+    // const oneItem = createdItem.toJSON();
     this.logger.log(`Item added successfully. id: ${createdItem.id}`);
-    return oneItem;
+    return createdItem;
   }
 
   /**

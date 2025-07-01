@@ -1,0 +1,1273 @@
+{
+  "data": [
+    {
+      "name": "Anti Snake Venom (ASV)",
+      "dosageForm": "INJECTION",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 250.0,
+      "sellingPrice": 325.0,
+      "categoryName": "Antivenom"
+    },
+    {
+      "name": "Anti Rabies Vaccine (ARV)",
+      "dosageForm": "INJECTION",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 80.0,
+      "sellingPrice": 104.0,
+      "categoryName": "Vaccine"
+    },
+    {
+      "name": "Anti Tetanus Serum (ATS)",
+      "dosageForm": "INJECTION",
+      "strength": "1500IU",
+      "reorderPoint": 20,
+      "costPrice": 40.0,
+      "sellingPrice": 52.0,
+      "categoryName": "Tetanus Antitoxins"
+    },
+    {
+      "name": "Artesunate",
+      "dosageForm": "INJECTION",
+      "strength": "120mg",
+      "reorderPoint": 50,
+      "costPrice": 5.5,
+      "sellingPrice": 7.15,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate",
+      "dosageForm": "INJECTION",
+      "strength": "60mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate",
+      "dosageForm": "INJECTION",
+      "strength": "30mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artemether",
+      "dosageForm": "INJECTION",
+      "strength": "80mg",
+      "reorderPoint": 50,
+      "costPrice": 12.0,
+      "sellingPrice": 15.6,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Amoxiclav",
+      "dosageForm": "INJECTION",
+      "strength": "600mg",
+      "reorderPoint": 50,
+      "costPrice": 18.0,
+      "sellingPrice": 23.4,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Benzylpenicillin",
+      "dosageForm": "INJECTION",
+      "strength": "1MU",
+      "reorderPoint": 50,
+      "costPrice": 14.0,
+      "sellingPrice": 18.2,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Bupivacaine Heavy",
+      "dosageForm": "INJECTION",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 6.5,
+      "sellingPrice": 8.45,
+      "categoryName": "Anesthetics"
+    },
+    {
+      "name": "Calcium Gluconate",
+      "dosageForm": "INJECTION",
+      "strength": "10%",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Electrolyte Replacements"
+    },
+    {
+      "name": "Ceftriaxone",
+      "dosageForm": "INJECTION",
+      "strength": "1g",
+      "reorderPoint": 50,
+      "costPrice": 8.0,
+      "sellingPrice": 10.4,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Cefuroxime",
+      "dosageForm": "INJECTION",
+      "strength": "750mg",
+      "reorderPoint": 50,
+      "costPrice": 7.0,
+      "sellingPrice": 9.1,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Ciprofloxacin",
+      "dosageForm": "INJECTION",
+      "strength": "200mg",
+      "reorderPoint": 50,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Clindamycin",
+      "dosageForm": "INJECTION",
+      "strength": "300mg/2ml",
+      "reorderPoint": 50,
+      "costPrice": 10.0,
+      "sellingPrice": 13.0,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Chlorpromazine",
+      "dosageForm": "INJECTION",
+      "strength": "50mg/2ml",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Antipsychotics"
+    },
+    {
+      "name": "Cytotec",
+      "dosageForm": "TABLET",
+      "strength": "200mcg",
+      "reorderPoint": 20,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Prostaglandins"
+    },
+    {
+      "name": "Diazepam",
+      "dosageForm": "INJECTION",
+      "strength": "10mg/2ml",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Benzodiazepines"
+    },
+    {
+      "name": "Dexamethasine",
+      "dosageForm": "INJECTION",
+      "strength": "4mg/ml",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Corticosteroids"
+    },
+    {
+      "name": "Ephedrine",
+      "dosageForm": "INJECTION",
+      "strength": "30mg",
+      "reorderPoint": 30,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Sympathomimetics"
+    },
+    {
+      "name": "Esomeprazole",
+      "dosageForm": "INJECTION",
+      "strength": "40mg",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Proton Pump Inhibitors (PPIs)"
+    },
+    {
+      "name": "Hydralazine",
+      "dosageForm": "INJECTION",
+      "strength": "20mg/ml",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Hydrocortison",
+      "dosageForm": "INJECTION",
+      "strength": "100mg",
+      "reorderPoint": 30,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Corticosteroids"
+    },
+    {
+      "name": "Hyoscine Butylpromide",
+      "dosageForm": "INJECTION",
+      "strength": "20mg",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antispasmodics"
+    },
+    {
+      "name": "Infusion Giving Set",
+      "dosageForm": null,
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 1.2,
+      "sellingPrice": 1.56,
+      "categoryName": "Medical Supply"
+    },
+    {
+      "name": "Ketamine",
+      "dosageForm": "INJECTION",
+      "strength": "50mg/ml",
+      "reorderPoint": 30,
+      "costPrice": 5.5,
+      "sellingPrice": 7.15,
+      "categoryName": "Anesthetics"
+    },
+    {
+      "name": "Labetalol",
+      "dosageForm": "INJECTION",
+      "strength": "100mg",
+      "reorderPoint": 30,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Beta-blockers"
+    },
+    {
+      "name": "Lidocaine",
+      "dosageForm": "INJECTION",
+      "strength": "2%",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Local Anesthetics"
+    },
+    {
+      "name": "Magnesium Sulphate",
+      "dosageForm": "INJECTION",
+      "strength": "50%",
+      "reorderPoint": 30,
+      "costPrice": 1.8,
+      "sellingPrice": 2.34,
+      "categoryName": "Electrolyte Replacements"
+    },
+    {
+      "name": "Metronidazole",
+      "dosageForm": "INJECTION",
+      "strength": "500mg/100ml",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Metoclopramide",
+      "dosageForm": "INJECTION",
+      "strength": "10mg",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Antiemetics"
+    },
+    {
+      "name": "Misoprostol",
+      "dosageForm": "TABLET",
+      "strength": "200mcg",
+      "reorderPoint": 20,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Prostaglandins"
+    },
+    {
+      "name": "Morphine",
+      "dosageForm": "INJECTION",
+      "strength": "10mg/ml",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Opioid Analgesics"
+    },
+    {
+      "name": "Omeprazole",
+      "dosageForm": "INJECTION",
+      "strength": "40mg",
+      "reorderPoint": 30,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Proton Pump Inhibitors (PPIs)"
+    },
+    {
+      "name": "Oxytocin",
+      "dosageForm": "INJECTION",
+      "strength": "10IU",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Oxytocics"
+    },
+    {
+      "name": "Paracetamol",
+      "dosageForm": "INJECTION",
+      "strength": null,
+      "reorderPoint": 50,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Analgesics and Antipyretics"
+    },
+    {
+      "name": "Pethidine",
+      "dosageForm": "INJECTION",
+      "strength": "100mg/2ml",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Opioid Analgesics"
+    },
+    {
+      "name": "Phytomenadione",
+      "dosageForm": "INJECTION",
+      "strength": "1mg",
+      "reorderPoint": 30,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Phenobarbitone",
+      "dosageForm": "INJECTION",
+      "strength": "200mg",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Anticonvulsants"
+    },
+    {
+      "name": "Promethazine",
+      "dosageForm": "INJECTION",
+      "strength": "50mg/2ml",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antihistamines"
+    },
+    {
+      "name": "Propofol",
+      "dosageForm": "INJECTION",
+      "strength": "1%",
+      "reorderPoint": 30,
+      "costPrice": 12.0,
+      "sellingPrice": 15.6,
+      "categoryName": "Anesthetics"
+    },
+    {
+      "name": "Salbutamol Nebules",
+      "dosageForm": "INHALER",
+      "strength": "2.5mg",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Bronchodilators"
+    },
+    {
+      "name": "Salbutamol Nebules",
+      "dosageForm": "INHALER",
+      "strength": "5mg",
+      "reorderPoint": 30,
+      "costPrice": 5.5,
+      "sellingPrice": 7.15,
+      "categoryName": "Bronchodilators"
+    },
+    {
+      "name": "Tranexamic acid",
+      "dosageForm": "INJECTION",
+      "strength": "500mg",
+      "reorderPoint": 30,
+      "costPrice": 8.0,
+      "sellingPrice": 10.4,
+      "categoryName": "Antifibrinolytics"
+    },
+    {
+      "name": "Water",
+      "dosageForm": "INJECTION",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 0.8,
+      "sellingPrice": 1.04,
+      "categoryName": "Diluent Solvent"
+    },
+    {
+      "name": "Aluminium Hydroxide + Magnesium Hydroxide + Simethicone",
+      "dosageForm": "SUSPENSION",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antacids"
+    },
+    {
+      "name": "Artemether + Lumefanterine",
+      "dosageForm": "SUSPENSION",
+      "strength": "20/120mg",
+      "reorderPoint": 50,
+      "costPrice": 10.0,
+      "sellingPrice": 13.0,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Amoxicillin",
+      "dosageForm": "SUSPENSION",
+      "strength": "125mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Amoxicillin + Clavulanic Acid",
+      "dosageForm": "SUSPENSION",
+      "strength": "228mg",
+      "reorderPoint": 50,
+      "costPrice": 12.0,
+      "sellingPrice": 15.6,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Artesunate",
+      "dosageForm": " SUPPORSITORY",
+      "strength": "100mg",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Azithromycin",
+      "dosageForm": "SUSPENSION",
+      "strength": "200mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 8.0,
+      "sellingPrice": 10.4,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Carbocisteine",
+      "dosageForm": "SYRUP",
+      "strength": "125mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Mucolytics"
+    },
+    {
+      "name": "Carbocisteine",
+      "dosageForm": "SYRUP",
+      "strength": "250mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Mucolytics"
+    },
+    {
+      "name": "Cetirizine",
+      "dosageForm": "SYRUP",
+      "strength": "5mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antihistamines"
+    },
+    {
+      "name": "Clotrimazole",
+      "dosageForm": "CREAM",
+      "strength": "1%",
+      "reorderPoint": 20,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Clotrimazole",
+      "dosageForm": "CREAM",
+      "strength": "2%",
+      "reorderPoint": 20,
+      "costPrice": 3.2,
+      "sellingPrice": 4.16,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Clotrimazole Vagina Pessary",
+      "dosageForm": "PESSARY",
+      "strength": "100mg",
+      "reorderPoint": 20,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Clotrimazole + Hydrocortisone + Gentamycin (Triple Action)",
+      "dosageForm": "CREAM",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Chloramphenicol Ear Drop",
+      "dosageForm": "DROPS",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Chloramphenicol Eye drop",
+      "dosageForm": "DROPS",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Co-trimoxazole",
+      "dosageForm": "SUSPENSION",
+      "strength": "240mg",
+      "reorderPoint": 50,
+      "costPrice": 5.5,
+      "sellingPrice": 7.15,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Chlorhexidine Gel",
+      "dosageForm": "CREAM",
+      "strength": "7.10%",
+      "reorderPoint": 20,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Antiseptics"
+    },
+    {
+      "name": "Diclofenac Gel",
+      "dosageForm": "CREAM",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Diclofenac",
+      "dosageForm": "SUPPORSITORY",
+      "strength": "100mg",
+      "reorderPoint": 30,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Diclofenac",
+      "dosageForm": "SUPPORSITORY",
+      "strength": "50mg",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Ephedrine Nasal Drop",
+      "dosageForm": "DROPS",
+      "strength": "0.50%",
+      "reorderPoint": 20,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Decongestants"
+    },
+    {
+      "name": "Ephedrine Nasal Drop",
+      "dosageForm": "DROPS",
+      "strength": "1%",
+      "reorderPoint": 20,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Decongestants"
+    },
+    {
+      "name": "Ferric Ammonium Citrate",
+      "dosageForm": "SYRUP",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Mineral Supplements"
+    },
+    {
+      "name": "Flucloxacillin",
+      "dosageForm": "SUSPENSION",
+      "strength": "125mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Gentamycin Eye drop",
+      "dosageForm": "DROPS",
+      "strength": null,
+      "reorderPoint": 20,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Griseofulvin",
+      "dosageForm": "SUSPENSION",
+      "strength": "125mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 10.0,
+      "sellingPrice": 13.0,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Hydrocortisone",
+      "dosageForm": "CREAM",
+      "strength": "1%",
+      "reorderPoint": 20,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Corticosteroids"
+    },
+    {
+      "name": "Ibuprofen",
+      "dosageForm": "SYRUP",
+      "strength": "100mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 4.5,
+      "sellingPrice": 5.85,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Iron 111 Polymatose",
+      "dosageForm": "SYRUP",
+      "strength": "50mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Mineral Supplements"
+    },
+    {
+      "name": "Magnesium Triscillicate",
+      "dosageForm": "SUSPENSION",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antacids"
+    },
+    {
+      "name": "Metronidazole",
+      "dosageForm": "SUSPENSION",
+      "strength": "200mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 5.5,
+      "sellingPrice": 7.15,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Multivitamin",
+      "dosageForm": "SYRUP",
+      "strength": "125mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Oral Rehydration Salt",
+      "dosageForm": "POWDER",
+      "strength": null,
+      "reorderPoint": 50,
+      "costPrice": 1.2,
+      "sellingPrice": 1.56,
+      "categoryName": "Oral Rehydration Solutions (ORS)"
+    },
+    {
+      "name": "Paracetamol",
+      "dosageForm": "SYRUP",
+      "strength": "125mg/5ml",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Analgesics and Antipyretics"
+    },
+    {
+      "name": "Pracetamol",
+      "dosageForm": "SUPPORSITORY",
+      "strength": " 250mg",
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Analgesics and Antipyretics"
+    },
+    {
+      "name": "Pracetamol",
+      "dosageForm": "SUPPORSITORY",
+      "strength": "500mg",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Analgesics and Antipyretics"
+    },
+    {
+      "name": "Promethazine",
+      "dosageForm": "SYRUP",
+      "strength": "5mg/5ml",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antihistamines"
+    },
+    {
+      "name": "Simple Linctus Paediatric",
+      "dosageForm": "SYRUP",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Cough Suppressants"
+    },
+    {
+      "name": "Simple Lintus Adult",
+      "dosageForm": "SYRUP",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Cough Suppressants"
+    },
+    {
+      "name": "Timolol Eye Drop",
+      "dosageForm": "DROPS",
+      "strength": "0.50%",
+      "reorderPoint": 20,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Beta-blockers"
+    },
+    {
+      "name": "Actilife Multivitamin",
+      "dosageForm": "TABLET",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Albendazole",
+      "dosageForm": "TABLET",
+      "strength": "200mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Anthelmintics"
+    },
+    {
+      "name": "Albendazole",
+      "dosageForm": "TABLET",
+      "strength": "400mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Anthelmintics"
+    },
+    {
+      "name": "Artemether + Lumefanterin; below 3yrs (6's)",
+      "dosageForm": "TABLET",
+      "strength": "20/120mg",
+      "reorderPoint": 50,
+      "costPrice": 4.5,
+      "sellingPrice": 5.85,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artemether + Lumefanterin; 3-8 yrs (12's)",
+      "dosageForm": "TABLET",
+      "strength": "20/120mg",
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artemether + Lumefantrine; 9-13yrs and above (18's)",
+      "dosageForm": "TABLET",
+      "strength": "20mg/120mg",
+      "reorderPoint": 50,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artemether + Lumefantrine; 14yrs and above (24's)",
+      "dosageForm": "TABLET",
+      "strength": "20mg/120mg",
+      "reorderPoint": 50,
+      "costPrice": 6.5,
+      "sellingPrice": 8.45,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate + Amodiaquine;  0-11months",
+      "dosageForm": "TABLET",
+      "strength": "25/67.5mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate + Amodiaquine; 1-5yrs",
+      "dosageForm": "TABLET",
+      "strength": "50/135mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate + Amodiaquine; 6-13yrs (3's)",
+      "dosageForm": "TABLET",
+      "strength": "100/270mg",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Artesunate + Amodiaquine; 14yrs and above(6's)",
+      "dosageForm": "TABLET",
+      "strength": "100/270mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antimalarials"
+    },
+    {
+      "name": "Amlodipine",
+      "dosageForm": "TABLET",
+      "strength": "5mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Amlodipine",
+      "dosageForm": "TABLET",
+      "strength": "10mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Atorvastatin",
+      "dosageForm": "TABLET",
+      "strength": "20mg",
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Statins"
+    },
+    {
+      "name": "Amoxicillin",
+      "dosageForm": "CAPSULE",
+      "strength": "500mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Amoxicillin",
+      "dosageForm": "CAPSULE",
+      "strength": "250mg",
+      "reorderPoint": 50,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Azithromycin",
+      "dosageForm": "CAPSULE",
+      "strength": "250mg",
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Bendrofluaizide",
+      "dosageForm": "TABLET",
+      "strength": "2.5mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Diuretics"
+    },
+    {
+      "name": "Cefuroxime",
+      "dosageForm": "TABLET",
+      "strength": "250mg",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Cefuroxime",
+      "dosageForm": "TABLET",
+      "strength": "500mg",
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Ciprofloxacin",
+      "dosageForm": "TABLET",
+      "strength": "500mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Ciprofloxacin + Tinidazole",
+      "dosageForm": "TABLET",
+      "strength": "(500+600mg)",
+      "reorderPoint": 50,
+      "costPrice": 6.5,
+      "sellingPrice": 8.45,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Clindamycin",
+      "dosageForm": "CAPSULE",
+      "strength": null,
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Diazepam",
+      "dosageForm": "TABLET",
+      "strength": "5mg",
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Benzodiazepines"
+    },
+    {
+      "name": "Diazepam",
+      "dosageForm": "TABLET",
+      "strength": "10mg",
+      "reorderPoint": 30,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Benzodiazepines"
+    },
+    {
+      "name": "Diclofenac",
+      "dosageForm": "TABLET",
+      "strength": "50mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Diclofenac",
+      "dosageForm": "CAPSULE",
+      "strength": "75mg",
+      "reorderPoint": 30,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Diclofenac",
+      "dosageForm": "TABLET",
+      "strength": "100mg",
+      "reorderPoint": 50,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Doxycycline",
+      "dosageForm": "CAPSULE",
+      "strength": "100mg",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Envelope Dispensing Plastic (Medium Size)",
+      "dosageForm": null,
+      "strength": null,
+      "reorderPoint": 200,
+      "costPrice": 0.5,
+      "sellingPrice": 0.65,
+      "categoryName": "Medical Supply"
+    },
+    {
+      "name": "Envelope Dispensing Plastic (Small Size)",
+      "dosageForm": null,
+      "strength": null,
+      "reorderPoint": 200,
+      "costPrice": 0.4,
+      "sellingPrice": 0.52,
+      "categoryName": "Medical Supply"
+    },
+    {
+      "name": "Erythromycin",
+      "dosageForm": "TABLET",
+      "strength": "250mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Flucloxacillin",
+      "dosageForm": "CAPSULE",
+      "strength": "250mg",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Folic Acid",
+      "dosageForm": "TABLET",
+      "strength": "5mg",
+      "reorderPoint": 30,
+      "costPrice": 1.0,
+      "sellingPrice": 1.3,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Ferrous Sulphate",
+      "dosageForm": "TABLET",
+      "strength": "60mg",
+      "reorderPoint": 30,
+      "costPrice": 0.8,
+      "sellingPrice": 1.04,
+      "categoryName": "Mineral Supplements"
+    },
+    {
+      "name": "Folic Acid",
+      "dosageForm": "TABLET",
+      "strength": "400mcg",
+      "reorderPoint": 30,
+      "costPrice": 0.5,
+      "sellingPrice": 0.65,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Fluconazole",
+      "dosageForm": "CAPSULE",
+      "strength": "150mg",
+      "reorderPoint": 30,
+      "costPrice": 5.0,
+      "sellingPrice": 6.5,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Furosemide",
+      "dosageForm": "TABLET",
+      "strength": "40mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Diuretics"
+    },
+    {
+      "name": "Glimepiride",
+      "dosageForm": "TABLET",
+      "strength": "2mg",
+      "reorderPoint": 50,
+      "costPrice": 3.5,
+      "sellingPrice": 4.55,
+      "categoryName": "Antidiabetic Agents"
+    },
+    {
+      "name": "Glimepiride",
+      "dosageForm": "TABLET",
+      "strength": "4mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antidiabetic Agents"
+    },
+    {
+      "name": "Glibenclamide",
+      "dosageForm": "TABLET",
+      "strength": "5mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Antidiabetic Agents"
+    },
+    {
+      "name": "Griseofulvin",
+      "dosageForm": "TABLET",
+      "strength": "125mg",
+      "reorderPoint": 50,
+      "costPrice": 6.0,
+      "sellingPrice": 7.8,
+      "categoryName": "Antifungals"
+    },
+    {
+      "name": "Hyoscine Butylbromide",
+      "dosageForm": "TABLET",
+      "strength": "10mg",
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Antispasmodics"
+    },
+    {
+      "name": "Ibuprofen",
+      "dosageForm": "TABLET",
+      "strength": "400mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "NSAIDs"
+    },
+    {
+      "name": "Lisinopril",
+      "dosageForm": "TABLET",
+      "strength": "10mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Losartan",
+      "dosageForm": "TABLET",
+      "strength": "50mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Metochlopramide",
+      "dosageForm": "TABLET",
+      "strength": "10mg",
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Antiemetics"
+    },
+    {
+      "name": "Metronidazole",
+      "dosageForm": "TABLET",
+      "strength": "200mg",
+      "reorderPoint": 50,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Metronidazole",
+      "dosageForm": "TABLET",
+      "strength": "400mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antibiotics"
+    },
+    {
+      "name": "Multivitamin Tablet",
+      "dosageForm": "TABLET",
+      "strength": null,
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Vitamin Supplements"
+    },
+    {
+      "name": "Nifedipine",
+      "dosageForm": "TABLET",
+      "strength": "20mg",
+      "reorderPoint": 50,
+      "costPrice": 3.0,
+      "sellingPrice": 3.9,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Nifedipine",
+      "dosageForm": "TABLET",
+      "strength": "30mg",
+      "reorderPoint": 50,
+      "costPrice": 4.0,
+      "sellingPrice": 5.2,
+      "categoryName": "Antihypertensives"
+    },
+    {
+      "name": "Mebendazole",
+      "dosageForm": "TABLET",
+      "strength": "500mg",
+      "reorderPoint": 50,
+      "costPrice": 2.5,
+      "sellingPrice": 3.25,
+      "categoryName": "Anthelmintics"
+    },
+    {
+      "name": "Paracetamol",
+      "dosageForm": "TABLET",
+      "strength": "500mg",
+      "reorderPoint": 50,
+      "costPrice": 1.0,
+      "sellingPrice": 1.3,
+      "categoryName": "Analgesics and Antipyretics"
+    },
+    {
+      "name": "Salbutamol",
+      "dosageForm": "TABLET",
+      "strength": "4mg",
+      "reorderPoint": 50,
+      "costPrice": 2.0,
+      "sellingPrice": 2.6,
+      "categoryName": "Bronchodilators"
+    },
+    {
+      "name": "Zinc Tablet",
+      "dosageForm": "TABLET",
+      "strength": "20mg",
+      "reorderPoint": 30,
+      "costPrice": 1.5,
+      "sellingPrice": 1.95,
+      "categoryName": "Mineral Supplements"
+    }
+  ]
+}

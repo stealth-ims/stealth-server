@@ -35,6 +35,7 @@ import { Facility } from '../admin/facility/models/facility.model';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Request } from 'express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +54,7 @@ export class AuthService {
     private readonly cloudinaryService: CloudinaryService,
     private readonly facilityService: FacilityService,
     private readonly httpService: HttpService,
+    private eventEmitter: EventEmitter2,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -88,6 +90,11 @@ export class AuthService {
     const expiresAt: number = this.configService.get<number>(
       'JWT_ACCESS_TOKEN_TTL',
     );
+    this.eventEmitter.emit('items.seed', {
+      userId: user.id,
+      facilityId: facility.id,
+    });
+    // items.seed;
     return new LoginTokenDto(user, token, expiresAt);
     // return createdUser;
   }

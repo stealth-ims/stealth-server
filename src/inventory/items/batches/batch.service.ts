@@ -345,7 +345,7 @@ export class BatchService {
   async findAllNoPaginate(itemId: string, departmentId: string) {
     return this.batchRepo.findAll({
       where: { itemId, departmentId },
-      attributes: ['id', 'batchNumber', 'quantity'],
+      attributes: ['id', 'batchNumber', 'quantity', 'validity'],
       order: [['updatedAt', 'DESC']],
     });
   }

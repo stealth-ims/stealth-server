@@ -29,12 +29,13 @@ export enum DosageForm {
   DROPS = 'DROPS',
   SPRAY = 'SPRAY',
   POWDER = 'POWDER',
-  SUPPOSITORY = 'SUPPOSITORY',
+  SUPPORSITORY = 'SUPPORSITORY',
   INHALER = 'INHALER',
   PATCH = 'PATCH',
   LOZENGE = 'LOZENGE',
   MOUTHWASH = 'MOUTHWASH',
   SHAMPOO = 'SHAMPOO',
+  PESSARY = 'PESSARY',
 }
 
 export enum ItemStatus {
