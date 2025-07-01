@@ -96,7 +96,7 @@ export class CreateSupplierDto extends GenericResponseDto {
 
   @ApiProperty({
     description: 'The primary phone number of the contact person.',
-    example: '+2335555538672',
+    example: '+233555538672',
   })
   @IsString()
   phoneNumber: string;

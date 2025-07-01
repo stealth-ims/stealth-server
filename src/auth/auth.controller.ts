@@ -33,6 +33,8 @@ import {
   RefreshTokenDto,
   ResetPasswordDto,
   SendForgotPasswordEmailDto,
+  ValidateCodeDto,
+  VerifyEmailDto,
 } from './dto';
 import {
   ApiBadRequestResponse,
@@ -40,6 +42,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiForbiddenResponse,
+  ApiGoneResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -273,9 +276,9 @@ export class AuthController {
     }
   }
 
-  @Post('forgot-password/send-mail')
+  @Post('forgot-password/send')
   @ApiSuccessResponseNullData({
-    description: 'Email sent successfully',
+    description: 'Code sent successfully',
   })
   @ApiInternalServerErrorResponse({
     type: ApiErrorResponse,
@@ -284,10 +287,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async sendMail(@Body() dto: SendForgotPasswordEmailDto) {
     try {
-      await this.authService.sendResetPasswordCode(dto.email);
+      await this.authService.sendResetPasswordCode(dto);
       return new ApiSuccessResponseNoData(
         HttpStatus.OK,
-        'email has been sent successfully',
+        'code has been sent successfully',
       );
     } catch (error) {
       throwError(this.logger, error);
@@ -303,10 +306,7 @@ export class AuthController {
     description: 'An unexpected error occured',
   })
   @HttpCode(HttpStatus.OK)
-  async sendVerificationMail(
-    @Body() dto: SendForgotPasswordEmailDto,
-    @Req() req: Request,
-  ) {
+  async sendVerificationMail(@Body() dto: VerifyEmailDto, @Req() req: Request) {
     try {
       await this.authService.sendVerificationEmail(dto.email, req);
       return new ApiSuccessResponseNoData(
@@ -348,12 +348,16 @@ export class AuthController {
   @ApiSuccessResponseNullData({
     description: 'Code has been validated successfully',
   })
+  @ApiGoneResponse({
+    type: ApiErrorResponse,
+    description: 'Code has expired',
+  })
   @ApiInternalServerErrorResponse({
     type: ApiErrorResponse,
     description: 'An unexpected error occured',
   })
   @HttpCode(HttpStatus.OK)
-  async validateCode(@Body() dto: CheckCodeDto) {
+  async validateCode(@Body() dto: ValidateCodeDto) {
     try {
       await this.authService.checkCode(dto);
       return new ApiSuccessResponseNoData(
@@ -432,7 +436,7 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   async sendResetMail(
-    @Body() dto: SendForgotPasswordEmailDto,
+    @Body() dto: VerifyEmailDto,
     @GetUser('sub', ParseUUIDPipe) userId: string,
   ) {
     try {

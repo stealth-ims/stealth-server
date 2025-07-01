@@ -8,7 +8,7 @@ export class SmsController {
 
   @Post()
   create(@Body() createSmDto: CreateSmsDto) {
-    return this.smsService.create(createSmDto);
+    return this.smsService.sendSms(createSmDto);
   }
 
   @Get()

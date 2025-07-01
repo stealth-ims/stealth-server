@@ -30,7 +30,7 @@ export class ImsStockmateService {
     console.log(dto);
     const data = await this.create(dto);
     console.log('data length', data.length);
-    await this.smsService.sendSms({ to: dto.from, body: data });
+    await this.smsService.sendWithAfricasTalking({ to: dto.from, body: data });
   }
   async create(dto: AtskWebhookDto) {
     const regex = /\+\d*/;

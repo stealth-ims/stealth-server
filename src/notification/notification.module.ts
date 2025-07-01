@@ -22,6 +22,6 @@ import { SmsModule } from './sms/sms.module';
   ],
   providers: [NotificationsGateway, NotificationService],
   controllers: [NotificationController],
-  exports: [NotificationService],
+  exports: [NotificationService, SmsModule],
 })
 export class NotificationModule {}

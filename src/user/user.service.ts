@@ -23,6 +23,7 @@ export class UserService {
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Settings) private settingsRepository: typeof Settings,
+    @InjectModel(Facility) private facilityRepository: typeof Facility,
     private readonly notificationService: NotificationService,
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
@@ -140,13 +141,21 @@ export class UserService {
       ],
     });
 
-    const userData = users.map((user) => {
+    const userData = users.map(async (user) => {
       const modUser = user.toJSON();
       const expiredAlertData = finalResults.find(
         (result) =>
           result.facilityId === user.facilityId &&
           result.departmentId === user.departmentId,
       );
+      if (!modUser.email) {
+        const facility = await this.facilityRepository.findByPk(
+          modUser.facilityId,
+          { attributes: ['email'] },
+        );
+        modUser.email = facility.email;
+      }
+
       const modData = {
         ...modUser,
         expired: +expiredAlertData.expired,

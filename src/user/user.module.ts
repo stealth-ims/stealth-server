@@ -5,9 +5,10 @@ import { User } from '../auth/models/user.model';
 import { Settings } from './models/setting.model';
 import { UserSettingsController } from './user-settings.controller';
 import { UsersController } from './users.controller';
+import { Facility } from '../admin/facility/models/facility.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User, Settings])],
+  imports: [SequelizeModule.forFeature([User, Settings, Facility])],
   controllers: [UserSettingsController, UsersController],
   providers: [UserService],
   exports: [UserService],

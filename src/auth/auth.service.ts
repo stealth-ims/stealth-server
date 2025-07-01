@@ -25,6 +25,8 @@ import {
   ChangePasswordDto,
   CheckCodeDto,
   ResetPasswordDto,
+  SendForgotPasswordEmailDto,
+  ValidateCodeDto,
 } from './dto/reset-password.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { LoginSession, StatusType } from './models/login-session.model';
@@ -36,6 +38,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Request } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SmsService } from '../notification/sms/sms.service';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +57,8 @@ export class AuthService {
     private readonly cloudinaryService: CloudinaryService,
     private readonly facilityService: FacilityService,
     private readonly httpService: HttpService,
-    private eventEmitter: EventEmitter2,
+    private readonly eventEmitter: EventEmitter2,
+    private readonly smsService: SmsService,
   ) {
     this.logger = new Logger(AuthService.name);
   }
@@ -149,6 +153,7 @@ export class AuthService {
       this.sendAccountCreationConfirmation(
         user.email,
         user.fullName,
+        user.username,
         user.role,
       );
       return `<p>Account Verified successfully <a href="${clientUrl}/auth/login">Proceed to login</a></p>`;
@@ -288,16 +293,37 @@ export class AuthService {
     }
   }
 
-  async sendResetPasswordCode(mail: string) {
-    const user = await this.userRepository.findOne({
-      where: { email: mail },
-    });
-    if (!user) {
-      throw new NotFoundException('user with this email not found');
+  async sendResetPasswordCode(dto: SendForgotPasswordEmailDto) {
+    let user: User;
+    if (dto.email) {
+      user = await this.userRepository.findOne({
+        where: { username: dto.username, email: dto.email },
+      });
+      if (!user) {
+        throw new NotFoundException('user with this email not found');
+      }
+    } else if (dto.phoneNumber) {
+      user = await this.userRepository.findOne({
+        where: { username: dto.username, phoneNumber: dto.phoneNumber },
+      });
+      if (!user) {
+        throw new NotFoundException('user with this phone number not found');
+      }
+    } else {
+      throw new NotFoundException(
+        'Provide either an email or phone number to proceed',
+      );
     }
+
     const code = await this.generateCode(user);
 
-    this.sendForgotPasswordMail(mail, code);
+    if (dto.email) {
+      this.sendForgotPasswordMail(dto.email, code);
+    }
+    if (dto.phoneNumber) {
+      await this.sendForgotPasswordSms(dto.phoneNumber, code);
+    }
+
     return true;
   }
 
@@ -313,17 +339,17 @@ export class AuthService {
     return true;
   }
 
-  async checkCode(dto: CheckCodeDto) {
-    const { email, code } = dto;
+  async checkCode(dto: ValidateCodeDto) {
+    const { username, code } = dto;
     const user = await this.userRepository.findOne({
-      where: { email },
+      where: { username },
     });
     if (!user) {
-      throw new NotFoundException('user with this email not found');
+      throw new NotFoundException('User not found');
     }
     const codeExpired = isAfter(new Date(), user.resetCodeExpires);
     if (codeExpired) {
-      throw new GoneException('code has expired');
+      throw new GoneException('Code has expired');
     }
 
     const codeMatch = await bcrypt.compare(code.toString(), user.resetCode);
@@ -334,10 +360,10 @@ export class AuthService {
   }
 
   async resetPassword(dto: ResetPasswordDto) {
-    const { email, newPassword } = dto;
+    const { username, newPassword } = dto;
 
     const user = await this.userRepository.findOne({
-      where: { email },
+      where: { username },
     });
     if (!user) {
       throw new NotFoundException('user with this email not found');
@@ -361,7 +387,9 @@ export class AuthService {
     user.updatedById = user.id;
     await user.save();
 
-    this.sendResetPasswordConfirmation(email);
+    if (user.email) {
+      this.sendResetPasswordConfirmation(user.email);
+    }
     return true;
   }
 
@@ -587,7 +615,7 @@ export class AuthService {
     const code = randomInt(10000, 100000);
     const hashCode = await bcrypt.hash(code.toString(), this.SALT_OR_ROUNDS);
     user.resetCode = hashCode;
-    user.resetCodeExpires = add(new Date(), { minutes: 11 });
+    user.resetCodeExpires = add(new Date(), { minutes: 31 });
     user.updatedById = user.id;
     await user.save();
     return code;
@@ -635,6 +663,7 @@ export class AuthService {
   private sendAccountCreationConfirmation(
     mail: string,
     fullName: string,
+    username: string,
     role: string,
   ) {
     const email = {
@@ -645,6 +674,7 @@ export class AuthService {
       context: {
         email: mail,
         fullName,
+        username,
         role,
       },
     };
@@ -665,6 +695,13 @@ export class AuthService {
     };
 
     this.mailService.send(email);
+  }
+
+  private async sendForgotPasswordSms(phoneNumber: string, code: number) {
+    await this.smsService.sendSms({
+      body: `Your Reset Code is ${code}`,
+      to: phoneNumber,
+    });
   }
 
   private sendResetPasswordConfirmation(mail: string) {
