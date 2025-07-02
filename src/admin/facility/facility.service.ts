@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import { PaginationRequestDto } from 'src/core/shared/dto/pagination.dto';
 import { FindAndCountOptions, Op } from 'sequelize';
-import { CreateFacilityDto, FacilityResponse, UpdateFacilityDto } from './dto';
+import { CreateFacilityDto, UpdateFacilityDto } from './dto';
 import { Facility } from './models/facility.model';
 
 @Injectable()
@@ -24,10 +24,7 @@ export class FacilityService {
    * @throws {BadRequestException} If there is a unique constraint error.
    * @throws {InternalServerErrorException} If there is an internal server error.
    */
-  async create(
-    createFacilityDto: CreateFacilityDto,
-    adminId?: string,
-  ): Promise<FacilityResponse> {
+  async create(createFacilityDto: CreateFacilityDto, adminId?: string) {
     this.logger.log('Creating a facility');
     const facility = await this.facilityRepo.create({
       ...createFacilityDto,

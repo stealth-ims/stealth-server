@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AtskWebhookDto, ParsedImsStockQlCommand } from './dto';
+import {
+  AtskWebhookDto,
+  ParsedImsStockQlCommand,
+  TwilioWebhookDto,
+} from './dto';
 import { ItemService } from '../inventory/items/items.service';
 import * as yaml from 'js-yaml';
 import { addDays, format, startOfToday } from 'date-fns';
@@ -28,11 +32,19 @@ export class ImsStockmateService {
 
   async sendSmsResponse(dto: AtskWebhookDto) {
     console.log(dto);
-    const data = await this.create(dto);
+    const data = await this.init({ from: dto.from, command: dto.text });
     console.log('data length', data.length);
     await this.smsService.sendWithAfricasTalking({ to: dto.from, body: data });
   }
-  async create(dto: AtskWebhookDto) {
+
+  async create(dto: TwilioWebhookDto | AtskWebhookDto) {
+    if (dto instanceof TwilioWebhookDto) {
+      return this.init({ from: dto.from, command: dto.body });
+    }
+    return this.init({ from: dto.from, command: dto.text });
+  }
+
+  async init(dto: { from: string; command: string }) {
     const regex = /\+\d*/;
     dto.from = dto.from.match(regex)[0];
     const user = await this.userService.fetchOne({
@@ -52,7 +64,7 @@ export class ImsStockmateService {
       departmentId: user.departmentId,
     };
     // const serializedBody = new IMSQuery(dto.body);
-    const parsedCommands = this.imsStockQlService.parse(dto.text);
+    const parsedCommands = this.imsStockQlService.parse(dto.command);
 
     const responses = await Promise.all(
       parsedCommands.map(async (cmd) => {

@@ -11,6 +11,12 @@ module.exports = {
       region: { type: Sequelize.STRING, allowNull: true },
       location: { type: Sequelize.STRING, allowNull: true },
       email: { type: Sequelize.STRING, allowNull: true },
+      expiryInterval: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '60 days',
+        field: 'expiry_interval',
+      },
     });
 
     await queryInterface.addColumn('users', 'facility_id', {

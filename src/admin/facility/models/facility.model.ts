@@ -2,17 +2,18 @@ import {
   AllowNull,
   BelongsTo,
   Column,
+  DataType,
+  Default,
   ForeignKey,
   HasMany,
   Table,
 } from 'sequelize-typescript';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { User } from 'src/auth/models/user.model';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
 // import { Item } from '../../../inventory/items/models/item.model';
 import { Department } from '../../department/models/department.model';
 import { StockAdjustment } from 'src/inventory/models/stock-adjustment.model';
+import { IntervalUnit } from '../dto';
 
 @Table({
   tableName: 'facilities',
@@ -21,12 +22,6 @@ import { StockAdjustment } from 'src/inventory/models/stock-adjustment.model';
   paranoid: true,
 })
 export class Facility extends BaseModel<Facility> {
-  @ApiProperty({
-    example: 'Hospital A',
-    description: 'The name of the hospital',
-  })
-  @IsString()
-  @IsNotEmpty()
   @Column
   name: string;
 
@@ -34,18 +29,6 @@ export class Facility extends BaseModel<Facility> {
   @Column
   email: string;
 
-  @ApiProperty({
-    example: '@kRhCnlAtrqe1gr',
-    description: 'The password for the facility',
-  })
-  @IsNotEmpty()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
-    {
-      message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
-    },
-  )
   @Column
   password: string;
 
@@ -53,14 +36,29 @@ export class Facility extends BaseModel<Facility> {
   @Column
   region: string;
 
-  // @ApiProperty({
-  //   example: '123 Main St',
-  //   description: 'The physical location of the hospital',
-  // })
-  // @IsNotEmpty()
   @AllowNull
   @Column
   location: string;
+
+  @Default('60 days')
+  @Column
+  expiryInterval: string;
+
+  @Column({
+    type: DataType.VIRTUAL,
+    get(this: Facility) {
+      return +this.expiryInterval.split(/\s+/)[0];
+    },
+  })
+  intervalQuantity: number;
+
+  @Column({
+    type: DataType.VIRTUAL,
+    get(this: Facility) {
+      return this.expiryInterval.split(/\s+/)[1] as IntervalUnit;
+    },
+  })
+  intervalUnit: IntervalUnit;
 
   @HasMany(() => Department)
   departments: Department[];
@@ -71,10 +69,6 @@ export class Facility extends BaseModel<Facility> {
   @HasMany(() => StockAdjustment)
   stockAdjustments: StockAdjustment[];
 
-  // @ApiProperty({
-  //   example: [],
-  //   description: 'List of items available in the hospital',
-  // })
   // @HasMany(() => Item)
   // items: Item[];
 

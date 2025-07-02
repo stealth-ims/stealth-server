@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from '../auth/models/user.model';
 import { Facility } from '../admin/facility/models/facility.model';
@@ -17,6 +21,8 @@ import { CreateNotificationDto } from '../notification/dto';
 import { NotificationStatus } from '../notification/enum';
 import { MailService } from '../notification/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
+import { IUserPayload } from '../auth/interface/payload.interface';
+import { UpdateExpiryIntervalDto } from '../admin/facility/dto';
 
 @Injectable()
 export class UserService {
@@ -91,6 +97,71 @@ export class UserService {
     return user;
   }
 
+  async fetchExpiryInterval(user: IUserPayload) {
+    if (user.department && user.role != 'Central Admin') {
+      throw new ForbiddenException('Not authorized to perform this action');
+    }
+    const facility = await this.facilityRepository.findByPk(user.facility, {
+      attributes: ['id', 'intervalQuantity', 'intervalUnit', 'expiryInterval'],
+    });
+    if (!facility) {
+      throw new NotFoundException('Facility not found');
+    }
+    const facilityJson = facility.toJSON();
+    delete facilityJson.expiryInterval;
+    return { facility, facilityJson };
+  }
+
+  async updateExpiryInterval(dto: UpdateExpiryIntervalDto, user: IUserPayload) {
+    const facility = (await this.fetchExpiryInterval(user)).facility;
+    let expiryInterval: string;
+    if (dto.intervalQuantity && dto.intervalUnit) {
+      expiryInterval = dto.intervalQuantity + ' ' + dto.intervalUnit;
+    } else if (dto.intervalUnit) {
+      expiryInterval = facility.intervalQuantity + ' ' + dto.intervalUnit;
+    } else {
+      expiryInterval = dto.intervalQuantity + ' ' + facility.intervalUnit;
+    }
+    await facility.update({ expiryInterval, updatedById: user.sub });
+    return;
+  }
+
+  async addSettings(dto: CreateSettingsDto, userId: string) {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    try {
+      const settings = await this.findSettings(userId);
+      await settings.update({ ...dto });
+    } catch {
+      await this.settingsRepository.create({
+        ...dto,
+        userId,
+        createdById: userId,
+      });
+    }
+
+    return;
+  }
+
+  async findSettings(userId: string) {
+    const settings = await this.settingsRepository.findOne({
+      where: { userId },
+      attributes: [
+        'id',
+        'emailItemStocked',
+        'emailDepartmentRequests',
+        'emailItemLowStocks',
+        'emailItemOutOfStock',
+      ],
+    });
+    if (!settings) {
+      throw new NotFoundException('Settings not found');
+    }
+    return settings;
+  }
+
   @Cron('0 30 10 * * 1-6', {
     disabled: process.env.NODE_ENV != 'development',
   })
@@ -100,14 +171,20 @@ export class UserService {
   async fetchExpiredBatches() {
     const [results] = await this.sequelize.query(
       `
-      SELECT b.facility_id "facilityId", b.department_id "departmentId", COUNT(*) FILTER (
-      WHERE validity BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL :dateInterval
-      ) AS "nearExpiry",
-       COUNT(*) FILTER(WHERE validity < CURRENT_DATE) AS expired
-       FROM batches b
-       GROUP BY b.facility_id, b.department_id;`,
+      SELECT 
+        b.facility_id AS "facilityId",
+        b.department_id AS "departmentId",
+        COUNT(*) FILTER (
+          WHERE b.validity BETWEEN CURRENT_DATE AND CURRENT_DATE + (f.expiry_interval)::INTERVAL
+        ) AS "nearExpiry",
+        COUNT(*) FILTER (
+          WHERE b.validity < CURRENT_DATE
+        ) AS expired
+      FROM batches b
+      JOIN facilities f ON f.id = b.facility_id
+      GROUP BY b.facility_id, b.department_id;
+      `,
       {
-        replacements: { dateInterval: '60 days' },
         type: QueryTypes.SELECT,
       },
     );
@@ -222,41 +299,5 @@ export class UserService {
     };
 
     this.mailService.send(email);
-  }
-
-  async addSettings(dto: CreateSettingsDto, userId: string) {
-    const user = await this.findOne(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    try {
-      const settings = await this.findSettings(userId);
-      await settings.update({ ...dto });
-    } catch {
-      await this.settingsRepository.create({
-        ...dto,
-        userId,
-        createdById: userId,
-      });
-    }
-
-    return;
-  }
-
-  async findSettings(userId: string) {
-    const settings = await this.settingsRepository.findOne({
-      where: { userId },
-      attributes: [
-        'id',
-        'emailItemStocked',
-        'emailDepartmentRequests',
-        'emailItemLowStocks',
-        'emailItemOutOfStock',
-      ],
-    });
-    if (!settings) {
-      throw new NotFoundException('Settings not found');
-    }
-    return settings;
   }
 }

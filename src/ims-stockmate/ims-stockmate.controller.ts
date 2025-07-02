@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ImsStockmateService } from './ims-stockmate.service';
-import { AtskWebhookDto } from './dto';
+import { AtskWebhookDto, TwilioWebhookDto } from './dto';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { Response } from 'express';
 import * as twilio from 'twilio';
@@ -36,7 +36,7 @@ export class ImsStockmateController {
   @Post('webhook/twilio')
   @HttpCode(HttpStatus.OK)
   async replyIncomingMessage(
-    @Body() dto: AtskWebhookDto,
+    @Body() dto: TwilioWebhookDto,
     @Res() res: Response,
   ) {
     // const dto = req.body as TwilioWebhookDto;
