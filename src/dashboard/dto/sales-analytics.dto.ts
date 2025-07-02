@@ -64,15 +64,11 @@ export class SalesPaymentMethodDto {
   }
 }
 export class MarkupAnalysticsDto {
-  @ApiResponseProperty({
-    example: [54, 67889],
-  })
+  @ApiResponseProperty({ example: { total: 3234323.33, quantity: 232 } })
   insured: [number, number];
-  @ApiResponseProperty({
-    example: [54, 67889],
-  })
+  @ApiResponseProperty({ example: { total: 3234323.33, quantity: 232 } })
   notInsured: [number, number];
-  constructor(insured: [number, number], notInsured: [number, number]) {
+  constructor(insured: any, notInsured: any) {
     this.insured = insured;
     this.notInsured = notInsured;
   }

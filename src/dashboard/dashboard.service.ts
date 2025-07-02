@@ -328,20 +328,16 @@ from calculations;
     const res: any = await this.sql.query(
       `
 SELECT
-	SUM(case when s.insured = true then si.quantity END) iquantity,
-	SUM(case when s.insured = true then s.total END) itotal,
-	SUM(case when s.insured = false then si.quantity END) nquantity,
-	SUM(case when s.insured = false then s.total END) ntotal
+	SUM(si.quantity)::INTEGER quantity,
+	ROUND(SUM(s.total)::numeric, 2) total
 FROM sales s
 JOIN sale_items si on s.id = si.sale_id
 ${this.applyWhere(createdAt, user)}
+group by s.insured;
 `,
-      { plain: true, type: sequelize.QueryTypes.SELECT },
+      { raw: true, type: sequelize.QueryTypes.SELECT },
     );
-    return new MarkupAnalysticsDto(
-      [res.iquantity, res.itotal.toFixed(2)],
-      [res.nquantity, res.ntotal.toFixed(2)],
-    );
+    return new MarkupAnalysticsDto(res[0], res[1]);
   }
 
   private applyWhere(
