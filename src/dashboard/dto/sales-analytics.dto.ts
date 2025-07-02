@@ -63,5 +63,19 @@ export class SalesPaymentMethodDto {
     this.topSelling = { categories, quantities };
   }
 }
+export class MarkupAnalysticsDto {
+  @ApiResponseProperty({
+    example: [54, 67889],
+  })
+  insured: [number, number];
+  @ApiResponseProperty({
+    example: [54, 67889],
+  })
+  notInsured: [number, number];
+  constructor(insured: [number, number], notInsured: [number, number]) {
+    this.insured = insured;
+    this.notInsured = notInsured;
+  }
+}
 
 export class RecentSalesDto {}

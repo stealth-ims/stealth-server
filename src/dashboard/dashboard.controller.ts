@@ -7,6 +7,7 @@ import {
   FindGeneralAnalyticsQueryDto,
   GeneralAnalyticsDto,
   ItemSalesAnalyticsDto,
+  MarkupAnalysticsDto,
   SalesPaymentMethodDto,
   SalesTrendDto,
   TopSellingCategoriesDto,
@@ -183,7 +184,7 @@ export class DashboardController {
   }
 
   @CustomApiResponse(['success', 'authorize'], {
-    type: null,
+    type: MarkupAnalysticsDto,
     message: 'markup sales sent successfully',
   })
   @Get('sales/markup')

@@ -5,6 +5,7 @@ import {
   FindGeneralAnalyticsQueryDto,
   GeneralAnalyticsDto,
   ItemSalesAnalyticsDto,
+  MarkupAnalysticsDto,
   SalesPaymentMethodDto,
   SalesTrendDto,
   TopSellingCategoriesDto,
@@ -322,8 +323,25 @@ from calculations;
     return new SalesPaymentMethodDto(categories, quantities);
   }
 
-  async getMarkupSales(_query: FindAnalyticsQueryDto, _user: IUserPayload) {
-    //
+  async getMarkupSales(query: FindAnalyticsQueryDto, user: IUserPayload) {
+    const { createdAt } = getDateRangeFilter(query.dateRange);
+    const res: any = await this.sql.query(
+      `
+SELECT
+	SUM(case when s.insured = true then si.quantity END) iquantity,
+	SUM(case when s.insured = true then s.total END) itotal,
+	SUM(case when s.insured = false then si.quantity END) nquantity,
+	SUM(case when s.insured = false then s.total END) ntotal
+FROM sales s
+JOIN sale_items si on s.id = si.sale_id
+${this.applyWhere(createdAt, user)}
+`,
+      { plain: true, type: sequelize.QueryTypes.SELECT },
+    );
+    return new MarkupAnalysticsDto(
+      [res.iquantity, res.itotal.toFixed(2)],
+      [res.nquantity, res.ntotal.toFixed(2)],
+    );
   }
 
   private applyWhere(
