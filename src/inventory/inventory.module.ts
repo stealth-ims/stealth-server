@@ -6,6 +6,7 @@ import { ItemsCategoryModule } from './items-category/items-category.module';
 import { StockAdjustmentsController } from './inventory.controller';
 import { StockAdjustment } from './models/stock-adjustment.model';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { StockAdjustmentExportsService } from './exports.service';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
     SequelizeModule.forFeature([StockAdjustment]),
   ],
   controllers: [StockAdjustmentsController],
-  providers: [StockAdjustmentsService],
+  providers: [StockAdjustmentsService, StockAdjustmentExportsService],
   exports: [StockAdjustmentsService, ItemsModule],
 })
 export class InventoryModule {}

@@ -8,6 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './health/health.module';
 import { AuditsModule } from './audit/audit.module';
 import { AppController } from './app.controller';
+import { ExportsModule } from './exports/exports.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AppController } from './app.controller';
     ScheduleModule.forRoot(),
     HealthModule,
     AuditsModule,
+    ExportsModule,
     ...IndexModules,
   ],
   controllers: [AppController],

@@ -6,6 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Query,
+  StreamableFile,
 } from '@nestjs/common';
 import { AuditsService } from './audit.service';
 import {
@@ -25,11 +26,36 @@ import {
   Features,
   PermissionLevel,
 } from '../core/shared/enums/permissions.enum';
+import { AuditsExportsService } from './exports.service';
+import { ExportQueryDto } from '../exports/dto';
 
 @Controller('audits')
 export class AuditsController {
   private logger = new Logger(AuditsController.name);
-  constructor(private readonly auditsService: AuditsService) {}
+  constructor(
+    private readonly auditsService: AuditsService,
+    private readonly auditsExportService: AuditsExportsService,
+  ) {}
+
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
+    message: 'Audits exported successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('export')
+  async exportAudits(
+    @Query() query: ExportQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response = await this.auditsExportService.exportAudits(query, user);
+      return new StreamableFile(response.data, {
+        type: response.meta.type,
+        disposition: `attachment; filename="${response.meta.fileName}"`,
+      });
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
 
   @CustomApiResponse(['paginated', 'authorize'], {
     type: AuditLogsResponseDto,

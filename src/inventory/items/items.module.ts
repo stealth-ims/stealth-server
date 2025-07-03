@@ -12,6 +12,7 @@ import { SuppliersModule } from '../suppliers/suppliers.module';
 import { NotificationModule } from '../../notification/notification.module';
 import { MarkupModule } from './markup/markup.module';
 import { MarkupService } from './markup/markup.service';
+import { ItemExportsService } from './exports.service';
 
 @Module({
   imports: [
@@ -22,7 +23,13 @@ import { MarkupService } from './markup/markup.service';
     MarkupModule,
   ],
   controllers: [ItemController],
-  providers: [ItemService, BatchService, ItemExistsRule, MarkupService],
+  providers: [
+    ItemService,
+    BatchService,
+    ItemExistsRule,
+    MarkupService,
+    ItemExportsService,
+  ],
   exports: [ItemService, BatchService, MarkupService],
 })
 export class ItemsModule {}

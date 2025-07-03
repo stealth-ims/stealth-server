@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUser, Permission } from 'src/auth/decorator';
@@ -38,19 +39,9 @@ import {
   UpdateItemDto,
 } from './dto';
 import { ItemService } from './items.service';
-
-import { BatchService } from './batches/batch.service';
 import { GetNoPaginateDto } from '../../core/shared/dto/get-no_paginate.dto';
-import {
-  BatchesNoPaginate,
-  CreateBatchDto,
-  OneBatch,
-  BatchResponseDto,
-  UpdateBatchDto,
-  FetchBatchesQueryDto,
-  FetchStockLevelReportDataQueryDto,
-} from './batches/dto';
-import { GetReportDataDto } from '../../reports/dto';
+import { ExportQueryDto } from '../../exports/dto';
+import { ItemExportsService } from './exports.service';
 
 @ApiTags('Items')
 @Controller('items')
@@ -58,7 +49,8 @@ export class ItemController {
   private readonly logger: Logger;
   constructor(
     private readonly itemsService: ItemService,
-    private batchService: BatchService,
+
+    private readonly itemsExportsService: ItemExportsService,
   ) {
     this.logger = new Logger(ItemController.name);
   }
@@ -85,123 +77,21 @@ export class ItemController {
     }
   }
 
-  @CustomApiResponse(['created', 'authorize'], {
-    type: OneBatch,
-    message: 'Batch created successfully',
-  })
-  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
-  @Post('add-batch')
-  async addBatch(@Body() dto: CreateBatchDto, @GetUser() user: IUserPayload) {
-    try {
-      dto.createdById = user.sub;
-      dto.departmentId = user.department;
-      dto.facilityId = user.facility;
-      const createdItem = await this.batchService.create(dto);
-      return new ApiSuccessResponseDto(
-        createdItem,
-        HttpStatus.CREATED,
-        'Batch created successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['success', 'authorize'], {
-    type: BatchesNoPaginate,
-    isArray: true,
-    message: 'Batches retrieved successfully',
-  })
-  @Permission(Features.ITEMS, PermissionLevel.READ)
-  @Get('batches/:itemId/no-paginate')
-  async retrieveBatchesNoPaginate(
-    @Param('itemId', ParseUUIDPipe) itemId: string,
-    @GetUser('department') departmentId: string,
-  ) {
-    try {
-      const batches = await this.batchService.findAllNoPaginate(
-        itemId,
-        departmentId,
-      );
-      return new ApiSuccessResponseDto(
-        batches,
-        HttpStatus.OK,
-        'Batches retrieved successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['paginated', 'authorize'], {
-    type: BatchResponseDto,
-    isArray: true,
-    message: 'Batches retrieved successfully',
-  })
-  @Permission(Features.ITEMS, PermissionLevel.READ)
-  @Get(':id/batches')
-  async retrieveBatches(
-    @Param('id', ParseUUIDPipe) itemId: string,
-    @Query() query: FetchBatchesQueryDto,
-    @GetUser('department') departmentId: string,
-  ) {
-    try {
-      const batches = await this.batchService.fetchAllPaginate(
-        itemId,
-        query,
-        departmentId,
-      );
-      const paginated = new PaginatedDataResponseDto(
-        batches.rows,
-        query.page || 1,
-        query.pageSize || 10,
-        batches.count,
-      );
-      return new ApiSuccessResponseDto(
-        paginated,
-        HttpStatus.OK,
-        'Batches retrieved successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['success', 'authorize', 'notfound'], {
-    type: BatchResponseDto,
-    message: 'Batch retrieved successfully',
-  })
-  @Permission(Features.ITEMS, PermissionLevel.READ)
-  @Get('batches/:id')
-  async retrieveBatch(@Param('id', ParseUUIDPipe) id: string) {
-    try {
-      const batches = await this.batchService.findOne(id, true);
-      return new ApiSuccessResponseDto(
-        batches,
-        HttpStatus.OK,
-        'Batches retrieved successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
-    message: 'batch updated successfully',
+    message: 'items exported successfully',
   })
-  @Permission(Features.ITEMS, PermissionLevel.READ_WRITE)
-  @Patch('edit-batch/:id')
-  async updateBatch(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateItemDto: UpdateBatchDto,
+  @Permission(Features.ITEMS, PermissionLevel.READ)
+  @Get('export')
+  async exportItems(
+    @Query() query: ExportQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {
-      await this.batchService.update(id, updateItemDto, user);
-      return new ApiSuccessResponseNoData(
-        HttpStatus.OK,
-        'Batch updated successfully',
-      );
+      const response = await this.itemsExportsService.exportItems(query, user);
+      return new StreamableFile(response.data, {
+        type: response.meta.type,
+        disposition: `attachment; filename="${response.meta.fileName}"`,
+      });
     } catch (error) {
       throwError(this.logger, error);
     }
@@ -226,47 +116,6 @@ export class ItemController {
         items,
         HttpStatus.OK,
         'Items retrieved successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['success', 'authorize'], {
-    type: GetReportDataDto,
-    message: 'Stock level data retrieved successfully',
-  })
-  @Permission(Features.REPORTS, PermissionLevel.READ)
-  @Get('report/stock-level')
-  async findStockLevelData(
-    @Query() query: FetchStockLevelReportDataQueryDto,
-    @GetUser() user: IUserPayload,
-  ) {
-    try {
-      const items = await this.batchService.fetchStockLevelData(query, user);
-      return new ApiSuccessResponseDto(
-        items,
-        HttpStatus.OK,
-        'Stock level data retrieved successfully',
-      );
-    } catch (error) {
-      throwError(this.logger, error);
-    }
-  }
-
-  @CustomApiResponse(['success', 'authorize'], {
-    type: GetReportDataDto,
-    message: 'Expiry data retrieved successfully',
-  })
-  @Permission(Features.REPORTS, PermissionLevel.READ)
-  @Get('report/expiry')
-  async findExpiryData(@GetUser() user: IUserPayload) {
-    try {
-      const items = await this.batchService.fetchExpiryData(user);
-      return new ApiSuccessResponseDto(
-        items,
-        HttpStatus.OK,
-        'Expiry data retrieved successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

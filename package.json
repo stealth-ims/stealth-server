@@ -42,6 +42,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@json2csv/plainjs": "^7.0.6",
+    "@json2csv/whatwg": "^7.0.6",
     "@logtail/node": "^0.5.2",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.0",
@@ -70,6 +72,7 @@
     "nodemailer": "^6.10.0",
     "pg": "^8.14.1",
     "pg-hstore": "^2.3.4",
+    "pg-query-stream": "^4.10.3",
     "pug": "^3.0.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
@@ -90,6 +93,8 @@
     "@types/multer": "^1.4.12",
     "@types/node": "^22.13.10",
     "@types/nodemailer": "^6.4.17",
+    "@types/pg": "^8.15.4",
+    "@types/pg-query-stream": "^3.4.0",
     "@types/sequelize": "^4.28.20",
     "@types/streamifier": "^0.1.2",
     "@types/supertest": "^6.0.2",
