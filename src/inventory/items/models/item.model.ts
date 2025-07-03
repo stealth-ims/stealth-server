@@ -66,7 +66,11 @@ export class Item extends BaseModel<Item> {
         nameConsts.push(`(${this.brandName})`);
       }
       if (this.dosageForm) {
-        nameConsts.push(this.dosageForm);
+        const lowercased = this.dosageForm.toLowerCase();
+
+        const capitalized =
+          lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
+        nameConsts.push(capitalized);
       }
       if (this.strength) {
         nameConsts.push(this.strength);
