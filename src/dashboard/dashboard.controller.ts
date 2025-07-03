@@ -185,7 +185,7 @@ export class DashboardController {
 
   @CustomApiResponse(['success', 'authorize'], {
     type: MarkupAnalysticsDto,
-    message: 'markup sales sent successfully',
+    message: 'Markup sales sent successfully',
   })
   @Get('sales/markup')
   async getMarkupSales(
@@ -197,7 +197,7 @@ export class DashboardController {
       return new ApiSuccessResponseDto(
         res,
         HttpStatus.OK,
-        'markup sales send successfully',
+        'Markup sales sent successfully',
       );
     } catch (e) {
       throwError(this.logger, e);

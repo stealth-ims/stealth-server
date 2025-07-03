@@ -329,7 +329,7 @@ from calculations;
       `
 SELECT
 	SUM(si.quantity)::INTEGER quantity,
-	ROUND(SUM(s.total)::numeric, 2) total
+	ROUND(SUM(s.total)::numeric, 2)::real total
 FROM sales s
 JOIN sale_items si on s.id = si.sale_id
 ${this.applyWhere(createdAt, user)}
