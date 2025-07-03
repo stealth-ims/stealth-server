@@ -251,9 +251,21 @@ export class OneItem extends IntersectionType(
 }
 
 export class ManyItem extends IntersectionType(
-  PickType(CreateItemDto, ['name', 'status', 'reorderPoint']),
+  PickType(CreateItemDto, [
+    'name',
+    'status',
+    'reorderPoint',
+    'brandName',
+    'dosageForm',
+    'strength',
+  ]),
   GenericResponseDto,
 ) {
+  @ApiResponseProperty({
+    example: 'Analgesics Item 2 (Brand Analgesics 2) LIQUIDS 945 mg',
+  })
+  itemFullName: string;
+
   @ApiResponseProperty({
     type: GetNoPaginateDto,
   })
