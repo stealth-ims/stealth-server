@@ -5,6 +5,7 @@ import {
   FindGeneralAnalyticsQueryDto,
   GeneralAnalyticsDto,
   ItemSalesAnalyticsDto,
+  MarkupAnalysticsDto,
   SalesPaymentMethodDto,
   SalesTrendDto,
   TopSellingCategoriesDto,
@@ -65,7 +66,7 @@ inventory as (
         SUM(b.quantity) item_quantitiy,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
   FROM items i
-  LEFT JOIN batches b 
+  LEFT JOIN batches b
       ON b.item_id = i.id
       ${user.department ? `AND i.department_id = '${user.department}'` : 'AND i.department_id IS NULL'}
   WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
@@ -321,6 +322,24 @@ from calculations;
 
     return new SalesPaymentMethodDto(categories, quantities);
   }
+
+  async getMarkupSales(query: FindAnalyticsQueryDto, user: IUserPayload) {
+    const { createdAt } = getDateRangeFilter(query.dateRange);
+    const res: any = await this.sql.query(
+      `
+SELECT
+	SUM(si.quantity)::INTEGER quantity,
+	ROUND(SUM(s.total)::numeric, 2) total
+FROM sales s
+JOIN sale_items si on s.id = si.sale_id
+${this.applyWhere(createdAt, user)}
+group by s.insured;
+`,
+      { raw: true, type: sequelize.QueryTypes.SELECT },
+    );
+    return new MarkupAnalysticsDto(res[0], res[1]);
+  }
+
   private applyWhere(
     { [Op.between]: [startDate, endDate] }: { [Op.between]: [Date, Date] },
     user: IUserPayload,

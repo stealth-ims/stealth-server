@@ -36,3 +36,8 @@ Authorization: Bearer {{accessToken}}
 # @name sales payment-methods
 GET {{baseUrl}}/dashboard/sales/payment-methods?dateRange=this_month
 Authorization: Bearer {{accessToken}}
+
+###
+# @name insured sales
+GET {{baseUrl}}/dashboard/sales/markup?dateRange=this_month
+Authorization: Bearer {{accessToken}}

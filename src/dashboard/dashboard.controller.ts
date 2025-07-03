@@ -7,6 +7,7 @@ import {
   FindGeneralAnalyticsQueryDto,
   GeneralAnalyticsDto,
   ItemSalesAnalyticsDto,
+  MarkupAnalysticsDto,
   SalesPaymentMethodDto,
   SalesTrendDto,
   TopSellingCategoriesDto,
@@ -179,6 +180,27 @@ export class DashboardController {
       );
     } catch (error) {
       throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['success', 'authorize'], {
+    type: MarkupAnalysticsDto,
+    message: 'markup sales sent successfully',
+  })
+  @Get('sales/markup')
+  async getMarkupSales(
+    @Query() query: FindAnalyticsQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const res = await this.dashboardService.getMarkupSales(query, user);
+      return new ApiSuccessResponseDto(
+        res,
+        HttpStatus.OK,
+        'markup sales send successfully',
+      );
+    } catch (e) {
+      throwError(this.logger, e);
     }
   }
 }
