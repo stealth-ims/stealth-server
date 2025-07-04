@@ -24,6 +24,14 @@ export class MetricDto {
   }
 }
 
+export class SoonToExpireMetricsDto extends MetricDto {
+  constructor() {
+    super();
+  }
+  @ApiProperty()
+  totalCost: number;
+}
+
 class StockDto {
   @ApiResponseProperty({ example: 300 })
   total: number;
@@ -108,10 +116,12 @@ export class GeneralAnalyticsDto {
   @ValidateNested()
   customers: MetricDto;
 
-  @ApiProperty({ type: MetricDto })
-  @Type(() => MetricDto)
+  @ApiProperty({
+    type: SoonToExpireMetricsDto,
+  })
+  @Type(() => SoonToExpireMetricsDto)
   @ValidateNested()
-  soonToExpireItems: MetricDto;
+  soonToExpireItems: SoonToExpireMetricsDto;
 
   @ApiProperty({ type: MetricDto })
   @Type(() => MetricDto)

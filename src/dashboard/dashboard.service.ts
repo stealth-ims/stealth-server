@@ -64,13 +64,14 @@ inventory as (
         i.id,
 		    i.reorder_point,
         SUM(b.quantity) item_quantitiy,
-        COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
+        COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '90 days' THEN i.id END) AS soon_expiring,
+		    i.cost_price
   FROM items i
   LEFT JOIN batches b
       ON b.item_id = i.id
       ${user.department ? `AND i.department_id = '${user.department}'` : 'AND i.department_id IS NULL'}
   WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
-	GROUP BY i.id
+	GROUP BY i.id, i.cost_price
 ),
 doh as (SELECT
 	SUM(b.quantity) * MIN(i.selling_price) sum_s_sales,
@@ -135,6 +136,7 @@ select jsonb_build_object(
 	) ,
 	'soonToExpireItems', jsonb_build_object(
         'total', (SELECT SUM(soon_expiring) FROM inventory),
+        'totalCost', (SELECT ROUND(SUM(soon_expiring * item_quantitiy * cost_price)::numeric ,2) FROM inventory),
         'percentageChange', 100,
         'changeType', 'INCREMENT'
     ),
