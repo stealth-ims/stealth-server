@@ -64,6 +64,7 @@ inventory as (
         i.id,
 		    i.reorder_point,
         SUM(b.quantity) item_quantitiy,
+		    SUM(b.quantity * i.selling_price) value,
         COUNT(distinct CASE WHEN b.validity  BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '60 days' THEN i.id END) AS soon_expiring
   FROM items i
   LEFT JOIN batches b
@@ -105,6 +106,7 @@ select jsonb_build_object(
      'stock', jsonb_build_object(
 		    'total', COUNT(id),
 		    'totalStock', SUM(item_quantitiy),
+		    'stockValue', ROUND(SUM(value)::numeric, 2),
 	      'outOfStock', COUNT(case when COALESCE(item_quantitiy, 0) = 0 then id end),
 	      'highStocked', COUNT(case when item_quantitiy > reorder_point then id end),
 	      'lowStocked', COUNT(case when item_quantitiy <= reorder_point and item_quantitiy > 0 then id end),
