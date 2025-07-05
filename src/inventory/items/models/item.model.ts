@@ -58,6 +58,31 @@ export class Item extends BaseModel<Item> {
   @Column({ field: 'unit_of_measurement' })
   unitOfMeasurement: string;
 
+  @Column({
+    type: DataType.VIRTUAL,
+    get(this: Item) {
+      const nameConsts = [this.name];
+      if (this.brandName) {
+        nameConsts.push(`(${this.brandName})`);
+      }
+      if (this.dosageForm) {
+        const lowercased = this.dosageForm.toLowerCase();
+
+        const capitalized =
+          lowercased.charAt(0).toUpperCase() + lowercased.slice(1);
+        nameConsts.push(capitalized);
+      }
+      if (this.strength) {
+        nameConsts.push(this.strength);
+      }
+      if (this.unitOfMeasurement) {
+        nameConsts.push(this.unitOfMeasurement);
+      }
+      return nameConsts.join(' ');
+    },
+  })
+  itemFullName: string;
+
   @Column({ type: DataType.TEXT, field: 'storage_req' })
   storageReq: string;
 

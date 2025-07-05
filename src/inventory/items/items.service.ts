@@ -445,6 +445,11 @@ export class ItemService {
       attributes: [
         'id',
         'name',
+        'brandName',
+        'dosageForm',
+        'strength',
+        'unitOfMeasurement',
+        'itemFullName',
         'reorderPoint',
         'status',
         'createdAt',

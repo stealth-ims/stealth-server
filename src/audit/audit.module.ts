@@ -8,6 +8,7 @@ import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { User } from '../auth/models/user.model';
 import { Facility } from '../admin/facility/models/facility.model';
 import { Department } from '../admin/department/models/department.model';
+import { AuditsExportsService } from './exports.service';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { Department } from '../admin/department/models/department.model';
       provide: APP_INTERCEPTOR,
       useClass: AuditInterceptor,
     },
+    AuditsExportsService,
   ],
 })
 export class AuditsModule {}

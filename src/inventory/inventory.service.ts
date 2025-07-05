@@ -267,7 +267,7 @@ export class StockAdjustmentsService {
     const whereOptions: WhereOptions<StockAdjustment> = {
       [Op.and]: [
         query.facilityId && { facilityId: query.facilityId },
-        query.departmentId && { departmentId: query.departmentId },
+        { departmentId: query.departmentId },
         query.type && { type: query.type },
         query.status && { status: query.status },
         query.startDate && { createdAt: { [Op.gte]: query.startDate } },

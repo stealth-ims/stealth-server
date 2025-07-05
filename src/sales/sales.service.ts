@@ -243,13 +243,16 @@ export class SalesService {
         if (!markup) {
           return 0;
         }
+        let cappedPrice = 0;
         switch (markup.amountType) {
           case AmountType.PERCENTAGE: {
             const newCapPercentage = item.sellingPrice * (markup.amount / 100);
-            return item.sellingPrice + newCapPercentage;
+            cappedPrice = item.sellingPrice - newCapPercentage;
+            return cappedPrice >= 0 ? cappedPrice : 0;
           }
           case AmountType.PRICE: {
-            return item.sellingPrice + markup.amount;
+            cappedPrice = item.sellingPrice - markup.amount;
+            return cappedPrice >= 0 ? cappedPrice : 0;
           }
           default:
             return 0;

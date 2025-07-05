@@ -10,6 +10,7 @@ import {
   Query,
   HttpStatus,
   Patch,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators/default.response.decorators';
@@ -33,16 +34,17 @@ import {
   StockAdjustmentPaginationDto,
   UpdateStockAdjustmentDto,
 } from './dto';
+import { ExportQueryDto } from '../exports/dto';
+import { StockAdjustmentExportsService } from './exports.service';
 
 @ApiTags('Stock Adjustments')
 @Controller('stock-adjustments')
 export class StockAdjustmentsController {
-  private readonly logger: Logger;
+  private readonly logger = new Logger(StockAdjustmentsController.name);
   constructor(
     private readonly stockAdjustmentsService: StockAdjustmentsService,
-  ) {
-    this.logger = new Logger(StockAdjustmentsController.name);
-  }
+    private readonly stockAdjustmentExportsService: StockAdjustmentExportsService,
+  ) {}
 
   @CustomApiResponse(['created', 'authorize'], {
     type: CreatedAdjustmentResponseDto,
@@ -64,6 +66,30 @@ export class StockAdjustmentsController {
         HttpStatus.CREATED,
         'Stock adjustment created successfully',
       );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
+    message: 'Stock adjustments exported successfully',
+  })
+  @Permission(Features.STOCK_ADJUSTMENT, PermissionLevel.READ)
+  @Get('export')
+  async exportStockAdjustments(
+    @Query() query: ExportQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response =
+        await this.stockAdjustmentExportsService.exportStockAdjustments(
+          query,
+          user,
+        );
+      return new StreamableFile(response.data, {
+        type: response.meta.type,
+        disposition: `attachment; filename="${response.meta.fileName}"`,
+      });
     } catch (error) {
       throwError(this.logger, error);
     }
