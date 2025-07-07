@@ -5,7 +5,7 @@ import { ExportAuditsQueryDto } from '../dto';
 function generateQuerySql(query: ExportAuditsQueryDto) {
   const filterClauses = [];
   if (query.action) {
-    filterClauses.push(`a.action = ${query.action}`);
+    filterClauses.push(`a.action = '${query.action}'`);
   }
   if (query.tableNames) {
     filterClauses.push(`a.table_name IN ('${query.tableNames.join(', ')}')`);
@@ -29,18 +29,22 @@ function generateQuerySql(query: ExportAuditsQueryDto) {
       )`);
   }
   if (query.description) {
-    filterClauses.push(`a.description ILIKE %${query.description}%`);
+    filterClauses.push(`a.description ILIKE '%${query.description}%'`);
   }
   if (query.userId) {
-    filterClauses.push(`a.user_id = ${query.userId}`);
+    filterClauses.push(`a.user_id = '${query.userId}'`);
   }
   if (query.startDate) {
-    filterClauses.push(`a.created_at >= ${query.startDate.toISOString()}`);
+    filterClauses.push(
+      `a.created_at >= '${new Date(query.startDate).toISOString()}'`,
+    );
   }
   if (query.endDate) {
-    filterClauses.push(`a.created_at <= ${query.endDate.toISOString()}`);
+    filterClauses.push(
+      `a.created_at <= '${new Date(query.endDate).toISOString()}'`,
+    );
   }
-  return filterClauses.join('AND');
+  return filterClauses.join('AND ');
 }
 
 export function generateExportQuery(

@@ -1,9 +1,9 @@
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { IUserPayload } from '../../../auth/interface/payload.interface';
 import { generateExportFilename } from '../../../core/shared/factory';
-import { ExportQueryDto } from '../../../exports/dto';
 import { ExportsService } from '../../../exports/exports.service';
 import { generateExpiredBatchesExportQuery } from './sql';
+import { ExportExpiryQueryDto } from '../dto';
 @Injectable()
 export class BatchesExportsService {
   constructor(private readonly exportService: ExportsService) {}
@@ -14,12 +14,12 @@ export class BatchesExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  async exportExpiredBatches(query: ExportQueryDto, user: IUserPayload) {
+  async exportExpiredBatches(query: ExportExpiryQueryDto, user: IUserPayload) {
     switch (query.exportType) {
       case 'csv':
-        return await this.exportExpiredBatchesCsv(user);
+        return await this.exportExpiredBatchesCsv(query, user);
       case 'xlsx':
-        return await this.exportExpiredBatchesExcel(user);
+        return await this.exportExpiredBatchesExcel(query, user);
       default:
         throw new NotImplementedException('Yet to be implemented');
     }
@@ -32,12 +32,24 @@ export class BatchesExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportExpiredBatchesCsv(user: IUserPayload) {
-    const sql = generateExpiredBatchesExportQuery({
+  private async exportExpiredBatchesCsv(
+    query: ExportExpiryQueryDto,
+    user: IUserPayload,
+  ) {
+    const sql = generateExpiredBatchesExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });
-    const expiredBatchesCsv = await this.exportService.exportStockCsv(sql);
+
+    const expiredBatchesCsv = await this.exportService.exportStockCsv(sql, {
+      fields: [
+        'Item Name',
+        'Status',
+        'Expiry Date',
+        'Total Stock',
+        'Batch Number',
+      ],
+    });
     const fileName = generateExportFilename('Batches_By_Expiry', 'csv');
     return {
       data: expiredBatchesCsv,
@@ -55,8 +67,11 @@ export class BatchesExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportExpiredBatchesExcel(user: IUserPayload) {
-    const sql = generateExpiredBatchesExportQuery({
+  private async exportExpiredBatchesExcel(
+    query: ExportExpiryQueryDto,
+    user: IUserPayload,
+  ) {
+    const sql = generateExpiredBatchesExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });

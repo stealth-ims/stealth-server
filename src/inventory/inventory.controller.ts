@@ -30,11 +30,11 @@ import { StockAdjustmentsService } from './inventory.service';
 import {
   CreatedAdjustmentResponseDto,
   CreateStockAdjustmentDto,
+  ExportStockAdjustmentsQueryDto,
   OneStockAdjustment,
   StockAdjustmentPaginationDto,
   UpdateStockAdjustmentDto,
 } from './dto';
-import { ExportQueryDto } from '../exports/dto';
 import { StockAdjustmentExportsService } from './exports.service';
 
 @ApiTags('Stock Adjustments')
@@ -77,7 +77,7 @@ export class StockAdjustmentsController {
   @Permission(Features.STOCK_ADJUSTMENT, PermissionLevel.READ)
   @Get('export')
   async exportStockAdjustments(
-    @Query() query: ExportQueryDto,
+    @Query() query: ExportStockAdjustmentsQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {

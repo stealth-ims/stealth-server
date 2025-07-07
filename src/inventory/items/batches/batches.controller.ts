@@ -37,7 +37,7 @@ import {
 import { throwError } from '../../../core/shared/responses/error.response';
 import { BatchesExportsService } from './exports.service';
 import { GetReportDataDto } from '../../../reports/dto';
-import { ExportQueryDto } from '../../../exports/dto';
+import { ExportExpiryQueryDto } from '../dto';
 
 @ApiTags('Item-Batches')
 @Controller('items')
@@ -104,7 +104,7 @@ export class BatchesController {
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('validity/export')
   async exportExpiryBatches(
-    @Query() query: ExportQueryDto,
+    @Query() query: ExportExpiryQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {

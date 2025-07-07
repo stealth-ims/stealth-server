@@ -4,6 +4,7 @@ import {
   ApiProperty,
   ApiResponseProperty,
   PickType,
+  OmitType,
 } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { GenericResponseDto } from 'src/core/shared/dto/base.dto';
@@ -13,6 +14,7 @@ import { addDays } from 'date-fns';
 import { Type } from 'class-transformer';
 import { BatchValidityStatus } from '../models';
 import { GetNoPaginateDto } from '../../../core/shared/dto/get-no_paginate.dto';
+import { ExportQueryDto } from '../../../exports/dto';
 
 export class ItemPaginationDto extends PaginationRequestDto {
   @ApiPropertyOptional()
@@ -31,6 +33,12 @@ export class ItemPaginationDto extends PaginationRequestDto {
 
   departmentId: string;
 }
+
+export class ExportItemsQueryDto extends IntersectionType(
+  ExportQueryDto,
+  OmitType(ItemPaginationDto, ['page', 'pageSize']),
+) {}
+
 export class FetchExpiredQueryDto extends PickType(PaginationRequestDto, [
   'search',
   'page',
@@ -56,6 +64,11 @@ export class FetchExpiredQueryDto extends PickType(PaginationRequestDto, [
   @IsEnum(BatchValidityStatus)
   status: BatchValidityStatus;
 }
+
+export class ExportExpiryQueryDto extends IntersectionType(
+  ExportQueryDto,
+  OmitType(FetchExpiredQueryDto, ['page', 'pageSize']),
+) {}
 
 export class GetExpiredItemsDto {
   @ApiResponseProperty({

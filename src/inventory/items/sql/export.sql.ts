@@ -1,8 +1,40 @@
 import { IUserPayload } from '../../../auth/interface/payload.interface';
+import { sqlGenerateFilter } from '../../../core/shared/factory';
+import { ExportItemsQueryDto, ItemStatus } from '../dto';
+
+function generateQuerySql(query: ExportItemsQueryDto) {
+  const filterClauses = [];
+  if (query.categories) {
+    filterClauses.push(`i.category_id IN ('${query.categories.join(', ')}')`);
+  }
+  if (query.status) {
+    let whereClause = 'COALESCE(ts.total, 0) > i.reorder_point';
+    switch (query.status) {
+      case ItemStatus.OUT_OF_STOCK:
+        whereClause = 'COALESCE(ts.total, 0) = 0';
+        break;
+      case ItemStatus.LOW:
+        whereClause =
+          'COALESCE(ts.total, 0) > 0 AND COALESCE(ts.total, 0) <= i.reorder_point';
+        break;
+      default:
+        break;
+    }
+    filterClauses.push(`${whereClause}`);
+  }
+  return filterClauses.join('AND ');
+}
 
 export function generateExportQuery(
+  query: ExportItemsQueryDto,
   user: Pick<IUserPayload, 'facility' | 'department'>,
 ) {
+  const queryFilters = sqlGenerateFilter(
+    'i',
+    query,
+    `i.name ILIKE '%${query.search}%' OR i.brand_name ILIKE '%${query.search}%'`,
+  );
+  const filters = generateQuerySql(query);
   return `
     WITH total_stocks AS (
       SELECT 
@@ -36,6 +68,9 @@ export function generateExportQuery(
     LEFT JOIN item_categories c ON i.category_id = c.id
     LEFT JOIN total_stocks ts ON ts.item_id = i.id
     WHERE i.facility_id = '${user.facility}'
-    ORDER BY updated_at DESC;
+    ${filters ? `AND ${filters}` : ''}
+    ${queryFilters.searchFilter ? `AND ${queryFilters.searchFilter}` : ''}
+
+    ${queryFilters.pageFilter}
   `;
 }

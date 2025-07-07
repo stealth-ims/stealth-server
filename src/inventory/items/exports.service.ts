@@ -3,7 +3,7 @@ import { generateExportQuery } from './sql';
 import { IUserPayload } from '../../auth/interface/payload.interface';
 import { ExportsService } from '../../exports/exports.service';
 import { generateExportFilename } from '../../core/shared/factory';
-import { ExportQueryDto } from '../../exports/dto';
+import { ExportItemsQueryDto } from './dto';
 
 @Injectable()
 export class ItemExportsService {
@@ -15,12 +15,12 @@ export class ItemExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  async exportItems(query: ExportQueryDto, user: IUserPayload) {
+  async exportItems(query: ExportItemsQueryDto, user: IUserPayload) {
     switch (query.exportType) {
       case 'csv':
-        return await this.exportItemsCsv(user);
+        return await this.exportItemsCsv(query, user);
       case 'xlsx':
-        return await this.exportItemsExcel(user);
+        return await this.exportItemsExcel(query, user);
       default:
         throw new NotImplementedException('Yet to be implemented');
     }
@@ -33,8 +33,8 @@ export class ItemExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportItemsCsv(user: IUserPayload) {
-    const sql = generateExportQuery({
+  private async exportItemsCsv(query: ExportItemsQueryDto, user: IUserPayload) {
+    const sql = generateExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });
@@ -64,8 +64,11 @@ export class ItemExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportItemsExcel(user: IUserPayload) {
-    const sql = generateExportQuery({
+  private async exportItemsExcel(
+    query: ExportItemsQueryDto,
+    user: IUserPayload,
+  ) {
+    const sql = generateExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });

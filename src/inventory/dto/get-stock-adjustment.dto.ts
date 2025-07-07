@@ -2,6 +2,7 @@ import {
   ApiPropertyOptional,
   ApiResponseProperty,
   IntersectionType,
+  OmitType,
   PickType,
 } from '@nestjs/swagger';
 import { GenericResponseDto } from 'src/core/shared/dto/base.dto';
@@ -12,6 +13,7 @@ import {
   StockAdjustmentStatus,
   StockAdjustmentType,
 } from '../models/stock-adjustment.model';
+import { ExportQueryDto } from '../../exports/dto';
 
 export class OneStockAdjustment extends IntersectionType(
   PickType(CreateStockAdjustmentDto, [
@@ -88,3 +90,8 @@ export class StockAdjustmentPaginationDto extends IntersectionType(
   @IsOptional()
   createdBy: string;
 }
+
+export class ExportStockAdjustmentsQueryDto extends IntersectionType(
+  ExportQueryDto,
+  OmitType(StockAdjustmentPaginationDto, ['page', 'pageSize']),
+) {}

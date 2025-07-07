@@ -3,7 +3,7 @@ import { generateExportQuery } from './sql';
 import { ExportsService } from '../exports/exports.service';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { generateExportFilename } from '../core/shared/factory';
-import { ExportQueryDto } from '../exports/dto';
+import { ExportStockAdjustmentsQueryDto } from './dto';
 
 @Injectable()
 export class StockAdjustmentExportsService {
@@ -15,12 +15,15 @@ export class StockAdjustmentExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  async exportStockAdjustments(query: ExportQueryDto, user: IUserPayload) {
+  async exportStockAdjustments(
+    query: ExportStockAdjustmentsQueryDto,
+    user: IUserPayload,
+  ) {
     switch (query.exportType) {
       case 'csv':
-        return await this.exportStockAdjustmentsCsv(user);
+        return await this.exportStockAdjustmentsCsv(query, user);
       case 'xlsx':
-        return await this.exportStockAdjustmentsExcel(user);
+        return await this.exportStockAdjustmentsExcel(query, user);
       default:
         throw new NotImplementedException('Yet to be implemented');
     }
@@ -33,12 +36,24 @@ export class StockAdjustmentExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportStockAdjustmentsCsv(user: IUserPayload) {
-    const sql = generateExportQuery({
+  private async exportStockAdjustmentsCsv(
+    query: ExportStockAdjustmentsQueryDto,
+    user: IUserPayload,
+  ) {
+    const sql = generateExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });
-    const stockAdjustmentCsv = await this.exportService.exportStockCsv(sql);
+    const stockAdjustmentCsv = await this.exportService.exportStockCsv(sql, {
+      fields: [
+        'Item',
+        'Created By',
+        'Adjustment Type',
+        'Quantity',
+        'Date Created',
+        'Status',
+      ],
+    });
     const fileName = generateExportFilename('Stock_Adjustment', 'csv');
     return {
       data: stockAdjustmentCsv,
@@ -56,8 +71,11 @@ export class StockAdjustmentExportsService {
    * @returns A promise that resolves to the created readable stream.
    * @throws If any error occurs during the creation process.
    */
-  private async exportStockAdjustmentsExcel(user: IUserPayload) {
-    const sql = generateExportQuery({
+  private async exportStockAdjustmentsExcel(
+    query: ExportStockAdjustmentsQueryDto,
+    user: IUserPayload,
+  ) {
+    const sql = generateExportQuery(query, {
       facility: user.facility,
       department: user.department,
     });

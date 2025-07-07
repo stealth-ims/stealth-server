@@ -29,6 +29,7 @@ import {
 import {
   AdjustPriceDto,
   CreateItemDto,
+  ExportItemsQueryDto,
   FetchExpiredQueryDto,
   GetExpiredItemsDto,
   ItemAnalytics,
@@ -40,7 +41,6 @@ import {
 } from './dto';
 import { ItemService } from './items.service';
 import { GetNoPaginateDto } from '../../core/shared/dto/get-no_paginate.dto';
-import { ExportQueryDto } from '../../exports/dto';
 import { ItemExportsService } from './exports.service';
 
 @ApiTags('Items')
@@ -83,7 +83,7 @@ export class ItemController {
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get('export')
   async exportItems(
-    @Query() query: ExportQueryDto,
+    @Query() query: ExportItemsQueryDto,
     @GetUser() user: IUserPayload,
   ) {
     try {

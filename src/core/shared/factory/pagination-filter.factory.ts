@@ -53,11 +53,11 @@ export function sqlGenerateFilter<T extends Partial<PaginationRequestDto>>(
     ];
 
     searchFilters.push(
-      `${tableAlias ? `${tableAlias}.` : ''}created_at BETWEEN ${startDate.toISOString()} AND ${endDate.toISOString()}`,
+      `${tableAlias ? `${tableAlias}.` : ''}created_at BETWEEN '${startDate.toISOString()}' AND '${endDate.toISOString()}'`,
     );
   }
 
-  const searchFilter = searchFilters.join('\nAND');
+  const searchFilter = searchFilters.join('\nAND ');
 
   return { pageFilter, searchFilter };
 }

@@ -67,7 +67,9 @@ export class AuditsExportsService {
       facility: user.facility,
       department: user.department,
     });
-    const auditsXlsx = await this.exportService.exportStockCsv(sql);
+    const auditsXlsx = await this.exportService.exportStockCsv(sql, {
+      fields: ['Action', 'Module Name', 'User', 'Department', 'Date'],
+    });
     const fileName = generateExportFilename('Audit_Logs', 'xlsx');
     return {
       data: auditsXlsx,
