@@ -265,12 +265,14 @@ export class SalesService {
           case AmountType.PERCENTAGE: {
             const newCapPercentage = item.sellingPrice * (markup.amount / 100);
             cappedPrice = item.sellingPrice - newCapPercentage;
-            cappedPrice *= item.quantity;
+            // cappedPrice *= item.quantity;
+            cappedPrice = 0;
             return cappedPrice >= 0 ? cappedPrice : 0;
           }
           case AmountType.PRICE: {
             cappedPrice = item.sellingPrice - markup.amount;
-            cappedPrice *= item.quantity;
+            // cappedPrice *= item.quantity;
+            cappedPrice = 0;
             return cappedPrice >= 0 ? cappedPrice : 0;
           }
           default:
