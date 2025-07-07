@@ -10,7 +10,7 @@ import {
   CreateSaleItemsDto,
 } from './dto/';
 import { InjectModel } from '@nestjs/sequelize';
-import { Sale } from './models/sales.model';
+import { Sale, SalePaymentType } from './models/sales.model';
 import { PaginatedDataResponseDto } from 'src/core/shared/responses/success.response';
 import { FindAndCountOptions } from 'sequelize';
 import { Op } from 'sequelize';
@@ -195,7 +195,16 @@ export class SalesService {
       dto.saleNumber = `S-${new Date().getTime()}`;
       dto.subTotal = parseFloat(subTotal.toFixed(2));
       if (dto.insured) {
-        const totalMarkup = await this.calculateTotal(batchSellingPrices);
+        const [totalMarkup, count] =
+          await this.calculateTotal(batchSellingPrices);
+
+        if (count === dto.saleItems.length) {
+          dto.paymentType = [SalePaymentType.NHIS];
+        } else if (count > 0 && count <= dto.saleItems.length) {
+          if (!dto.paymentType.includes(SalePaymentType.NHIS)) {
+            dto.paymentType = [...dto.paymentType, SalePaymentType.NHIS];
+          }
+        }
         const total = totalMarkup + dto.subTotal;
         dto.total = parseFloat(total.toFixed(2));
       } else {
@@ -203,6 +212,7 @@ export class SalesService {
       }
 
       const { saleItems: _saleItems, ...createDto } = dto;
+
       const sale = await this.saleRepository.create(
         {
           ...createDto,
@@ -234,7 +244,10 @@ export class SalesService {
     }
   }
 
-  async calculateTotal(payload: BatchSellingPrice[]) {
+  async calculateTotal(
+    payload: BatchSellingPrice[],
+  ): Promise<[number, number]> {
+    let count = 0;
     const cappedPrices = await Promise.all(
       payload.map(async (item) => {
         const markup = await this.markupService.fetchOne({
@@ -243,6 +256,7 @@ export class SalesService {
         if (!markup) {
           return 0;
         }
+        count += 1;
         let cappedPrice = 0;
         switch (markup.amountType) {
           case AmountType.PERCENTAGE: {
@@ -264,7 +278,7 @@ export class SalesService {
       (accum, current) => current + accum,
       0,
     );
-    return finalTotal;
+    return [finalTotal, count];
   }
 
   async smsSale(dto: SmsCreateSale) {

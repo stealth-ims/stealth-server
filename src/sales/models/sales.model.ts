@@ -23,7 +23,7 @@ export enum PaymentStatus {
 
 export enum SalePaymentType {
   CASH = 'CASH',
-  MOMO = 'MOMO',
+  NHIS = 'NHIS',
   ONLINE = 'ONLINE',
 }
 
@@ -38,8 +38,8 @@ export class Sale extends BaseModel<Sale> {
   @Column({ type: DataType.STRING })
   saleNumber: string;
 
-  @Column
-  paymentType: string;
+  @Column(DataType.ARRAY(DataType.STRING))
+  paymentType: string[];
 
   @HasMany(() => SaleItem)
   saleItems: SaleItem[];

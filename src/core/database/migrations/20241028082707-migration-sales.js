@@ -28,7 +28,7 @@ module.exports = {
       },
 
       paymentType: {
-        type: Sequelize.ENUM('CASH', 'ONLINE'),
+        type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         field: 'payment_type',
       },

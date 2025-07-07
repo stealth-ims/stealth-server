@@ -252,7 +252,9 @@ export class ImsStockQlService {
       if (input) {
         const match = input.match(/USING\s*["']?(.+?)["']?$/);
         if (match && match.length > 1) {
-          salesAction.paymentType = match[1].toUpperCase() as SalePaymentType;
+          salesAction.paymentType = [
+            match[1].toUpperCase(),
+          ] as SalePaymentType[];
         }
         return;
       }

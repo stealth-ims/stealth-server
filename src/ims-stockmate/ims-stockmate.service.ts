@@ -139,7 +139,7 @@ export class ImsStockmateService {
         const cmd = command.sellOptions;
         const sale = await this.salesService.smsSale({
           ...(cmd.patientCardId && { patientCardId: cmd.patientCardId }),
-          paymentType: cmd.paymentType ?? SalePaymentType.CASH,
+          paymentType: cmd.paymentType ?? [SalePaymentType.CASH],
           saleItems: cmd.saleItems,
           createdById: userId,
           facilityId: ownershipQuery.facilityId,

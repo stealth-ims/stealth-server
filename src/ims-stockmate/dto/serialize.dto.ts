@@ -27,7 +27,7 @@ export interface ErrorOptions {
 export interface SellActionOptions {
   action: IMSQLAction;
   patientCardId?: string;
-  paymentType?: SalePaymentType;
+  paymentType?: SalePaymentType[];
   saleItems: { batchNumber: string; quantity: number; itemId?: string }[];
 }
 export interface ParsedImsStockQlCommand {

@@ -49,13 +49,14 @@ export class CreateSaleDto {
   patientCardId: string;
 
   @ApiProperty({
-    example: 'CASH',
+    example: ['CASH'],
     enum: SalePaymentType,
     description: 'The type of payment for the sale',
   })
   @IsNotEmpty()
-  @IsEnum(SalePaymentType)
-  paymentType: SalePaymentType;
+  @IsArray()
+  @IsEnum(SalePaymentType, { each: true })
+  paymentType: SalePaymentType[];
 
   @ApiPropertyOptional({
     example: true,

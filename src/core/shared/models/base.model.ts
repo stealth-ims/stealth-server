@@ -47,7 +47,6 @@ export abstract class BaseModel<T = any> extends Model<T> {
   @AfterCreate
   static async logCreate(instance: BaseModel, options: any) {
     if (options.skipAudit) return;
-    console.log(`${instance.constructor.name} created hook options:`, options);
 
     const ownershipOptions: Record<string, any> = {};
     const extendedInstance = instance as any;
@@ -98,7 +97,6 @@ export abstract class BaseModel<T = any> extends Model<T> {
   @AfterUpdate
   static async logUpdate(instance: BaseModel, options: any) {
     if (options.skipAudit) return;
-    console.log(`${instance.constructor.name} updated hook options:`, options);
 
     const ownershipOptions: Record<string, any> = {};
     const extendedInstance = instance as any;
@@ -129,7 +127,7 @@ export abstract class BaseModel<T = any> extends Model<T> {
       },
       transaction: options.transaction,
     });
-    console.log('created?', created);
+
     if (!created) {
       await auditLog.update(
         {
@@ -151,7 +149,6 @@ export abstract class BaseModel<T = any> extends Model<T> {
   @AfterDestroy
   static async logDelete(instance: BaseModel, options: any) {
     if (options.skipAudit) return;
-    console.log(`${instance.constructor.name} deleted hook options:`, options);
 
     const ownershipOptions: Record<string, any> = {};
     const extendedInstance = instance as any;
