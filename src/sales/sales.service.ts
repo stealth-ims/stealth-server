@@ -257,7 +257,7 @@ export class SalesService {
           query: { batchId: item.batchId, type: 'NHIS' },
         });
         if (!markup) {
-          return 0;
+          return item.sellingPrice;
         }
         count += 1;
         let cappedPrice = 0;
