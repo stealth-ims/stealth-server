@@ -358,6 +358,7 @@ export class SalesService {
         'total',
         'createdAt',
         'status',
+        'paymentType',
         'updatedAt',
       ],
       include: [
