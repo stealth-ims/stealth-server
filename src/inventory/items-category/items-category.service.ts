@@ -229,10 +229,9 @@ export class ItemCategoryService {
     });
 
     await Item.bulkCreate(finalItems, { individualHooks: true });
-    this.logger.debug(
-      'Data seeded successfully for facility: ',
-      payload.facilityId,
-    );
+    this.logger.debug('Data seeded successfully for facility: ', {
+      facilityId: payload.facilityId,
+    });
     return;
   }
 }
