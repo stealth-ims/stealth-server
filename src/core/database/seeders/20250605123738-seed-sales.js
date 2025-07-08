@@ -43,6 +43,7 @@ module.exports = {
           item_id: item.id,
           batch_id: item.batchid,
           quantity: faker.number.int(item.quantity % 10) + 1,
+          nhis_covered: faker.datatype.boolean(0.3),
           facility_id: item.facility_id,
           created_at: createdAt,
           updated_at: updatedAt,
@@ -63,7 +64,10 @@ module.exports = {
 
       sales.push({
         id: saleId,
-        payment_type: faker.helpers.arrayElement(['ONLINE', 'CASH']),
+        payment_type: faker.helpers.arrayElements(['ONLINE', 'CASH', 'NHIS'], {
+          max: 2,
+          min: 1,
+        }),
         sale_number: `S-${faker.number.int({ min: 1000, max: 9999 })}`,
         notes: faker.lorem.sentences(2),
         total: total,
