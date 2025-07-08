@@ -80,7 +80,7 @@ export class CreateItemDto {
   })
   @IsNotEmpty()
   @IsEnum(DosageForm)
-  dosageForm: DosageForm;
+  dosageForm: DosageForm | string;
 
   @ApiPropertyOptional({
     example: 'ABC-DGU-123',

@@ -52,7 +52,7 @@ export function generateExportQuery(
           i.name,
           CASE WHEN i.brand_name IS NOT NULL THEN CONCAT(' (', i.brand_name, ')') ELSE '' END,
           CASE WHEN i.dosage_form IS NOT NULL THEN CONCAT(' ', INITCAP(i.dosage_form)) ELSE '' END,
-          CASE WHEN i.strength IS NOT NULL THEN CONCAT(' ', i.strength) ELSE '' END,
+          CASE WHEN i.strength IS NOT NULL THEN CONCAT(' ', i.strength) ELSE '' END
         )
       ) AS "Item Name",
       c.name as "Category",
