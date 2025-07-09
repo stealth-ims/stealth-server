@@ -19,7 +19,28 @@ async function bootstrap() {
     },
   );
 
-  app.enableCors();
+  const corsOptions = {
+    origin: '*' as string | Array<string>,
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  };
+
+  switch (process.env.NODE_ENV) {
+    case 'staging':
+      corsOptions.origin = [process.env.CLIENT_URL];
+      break;
+    case 'production':
+      corsOptions.origin = [
+        process.env.CLIENT_URL,
+        'https://ims-v2-frontend-release.up.railway.app',
+      ];
+      break;
+    default:
+      break;
+  }
+
+  app.enableCors(corsOptions);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   app.useGlobalInterceptors(new TelemetryInterceptor());
