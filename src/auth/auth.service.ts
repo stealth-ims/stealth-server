@@ -63,7 +63,7 @@ export class AuthService {
     this.logger = new Logger(AuthService.name);
   }
 
-  async register(dto: AdminSignUpDto, req: Request) {
+  async register(dto: AdminSignUpDto, _req: Request) {
     dto.facility.email = dto.email;
     const facility = await this.facilityService.create(dto.facility);
     const hashPassword = await bcrypt.hash(dto.password, this.SALT_OR_ROUNDS);
@@ -91,7 +91,7 @@ export class AuthService {
     await facility.update({ createdById: user.id });
 
     const token = await this.generateTokens(user, null);
-    await this.sendVerificationEmail(user.email, req);
+    // await this.sendVerificationEmail(user.email, req);
     const expiresAt: number = this.configService.get<number>(
       'JWT_ACCESS_TOKEN_TTL',
     );
@@ -106,9 +106,9 @@ export class AuthService {
 
   async sendVerificationEmail(email: string, req: Request) {
     const user = await this.fetchUserByEmail(email);
-    // if (user.status !== AccountState.UNVERIFIED) {
-    //   throw new ForbiddenException('Account cannot be verified');
-    // }
+    if (user.status !== AccountState.UNVERIFIED) {
+      throw new ForbiddenException('Account cannot be verified');
+    }
     const verificationToken = await this.signToken(user.id, 3600, {});
     const fullUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify?token=${verificationToken}`;
     this.sendAccountVerficationMail(
