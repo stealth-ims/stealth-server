@@ -12,6 +12,10 @@ import { PatientModule } from '../../../patient/patient.module';
 import { ComplaintsModule } from '../../../complaints/complaints.module';
 import { DashboardModule } from '../../../dashboard/dashboard.module';
 import { ImsStockmateModule } from '../../../ims-stockmate/ims-stockmate.module';
+import { SyncModule } from '../../../sync/sync.module';
+import { AuditsModule } from '../../../audit/audit.module';
+import { ExportsModule } from '../../../exports/exports.module';
+import { HealthModule } from '../../../health/health.module';
 
 export const IndexModules = [
   NotificationModule,
@@ -28,4 +32,8 @@ export const IndexModules = [
   ComplaintsModule,
   DashboardModule,
   ImsStockmateModule,
+  HealthModule,
+  AuditsModule,
+  ExportsModule,
+  SyncModule,
 ];

@@ -10,6 +10,7 @@ import { NotificationModels } from '../../../notification/models';
 import { UserSecondaryModels } from '../../../user/models';
 import { ComplaintsModels } from '../../../complaints/models';
 import { AuditModels } from '../../../audit/models';
+import { SyncModels } from '../../../sync/models';
 
 export const IndexModels = [
   ...AdminModels,
@@ -24,4 +25,5 @@ export const IndexModels = [
   ...UserSecondaryModels,
   ...ComplaintsModels,
   ...AuditModels,
+  ...SyncModels,
 ];
