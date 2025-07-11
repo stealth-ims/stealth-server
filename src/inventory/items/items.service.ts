@@ -428,8 +428,8 @@ export class ItemService {
     if (query.search) {
       searchOptions = {
         [Op.or]: [
-          { name: { [Op.iLike]: `%${query.search}%` } },
-          { brandName: { [Op.iLike]: `%${query.search}%` } },
+          { name: { [Op.iLike]: `${query.search}%` } },
+          { brandName: { [Op.iLike]: `${query.search}%` } },
         ],
       };
     }
