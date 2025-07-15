@@ -32,7 +32,7 @@ export class ImsStockmateService {
   ) {}
 
   async sendSmsResponse(dto: AtskWebhookDto) {
-    console.log(dto);
+    // console.log(dto);
     const data = await this.init({ from: dto.from, command: dto.text });
     // console.log('data length', data.length);
     await this.smsService.sendWithAfricasTalking({ to: dto.from, body: data });
@@ -109,16 +109,18 @@ export class ImsStockmateService {
           return yaml.dump(result);
         } catch (error) {
           if (error instanceof HttpException) {
-            return {
+            const errorData = {
               errorCode: error.getStatus(),
               message: error.message,
             };
+            return yaml.dump(errorData);
           } else {
             this.logger.error(error);
-            return {
+            const errorData = {
               errorCode: HttpStatus.INTERNAL_SERVER_ERROR,
               message: error.message,
             };
+            return yaml.dump(errorData);
           }
         }
       }),

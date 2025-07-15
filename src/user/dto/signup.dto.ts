@@ -26,11 +26,11 @@ export class AdminSignUpDto extends IntersectionType(GenericResponseDto) {
   @IsNotEmpty()
   fullName: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'newUser@email.com',
     description: 'The email of the user',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email: string;
 
