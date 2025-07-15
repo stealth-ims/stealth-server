@@ -200,6 +200,7 @@ export class Item extends BaseModel<Item> {
     items: Item | Item[],
     options: any,
   ): Promise<void> {
+    if (options.skipStatus) return;
     if (!items) return;
     const processItem = async (item: Item) => {
       if (!item) return;

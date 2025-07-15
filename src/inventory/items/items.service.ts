@@ -164,7 +164,10 @@ export class ItemService {
 
   async fetchAndCountAll(options?: QueryOptionsDto<Item>) {
     const queryOptions = buildQuery<Item>(options, this.populates);
-    const items = await this.itemRepo.findAndCountAll(queryOptions);
+    const items = await this.itemRepo.findAndCountAll({
+      ...queryOptions,
+      skipStatus: true,
+    } as FindAndCountOptions);
     return items;
   }
 

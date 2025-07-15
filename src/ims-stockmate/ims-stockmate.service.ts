@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import {
   AtskWebhookDto,
   ParsedImsStockQlCommand,
@@ -20,6 +20,7 @@ import { SmsService } from '../notification/sms/sms.service';
 
 @Injectable()
 export class ImsStockmateService {
+  private logger = new Logger(ImsStockmateService.name);
   constructor(
     private itemService: ItemService,
     private imsStockQlService: ImsStockQlService,
@@ -31,7 +32,7 @@ export class ImsStockmateService {
   ) {}
 
   async sendSmsResponse(dto: AtskWebhookDto) {
-    // console.log(dto);
+    console.log(dto);
     const data = await this.init({ from: dto.from, command: dto.text });
     // console.log('data length', data.length);
     await this.smsService.sendWithAfricasTalking({ to: dto.from, body: data });
@@ -74,7 +75,38 @@ export class ImsStockmateService {
             ownershipQuery,
             user.id,
           );
-          return result;
+          // switch (cmd.action) {
+          //   default:
+          //     return { message: '🤖 Unknown action' };
+
+          //   case 'STOCK': {
+          //     // const command = cmd.stockOptions;
+          //     // const serializedOutput = yaml.dump({ ...responses[0] });
+          //     return yaml.dump(result);
+          //   }
+          //   case 'SELL': {
+          //     return;
+          //   }
+          //   case 'QUERY': {
+          //     return;
+          //   }
+          //   case 'LIST': {
+          //     const command = cmd.listOptions;
+          //     if (command.listType === 'ITEMS') {
+          //       const template = SmsTemplates.LIST;
+          //       let messageBody = render(template.default.body, result);
+          //       if (messageBody.length > 300) {
+          //         messageBody = render(template.short.body, result);
+          //       }
+          //       return messageBody;
+          //     } else if (command.listType === 'BATCHES') {
+          //       return { message: 'yet to be implemented' };
+          //     } else if (command.listType === 'PATIENTS') {
+          //       return;
+          //     }
+          //   }
+          // }
+          return yaml.dump(result);
         } catch (error) {
           if (error instanceof HttpException) {
             return {
@@ -82,6 +114,7 @@ export class ImsStockmateService {
               message: error.message,
             };
           } else {
+            this.logger.error(error);
             return {
               errorCode: HttpStatus.INTERNAL_SERVER_ERROR,
               message: error.message,
@@ -91,8 +124,8 @@ export class ImsStockmateService {
       }),
     );
 
-    const serializedOutput = yaml.dump({ responses });
-    return serializedOutput;
+    // const serializedOutput = yaml.dump({ ...responses[0] });
+    return responses.join('\n');
   }
 
   async handleParsedCommand(
@@ -185,10 +218,12 @@ export class ImsStockmateService {
       }
       case 'LIST': {
         const cmd = command.listOptions;
+        this.logger.log(cmd);
         const whereOptions: Record<string, any> = {};
         if (cmd.listType === 'ITEMS') {
           const searchOptions: Record<string, any> = {};
           if (cmd.item) {
+            this.logger.log('enterd');
             searchOptions.search = cmd.item;
             searchOptions.searchFields = ['name'];
           }
@@ -216,6 +251,7 @@ export class ImsStockmateService {
               },
             ];
           }
+
           const items = await this.itemService.fetchAndCountAll({
             query: {
               ...ownershipQuery,
@@ -267,7 +303,13 @@ export class ImsStockmateService {
           });
           const patientsJson = {
             total: patients.count,
-            patients: patients.rows.map((patient) => patient.toJSON()),
+            patients: patients.rows.map((patient) => {
+              const pat = patient.toJSON();
+              const cardIdNumber = pat.cardIdentificationNumber;
+              delete pat.cardIdentificationNumber;
+
+              return { ...pat, cardIdNumber };
+            }),
           };
           return patientsJson;
         }
