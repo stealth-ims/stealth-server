@@ -16,6 +16,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { LoginSession } from '../models/login-session.model';
 import { IUserPayload } from '../interface/payload.interface';
 import { User } from '../models/user.model';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -56,27 +57,7 @@ export class AuthGuard implements CanActivate {
           secret: this.jwtConfiguration.secret,
         },
       );
-      const loggedInUser = await this.userRepository.findByPk(decoded.sub, {
-        attributes: [
-          'id',
-          'username',
-          'email',
-          'facilityId',
-          'departmentId',
-          'role',
-          'permissions',
-        ],
-      });
-      const payload: IUserPayload = {
-        sub: loggedInUser.id,
-        email: loggedInUser.email,
-        username: loggedInUser.username,
-        facility: loggedInUser.facilityId,
-        department: loggedInUser.departmentId,
-        role: loggedInUser.role,
-        permissions: loggedInUser.permissions,
-        session: decoded.session,
-      };
+      const payload: IUserPayload = await this.fetchAuthUser(decoded);
       request['user'] = payload;
 
       if (payload.session) {
@@ -96,11 +77,47 @@ export class AuthGuard implements CanActivate {
       } else if (error.name == 'TokenExpiredError') {
         throw new UnauthorizedException('TOKEN_EXPIRED');
       } else {
-        this.logger.error(error);
-        throw new UnauthorizedException(error.message);
+        if (isUUID(token)) {
+          const payload: IUserPayload = await this.fetchAuthUser({
+            sub: token,
+            session: null,
+          });
+          request['user'] = payload;
+        } else {
+          this.logger.error(error);
+          throw new UnauthorizedException(error.message);
+        }
       }
     }
     return true;
+  }
+
+  private async fetchAuthUser(decoded: Partial<IUserPayload>) {
+    const loggedInUser = await this.userRepository.findByPk(decoded.sub, {
+      attributes: [
+        'id',
+        'username',
+        'email',
+        'facilityId',
+        'departmentId',
+        'role',
+        'permissions',
+      ],
+    });
+    if (!loggedInUser) {
+      throw new UnauthorizedException('User not found');
+    }
+    const payload: IUserPayload = {
+      sub: loggedInUser.id,
+      email: loggedInUser.email,
+      username: loggedInUser.username,
+      facility: loggedInUser.facilityId,
+      department: loggedInUser.departmentId,
+      role: loggedInUser.role,
+      permissions: loggedInUser.permissions,
+      session: decoded.session,
+    };
+    return payload;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {

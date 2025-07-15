@@ -1,18 +1,17 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { IndexModels } from './core/shared/models/index.models';
 import { IndexModules } from './core/shared/modules/index.modules';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
-import { HealthModule } from './health/health.module';
-import { AuditsModule } from './audit/audit.module';
 import { AppController } from './app.controller';
-import { ExportsModule } from './exports/exports.module';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: process.env.DB_HOST || '127.0.0.1',
@@ -35,11 +34,21 @@ import { ExportsModule } from './exports/exports.module';
       logging: false,
       models: [...IndexModels],
     }),
+
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        connection: {
+          family: 0,
+          url: configService.get('REDIS_URL'),
+          tls: configService.get<boolean>('QUEUE_TLS'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
     EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
-    HealthModule,
-    AuditsModule,
-    ExportsModule,
     ...IndexModules,
   ],
   controllers: [AppController],
