@@ -1,12 +1,14 @@
 import {
   ApiPropertyOptional,
   ApiResponseProperty,
+  IntersectionType,
   PickType,
 } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { addDays } from 'date-fns';
 import { PaginationRequestDto } from '../../core/shared/dto/pagination.dto';
+import { ExportQueryDto } from '../../exports/dto';
 
 export class FetchSalesReportDataQueryDto extends PickType(
   PaginationRequestDto,
@@ -43,6 +45,19 @@ export class FetchTopSellingReportDataQueryDto extends FetchSalesReportDataQuery
   @Min(0)
   @Type(() => Number)
   limit: number;
+}
+
+export class ExportPeriodicSalesQueryDto extends IntersectionType(
+  ExportQueryDto,
+  FetchSalesReportDataQueryDto,
+) {
+  @ApiPropertyOptional({
+    description: 'name of the periodic report to export',
+    example: 'periodic_sale_2025',
+  })
+  @IsOptional()
+  @IsString()
+  fileName: string;
 }
 
 export class CreatedByDto {

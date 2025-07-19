@@ -26,6 +26,7 @@ import {
   FetchTopSellingReportDataQueryDto,
   ExportSalesQueryDto,
   SalesReportResponseDto,
+  ExportPeriodicSalesQueryDto,
 } from './dto/';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators';
@@ -133,7 +134,7 @@ export class SalesController {
     @GetUser() user: IUserPayload,
   ) {
     try {
-      const response = await this.salesExportsService.exportAudits(query, user);
+      const response = await this.salesExportsService.exportSales(query, user);
       return new StreamableFile(response.data, {
         type: response.meta.type,
         disposition: `attachment; filename="${response.meta.fileName}"`,
@@ -160,6 +161,29 @@ export class SalesController {
         HttpStatus.OK,
         'Periodic sales data retrieved successfully',
       );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
+    message: 'Periodic Sales report exported successfully',
+  })
+  @Permission(Features.REPORTS, PermissionLevel.READ)
+  @Get('export/periodic-sales')
+  async exportPeriodicSales(
+    @Query() query: ExportPeriodicSalesQueryDto,
+    @GetUser() user: IUserPayload,
+  ) {
+    try {
+      const response = await this.salesExportsService.exportPeriodicSalesReport(
+        query,
+        user,
+      );
+      return new StreamableFile(response.data, {
+        type: response.meta.type,
+        disposition: `attachment; filename="${query.fileName ?? response.meta.fileName}"`,
+      });
     } catch (error) {
       throwError(this.logger, error);
     }
