@@ -1,4 +1,4 @@
-import { SalePaymentType } from '../../sales/models/sales.model';
+import { SalePaymentType } from '../../../sales/models/sales.model';
 
 export type IMSQLAction = 'STOCK' | 'QUERY' | 'LIST' | 'SELL' | 'UNKNOWN';
 export type IMSQLListType = 'ITEMS' | 'BATCHES' | 'PATIENTS';

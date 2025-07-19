@@ -5,7 +5,7 @@ import {
   ParsedImsStockQlCommand,
   SellActionOptions,
 } from './dto';
-import { SalePaymentType } from '../sales/models/sales.model';
+import { SalePaymentType } from '../../sales/models/sales.model';
 
 @Injectable()
 export class ImsStockQlService {

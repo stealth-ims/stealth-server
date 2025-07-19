@@ -7,17 +7,19 @@ import {
   Res,
   Logger,
 } from '@nestjs/common';
-import { ImsStockmateService } from './ims-stockmate.service';
+import { StockmateSmsService } from './sms.service';
 import { AtskWebhookDto, TwilioWebhookDto } from './dto';
-import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { Response } from 'express';
 import * as twilio from 'twilio';
+import { CustomApiResponse } from '../../core/shared/docs/decorators';
+import { ApiTags } from '@nestjs/swagger';
 // import MessagingResponse from 'twilio/lib/twiml/MessagingResponse';
 
-@Controller('ims-stockmate')
-export class ImsStockmateController {
-  private logger = new Logger(ImsStockmateController.name);
-  constructor(private readonly imsStockmateService: ImsStockmateService) {}
+@ApiTags('IMS Stockmate Sms')
+@Controller('ims-stockmate/sms')
+export class StockmateSmsController {
+  private logger = new Logger(StockmateSmsController.name);
+  constructor(private readonly stockmateSmsService: StockmateSmsService) {}
 
   @CustomApiResponse(['success'], {
     type: String,
@@ -26,7 +28,7 @@ export class ImsStockmateController {
   @Post('webhook/dev-test')
   @HttpCode(HttpStatus.OK)
   create(@Body() dto: AtskWebhookDto) {
-    return this.imsStockmateService.create(dto);
+    return this.stockmateSmsService.create(dto);
   }
 
   @CustomApiResponse(['success'], {
@@ -42,7 +44,7 @@ export class ImsStockmateController {
     // const dto = req.body as TwilioWebhookDto;
     this.logger.log(dto);
     const twiml = new twilio.twiml.MessagingResponse();
-    const data = await this.imsStockmateService.create(dto);
+    const data = await this.stockmateSmsService.create(dto);
 
     this.logger.log('data length', data.length);
     // if (data.length > 1600) {
@@ -62,7 +64,7 @@ export class ImsStockmateController {
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   async handleIncomingMessage(@Body() dto: AtskWebhookDto) {
-    await this.imsStockmateService.sendSmsResponse(dto);
+    await this.stockmateSmsService.sendSmsResponse(dto);
     return;
   }
 }

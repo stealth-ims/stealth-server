@@ -25,6 +25,7 @@ import {
   FetchSalesReportDataQueryDto,
   FetchTopSellingReportDataQueryDto,
   ExportSalesQueryDto,
+  SalesReportResponseDto,
 } from './dto/';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from 'src/core/shared/docs/decorators';
@@ -143,7 +144,7 @@ export class SalesController {
   }
 
   @CustomApiResponse(['authorize', 'success'], {
-    type: GetReportDataDto,
+    type: SalesReportResponseDto,
     message: 'Periodic sales data retrieved successfully',
   })
   @Permission(Features.REPORTS, PermissionLevel.READ)

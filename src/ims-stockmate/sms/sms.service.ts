@@ -4,23 +4,23 @@ import {
   ParsedImsStockQlCommand,
   TwilioWebhookDto,
 } from './dto';
-import { ItemService } from '../inventory/items/items.service';
 import * as yaml from 'js-yaml';
 import { addDays, format, startOfToday } from 'date-fns';
-import { UserService } from '../user/user.service';
-import { ImsStockQlService } from './ims-stockql.service';
 import { Op } from 'sequelize';
-import { ItemCategory } from '../inventory/items-category/models/items-category.model';
-import { Batch } from '../inventory/items/models';
-import { BatchService } from '../inventory/items/batches/batch.service';
-import { SalesService } from '../sales/sales.service';
-import { SalePaymentType } from '../sales/models/sales.model';
-import { PatientService } from '../patient/patient.service';
-import { SmsService } from '../notification/sms/sms.service';
+import { ItemCategory } from '../../inventory/items-category/models/items-category.model';
+import { BatchService } from '../../inventory/items/batches/batch.service';
+import { ItemService } from '../../inventory/items/items.service';
+import { Batch } from '../../inventory/items/models';
+import { SmsService } from '../../notification/sms/sms.service';
+import { PatientService } from '../../patient/patient.service';
+import { SalePaymentType } from '../../sales/models/sales.model';
+import { SalesService } from '../../sales/sales.service';
+import { UserService } from '../../user/user.service';
+import { ImsStockQlService } from './ims-stockql.service';
 
 @Injectable()
-export class ImsStockmateService {
-  private logger = new Logger(ImsStockmateService.name);
+export class StockmateSmsService {
+  private logger = new Logger(StockmateSmsService.name);
   constructor(
     private itemService: ItemService,
     private imsStockQlService: ImsStockQlService,
@@ -266,10 +266,10 @@ export class ImsStockmateService {
           const itemsJson = {
             total: items.count,
             items: items.rows.map((row) => {
-              const itemJson = row.toJSON();
+              const itemJson = row.toJSON<any>();
               if (itemJson.batches) {
                 const newBatches = itemJson.batches.map((batch) => {
-                  const newBatch = { ...batch } as any;
+                  const newBatch = { ...batch };
                   if (batch.validity) {
                     delete newBatch.validity;
                     newBatch.validity = format(

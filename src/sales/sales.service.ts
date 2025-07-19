@@ -26,6 +26,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { ItemService } from '../inventory/items/items.service';
 import { MarkupService } from '../inventory/items/markup/markup.service';
 import { AmountType } from '../inventory/items/markup/dto';
+import { generateSaleReportQuery } from './sql';
 
 type BatchSellingPrice = {
   batchId: string;
@@ -487,6 +488,19 @@ export class SalesService {
   }
 
   async fetchPeriodicSales(
+    query: FetchSalesReportDataQueryDto,
+    user: IUserPayload,
+  ) {
+    const sqlQuery = generateSaleReportQuery(query, {
+      facility: user.facility,
+      department: user.department,
+    });
+
+    const [results] = await this.sequelize.query(sqlQuery);
+    return (results[0] as any).result;
+  }
+
+  async oldFetchPeriodicSales(
     query: FetchSalesReportDataQueryDto,
     user: IUserPayload,
   ) {
