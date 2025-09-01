@@ -7,6 +7,11 @@ import {
   Min,
 } from 'class-validator';
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   BelongsTo,
   Column,
   DataType,
@@ -19,6 +24,7 @@ import { Batch, Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { User } from 'src/auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum StockAdjustmentType {
   REDUCTION = 'REDUCTION',
@@ -166,4 +172,13 @@ export class StockAdjustment extends BaseModel<StockAdjustment> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'stock-adjustments*');
+  }
 }

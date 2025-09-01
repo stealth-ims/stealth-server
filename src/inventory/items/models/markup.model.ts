@@ -1,4 +1,9 @@
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -12,6 +17,7 @@ import { Batch } from './batch.model';
 import { Item } from '.';
 import { AmountType, MarkupType } from '../markup/dto';
 import { User } from '../../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'markups',
@@ -78,4 +84,15 @@ export class Markup extends BaseModel<Markup> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*batches*');
+    await deleteByPattern(process.env.REDIS_URL, 'dashboard:general*');
+    await deleteByPattern(process.env.REDIS_URL, '*markup*');
+  }
 }

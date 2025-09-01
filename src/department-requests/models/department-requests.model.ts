@@ -5,12 +5,18 @@ import {
   ForeignKey,
   BelongsTo,
   AllowNull,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { Item } from 'src/inventory/items/models/item.model';
 import { Department } from 'src/admin/department/models/department.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { User } from '../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum DepartmentRequestStatus {
   PENDING = 'PENDING',
@@ -86,4 +92,13 @@ export class DepartmentRequest extends BaseModel {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*requests*');
+  }
 }

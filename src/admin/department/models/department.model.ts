@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   BelongsTo,
   Column,
   ForeignKey,
@@ -12,6 +17,7 @@ import { User } from '../../../auth/models/user.model';
 import { Facility } from '../../facility/models/facility.model';
 import { DepartmentRequest } from 'src/department-requests/models/department-requests.model';
 import { StockAdjustment } from 'src/inventory/models/stock-adjustment.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'departments',
@@ -86,4 +92,13 @@ export class Department extends BaseModel<Department> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'departments*');
+  }
 }

@@ -1,4 +1,9 @@
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -14,6 +19,7 @@ import { Department } from '../../../admin/department/models/department.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { differenceInDays, startOfToday } from 'date-fns';
 import { User } from 'src/auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum BatchValidityStatus {
   EXPIRED = 'EXPIRED',
@@ -113,4 +119,14 @@ export class Batch extends BaseModel<Batch> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*batches*');
+    await deleteByPattern(process.env.REDIS_URL, 'dashboard:general*');
+  }
 }

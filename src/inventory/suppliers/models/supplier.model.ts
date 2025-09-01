@@ -7,11 +7,17 @@ import {
   ForeignKey,
   HasMany,
   Table,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { Batch, Item } from 'src/inventory/items/models';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { User } from 'src/auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum StatusType {
   ACTIVE = 'Active',
@@ -198,5 +204,14 @@ export class Supplier extends BaseModel<Supplier> {
     } else {
       await processSupplier(suppliers);
     }
+  }
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'suppliers*');
   }
 }

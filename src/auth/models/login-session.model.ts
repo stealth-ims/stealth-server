@@ -1,4 +1,9 @@
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -9,6 +14,7 @@ import {
 import { BaseModel } from '../../core/shared/models/base.model';
 import { User } from '../../auth/models/user.model';
 import { formatDistance } from 'date-fns';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum StatusType {
   ACTIVE = 'ACTIVE',
@@ -83,4 +89,13 @@ export class LoginSession extends BaseModel<LoginSession> {
     },
   })
   activity: string;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'auth:sessions*');
+  }
 }

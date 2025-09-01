@@ -1,5 +1,9 @@
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
   AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   AllowNull,
   BeforeCreate,
   BeforeUpdate,
@@ -19,6 +23,7 @@ import { Department } from '../../admin/department/models/department.model';
 import { LoginSession } from './login-session.model';
 import { Settings } from '../../user/models/setting.model';
 import { generateUsername } from '../../core/shared/factory';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum AccountState {
   PENDING = 'Pending',
@@ -130,5 +135,17 @@ export class User extends BaseModel<User> {
       userId: instance.id,
       createdById: instance.id,
     });
+  }
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*admin*');
+    await deleteByPattern(process.env.REDIS_URL, '*auth*');
+    await deleteByPattern(process.env.REDIS_URL, '*user*');
+    await deleteByPattern(process.env.REDIS_URL, 'dashboard:general*');
   }
 }

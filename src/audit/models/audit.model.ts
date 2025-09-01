@@ -8,7 +8,13 @@ import {
   PrimaryKey,
   Default,
   AllowNull,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'audit_logs',
@@ -124,4 +130,13 @@ export class AuditLog extends Model<AuditLog> {
   @UpdatedAt
   @Column({ type: DataType.DATE, field: 'updated_at' })
   updatedAt: Date;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'audits*');
+  }
 }

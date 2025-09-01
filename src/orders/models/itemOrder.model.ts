@@ -5,12 +5,18 @@ import {
   ForeignKey,
   BelongsTo,
   AllowNull,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { OrderStatus } from 'src/core/shared/enums/itemOrder.enum';
 import { Item } from '../../inventory/items/models';
 import { Supplier } from '../../inventory/suppliers/models/supplier.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { User } from 'src/auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 @Table({
   tableName: 'item_orders',
   underscored: true,
@@ -90,4 +96,13 @@ export class ItemOrder extends BaseModel<ItemOrder> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'item-orders*');
+  }
 }

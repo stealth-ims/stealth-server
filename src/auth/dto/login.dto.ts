@@ -4,7 +4,7 @@ import { CreateLoginSessionDto } from './login-session.dto';
 
 export class LoginDto {
   @ApiProperty({
-    example: 'j.doe3256',
+    example: 'jack frost',
     examples: ['example@gmail.com', 'j.doe3256'],
     description: 'The email or username of the registered user',
   })

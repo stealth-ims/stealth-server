@@ -444,6 +444,7 @@ export class ItemService {
         ...queryFilter.searchFilter,
       },
       ...queryFilter.pageFilter,
+      order: [['name', 'ASC']],
       attributes: [
         'id',
         'name',
@@ -484,11 +485,11 @@ export class ItemService {
     if (quantity === 0) {
       notification.message = `${item.name} is out of stock. Restock now`;
       notification.linkName = 'Restock';
-      notification.linkRoute = `/items/${item.id}/batches`;
+      notification.linkRoute = `/items?itemId=${item.id}&itemName=${item.name}`;
     } else if (quantity < item.reorderPoint) {
       notification.message = `${item.name} is almost out of stock. ${quantity} pieces left`;
       notification.linkName = 'Restock';
-      notification.linkRoute = `/items/${item.id}/batches`;
+      notification.linkRoute = `/items?itemId=${item.id}&itemName=${item.name}`;
     } else {
       return;
     }
@@ -508,7 +509,7 @@ export class ItemService {
 
     notification.message = `${item.name} just got stocked`;
     notification.linkName = 'View';
-    notification.linkRoute = `/items/${item.id}/batches`;
+    notification.linkRoute = `/items?itemId=${item.id}&itemName=${item.name}`;
 
     await this.notificationService.sendNotification(
       notification,

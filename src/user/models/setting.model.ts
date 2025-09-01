@@ -5,9 +5,15 @@ import {
   ForeignKey,
   Table,
   AllowNull,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { User } from '../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'settings',
@@ -62,4 +68,13 @@ export class Settings extends BaseModel<Settings> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*settings*');
+  }
 }

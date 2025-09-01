@@ -7,6 +7,11 @@ import {
   HasMany,
   AllowNull,
   AfterFind,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { Department } from 'src/admin/department/models/department.model';
 import { Facility } from 'src/admin/facility/models/facility.model';
@@ -17,6 +22,7 @@ import { Batch } from '.';
 import { StockAdjustment } from '../../models/stock-adjustment.model';
 import { DosageForm, ItemStatus } from '../dto';
 import { User } from 'src/auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'items',
@@ -216,5 +222,15 @@ export class Item extends BaseModel<Item> {
     } else {
       await processItem(items);
     }
+  }
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*items*');
+    await deleteByPattern(process.env.REDIS_URL, 'dashboard:general*');
   }
 }

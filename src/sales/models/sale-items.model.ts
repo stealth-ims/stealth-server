@@ -1,4 +1,9 @@
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -12,6 +17,7 @@ import { Sale } from './sales.model';
 import { Facility } from '../../admin/facility/models/facility.model';
 import { Department } from '../../admin/department/models/department.model';
 import { User } from '../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'sale_items',
@@ -90,4 +96,13 @@ export class SaleItem extends BaseModel<SaleItem> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*sales*');
+  }
 }

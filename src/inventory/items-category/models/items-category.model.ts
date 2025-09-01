@@ -1,7 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import {
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
   AfterFind,
+  AfterUpdate,
   AllowNull,
   BelongsTo,
   Column,
@@ -14,6 +19,7 @@ import { Item } from 'src/inventory/items/models/item.model';
 import { BaseModel } from 'src/core/shared/models/base.model';
 import { Facility } from '../../../admin/facility/models/facility.model';
 import { User } from '../../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 export enum ItemCategoryStatus {
   ACTIVE = 'ACTIVE',
@@ -111,5 +117,14 @@ export class ItemCategory extends BaseModel<ItemCategory> {
     } else {
       await processCategory(categories);
     }
+  }
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, '*item-categories*');
   }
 }

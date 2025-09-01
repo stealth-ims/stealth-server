@@ -7,10 +7,16 @@ import {
   Table,
   Unique,
   AllowNull,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { Sale } from '../../sales/models/sales.model';
 import { User } from '../../auth/models/user.model';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'patients',
@@ -55,4 +61,13 @@ export class Patient extends BaseModel<Patient> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'patients*');
+  }
 }

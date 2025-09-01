@@ -5,6 +5,11 @@ import {
   DataType,
   BelongsTo,
   Table,
+  AfterBulkDestroy,
+  AfterBulkUpdate,
+  AfterCreate,
+  AfterDestroy,
+  AfterUpdate,
 } from 'sequelize-typescript';
 import { Department } from '../../admin/department/models/department.model';
 import { Facility } from '../../admin/facility/models/facility.model';
@@ -12,6 +17,7 @@ import { User } from '../../auth/models/user.model';
 import { BaseModel } from '../../core/shared/models/base.model';
 import { IncomingHttpHeaders } from 'http';
 import { RequestMethods } from '../dto';
+import { deleteByPattern } from 'src/core/shared/modules/cache/utils/delete-prefix.util';
 
 @Table({
   tableName: 'sync_requests',
@@ -77,4 +83,13 @@ export class SyncRequest extends BaseModel<SyncRequest> {
 
   @BelongsTo(() => User)
   deletedBy: User;
+
+  @AfterCreate
+  @AfterUpdate
+  @AfterDestroy
+  @AfterBulkUpdate
+  @AfterBulkDestroy
+  static async handleMutation() {
+    await deleteByPattern(process.env.REDIS_URL, 'sync*');
+  }
 }
