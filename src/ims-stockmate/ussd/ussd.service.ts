@@ -62,7 +62,7 @@ export class StockmateUssdService {
       if (!user) {
         return 'END Username not found';
       }
-      const _newUssdSesssion = await this.ussdSessionRepository.create({
+      await this.ussdSessionRepository.create({
         sessionId: dto.sessionId,
         createdById: user.id,
       });
@@ -116,7 +116,7 @@ export class StockmateUssdService {
       if (!user) {
         return 'END Username not found';
       }
-      const _newUssdSesssion = await this.ussdSessionRepository.create({
+      await this.ussdSessionRepository.create({
         sessionId: dto.sessionId,
         createdById: user.id,
       });
@@ -285,7 +285,7 @@ export class StockmateUssdService {
   }) {
     let respString: string;
     try {
-      const _response = await this.batchService.stock(payload.data);
+      await this.batchService.stock(payload.data);
       const { itemCode, batchNumber, quantity, validity } = payload.data;
       respString = `Stock update: ${itemCode} (Batch ${batchNumber}) has been stocked with quantity ${quantity}.
       Expiry date: ${new Date(validity).toLocaleDateString('en-GB')}.`;

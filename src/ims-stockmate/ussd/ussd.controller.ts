@@ -2,6 +2,7 @@ import { Controller, Logger, Post, Body, Header } from '@nestjs/common';
 import { CreateUssdDto } from './dto';
 import { StockmateUssdService } from './ussd.service';
 import { ApiTags } from '@nestjs/swagger';
+import { throwError } from 'src/core/shared/responses/error.response';
 
 @ApiTags('IMS Stockmate Ussd')
 @Controller('ims-stockmate/ussd')
@@ -50,6 +51,15 @@ export class StockmateUssdController {
         error.stack,
       );
       return 'END An error occured. Please try again.';
+    }
+  }
+
+  @Post('events')
+  webhookEvents(@Body() body: any) {
+    try {
+      this.logger.debug('sms status data:', body);
+    } catch (error) {
+      throwError(this.logger, error);
     }
   }
 }
