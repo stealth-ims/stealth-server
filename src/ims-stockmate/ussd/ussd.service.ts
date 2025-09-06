@@ -31,7 +31,53 @@ export class StockmateUssdService {
   ) {}
 
   async create(dto: CreateUssdDto) {
-    return this.baseInit(dto);
+    if (dto.text == '') {
+      return 'CON Welcome to Stealth-IMS.\nPlease enter your username';
+    }
+
+    const ussdSession = await this.ussdSessionRepository.findOne({
+      where: { sessionId: dto.sessionId },
+      include: [
+        {
+          model: User,
+          as: 'createdBy',
+          attributes: ['id', 'fullName', 'facilityId', 'departmentId'],
+        },
+      ],
+    });
+    const splitText = dto.text.split('*');
+    const text = splitText.at(-1);
+
+    if (!ussdSession) {
+      const user = await this.userRepository.findOne({
+        where: { username: { [Op.iLike]: text } },
+        attributes: [
+          'id',
+          'fullName',
+          'username',
+          'facilityId',
+          'departmentId',
+        ],
+      });
+      if (!user) {
+        return 'END Username not found';
+      }
+      const _newUssdSesssion = await this.ussdSessionRepository.create({
+        sessionId: dto.sessionId,
+        createdById: user.id,
+      });
+      dto.name = user.fullName;
+      dto.userId = user.id;
+      dto.departmentId = user.departmentId;
+      dto.facilityId = user.facilityId;
+      return await this.baseInit(dto);
+    } else {
+      dto.name = ussdSession.createdBy.fullName;
+      dto.userId = ussdSession.createdBy.id;
+      dto.departmentId = ussdSession.createdBy.departmentId;
+      dto.facilityId = ussdSession.createdBy.facilityId;
+      return await this.baseInit(dto);
+    }
   }
 
   async createDevTest(dto: CreateUssdDto) {
@@ -93,7 +139,7 @@ export class StockmateUssdService {
     let response = '';
     console.log(text);
     if (!text.includes('*')) {
-      response = `CON Welcome${dto.name && ' ' + dto.name}!\nWhat would you like to do?\n1. Query a Drug\n2. Dispense Drugs\n3. Stock a drug`;
+      response = `CON Welcome${dto.name ? ' ' + dto.name : ''}!\nWhat would you like to do?\n1. Query a Drug\n2. Dispense Drugs\n3. Stock a drug`;
     }
 
     const inputs = text.split('*');

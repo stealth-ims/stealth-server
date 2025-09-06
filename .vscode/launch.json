@@ -13,6 +13,17 @@
       "stopOnEntry": false
     },
     {
+      "type": "node2",
+      "request": "launch",
+      "name": "Debug Nest Project(nvim)",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["start:debug", "--", "--inspect-brk"],
+      "autoAttachChildProcesses": true,
+      "restart": true,
+      "sourceMaps": true,
+      "stopOnEntry": false
+    },
+    {
       "type": "node",
       "request": "launch",
       "name": "Debug Nest Framework Tests",

@@ -66,7 +66,8 @@ export class SmsService {
   }
 
   async sendWithAfricasTalking(dto: CreateSmsDto): Promise<SMSMessageData> {
-    const from = this.configService.get<string>('ATSK_SHORT_CODE');
+    // const from = this.configService.get<string>('ATSK_SHORT_CODE');
+    const from = this.configService.get<string>('ATSK_SENDER');
     return this.africastalkingClient.SMS.send({
       to: dto.to,
       from: from,
