@@ -32,7 +32,7 @@ export class StockmateUssdService {
 
   async create(dto: CreateUssdDto) {
     if (dto.text == '') {
-      return 'CON Welcome to Stealth-IMS.\nPlease enter your username';
+      return 'CON Welcome to Zomujo IMS.\nPlease enter your username';
     }
 
     const ussdSession = await this.ussdSessionRepository.findOne({
