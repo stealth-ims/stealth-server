@@ -612,7 +612,7 @@ export class AuthService {
     const code = randomInt(10000, 100000);
     const hashCode = await bcrypt.hash(code.toString(), this.SALT_OR_ROUNDS);
     user.resetCode = hashCode;
-    user.resetCodeExpires = add(new Date(), { minutes: 31 });
+    user.resetCodeExpires = add(new Date(), { minutes: 15 });
     user.updatedById = user.id;
     await user.save();
     return code;
