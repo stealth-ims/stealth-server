@@ -294,7 +294,7 @@ export class AuthService {
     let user: User;
     if (dto.email) {
       user = await this.userRepository.findOne({
-        where: { username: dto.username, email: dto.email },
+        where: { username: { [Op.iLike]: dto.username }, email: dto.email },
       });
       if (!user) {
         throw new NotFoundException('user with this email not found');
