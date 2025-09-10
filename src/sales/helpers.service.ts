@@ -19,6 +19,7 @@ import { startOfToday, endOfToday } from 'date-fns';
 import { Op, FindAndCountOptions, Includeable } from 'sequelize';
 import { generateFilter } from '../core/shared/factory';
 import { Patient } from '../patient/models/patient.model';
+import { ItemService } from 'src/inventory/items/items.service';
 
 @Injectable()
 export class SalesHelperService {
@@ -30,6 +31,7 @@ export class SalesHelperService {
     private readonly markupService: MarkupService,
     private readonly patientService: PatientService,
     private readonly batchService: BatchService,
+    private readonly itemService: ItemService,
   ) {}
 
   defaultIncludes: Includeable[] = [
@@ -385,7 +387,17 @@ export class SalesHelperService {
 
       if (batches.length === 0) {
         batchesPresent = false;
-        responses.push(`❌ Item ${itemCode} - Out of stock`);
+        const item = await this.itemService.fetchOne({
+          query: { code: itemCode, facilityId },
+          fields: ['id', 'name'],
+        });
+
+        if (!item) {
+          responses.push(`❌ Item ${itemCode} - Not Found`);
+        } else {
+          responses.push(`❌ Item ${itemCode} - Out of stock`);
+        }
+
         break;
       }
 
