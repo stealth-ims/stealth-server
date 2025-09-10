@@ -458,6 +458,7 @@ export class ItemService {
         'createdAt',
         'updatedAt',
         'totalStock',
+        'code',
       ],
       include: [{ model: ItemCategory, attributes: ['id', 'name'] }],
       distinct: true,

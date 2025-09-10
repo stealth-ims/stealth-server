@@ -271,6 +271,7 @@ export class ManyItem extends IntersectionType(
     'brandName',
     'dosageForm',
     'strength',
+    'code',
   ]),
   GenericResponseDto,
 ) {
