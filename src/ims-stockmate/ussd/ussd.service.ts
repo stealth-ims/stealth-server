@@ -1,19 +1,19 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { CreateUssdDto } from './dto';
-import { StockmateUssdSession } from './models/ussd.model';
-import { InjectModel } from '@nestjs/sequelize';
-import { User } from '../../auth/models/user.model';
-import { CreateOptions, Op } from 'sequelize';
-import { ItemService } from '../../inventory/items/items.service';
-import { ItemCategory } from '../../inventory/items-category/models/items-category.model';
-import { Patient } from '../../patient/models/patient.model';
-import { SalesService } from '../../sales/sales.service';
-import { UssdCreateSale } from '../../sales/dto';
-import { SalePaymentType } from '../../sales/models/sales.model';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
-import { SmsService } from '../../notification/sms/sms.service';
+import { InjectModel } from '@nestjs/sequelize';
+import { CreateOptions, Op } from 'sequelize';
+import { User } from '../../auth/models/user.model';
 import { BatchService } from '../../inventory/items/batches/batch.service';
 import { StockBatchDto } from '../../inventory/items/batches/dto';
+import { ItemService } from '../../inventory/items/items.service';
+import { ItemCategory } from '../../inventory/items-category/models/items-category.model';
+import { SmsService } from '../../notification/sms/sms.service';
+import { Patient } from '../../patient/models/patient.model';
+import { UssdCreateSale } from '../../sales/dto';
+import { SalePaymentType } from '../../sales/models/sales.model';
+import { SalesService } from '../../sales/sales.service';
+import { CreateUssdDto } from './dto';
+import { StockmateUssdSession } from './models/ussd.model';
 
 @Injectable()
 export class StockmateUssdService {
@@ -50,7 +50,7 @@ export class StockmateUssdService {
 
     if (!ussdSession) {
       const user = await this.userRepository.findOne({
-        where: { username: { [Op.iLike]: text } },
+        where: { username: { [Op.iLike]: `${text}%` } },
         attributes: [
           'id',
           'fullName',
