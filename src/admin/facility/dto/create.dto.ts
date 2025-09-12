@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFacilityDto {
   @ApiProperty({
@@ -15,13 +15,13 @@ export class CreateFacilityDto {
     description: 'The password for the facility',
   })
   @IsNotEmpty()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
-    {
-      message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
-    },
-  )
+  // @Matches(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
+  //   {
+  //     message:
+  //       'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
+  //   },
+  // )
   password: string;
 
   email: string;

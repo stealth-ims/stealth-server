@@ -5,7 +5,6 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
-  Matches,
   Max,
   Min,
 } from 'class-validator';
@@ -79,13 +78,13 @@ export class ResetPasswordDto {
     description: 'The new password',
   })
   @IsNotEmpty()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
-    {
-      message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
-    },
-  )
+  // @Matches(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
+  //   {
+  //     message:
+  //       'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
+  //   },
+  // )
   newPassword: string;
 }
 
@@ -117,12 +116,12 @@ export class ChangePasswordDto extends PickType(ResetPasswordDto, [
   })
   @IsOptional()
   // @IsNotEmpty()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
-    {
-      message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
-    },
-  )
+  // @Matches(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
+  //   {
+  //     message:
+  //       'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
+  //   },
+  // )
   oldPassword: string;
 }

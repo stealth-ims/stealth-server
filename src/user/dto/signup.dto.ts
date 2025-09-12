@@ -9,10 +9,9 @@ import {
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
-  Matches,
 } from 'class-validator';
-import { GenericResponseDto } from '../../core/shared/dto/base.dto';
 import { CreateFacilityDto } from '../../admin/facility/dto';
+import { GenericResponseDto } from '../../core/shared/dto/base.dto';
 
 // enum FacilityType {
 //   HOSPITAL = 'hospital',
@@ -64,13 +63,13 @@ export class AdminSignUpDto extends IntersectionType(GenericResponseDto) {
     description: 'The password for the new admin',
   })
   @IsNotEmpty()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
-    {
-      message:
-        'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
-    },
-  )
+  // @Matches(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.,!@#$^&*()_-])[a-zA-Z\d.,!@#$^&*()_-]{8,32}$/gm,
+  //   {
+  //     message:
+  //       'Password must be between 8 and 32 characters long with at least 1 special character and an uppercase character',
+  //   },
+  // )
   password: string;
 
   @ApiResponseProperty({
