@@ -13,7 +13,6 @@ import {
   Put,
   Query,
   Req,
-  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
