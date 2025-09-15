@@ -9,9 +9,13 @@ import {
   IsOptional,
   IsEnum,
   IsEmail,
+  IsNotEmpty,
+  IsPhoneNumber,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { GenericResponseDto } from '../../../core/shared/dto/base.dto';
 import { StatusType } from '../models/supplier.model';
+
 enum PaymentType {
   BANK = 'Bank',
   MOBILE_MONEY = 'Mobile Money',
@@ -23,12 +27,16 @@ enum ProviderType {
   AIRTELTIGO = 'Airteltigo',
 }
 
+const EmptyToUndefined = () =>
+  Transform(({ value }) => (value === '' ? undefined : value));
+
 export class CreateSupplierDto extends GenericResponseDto {
   @ApiProperty({
     description: 'The official name of the supplier.',
     example: 'FreshFarm Supplies Ltd',
   })
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiPropertyOptional({
@@ -37,6 +45,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   brandTradeName?: string;
 
   @ApiProperty({
@@ -45,6 +54,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'Wholesaler',
   })
   @IsString()
+  @IsNotEmpty()
   supplierType: string;
 
   @ApiProperty({
@@ -61,6 +71,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: '7 days',
   })
   @IsString()
+  @IsNotEmpty()
   leadTime: string;
 
   @ApiProperty({
@@ -69,6 +80,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'Courier',
   })
   @IsString()
+  @IsNotEmpty()
   deliveryMethod: string;
 
   // Contact Details
@@ -77,6 +89,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'John Doe',
   })
   @IsString()
+  @IsNotEmpty()
   primaryContactName: string;
 
   @ApiProperty({
@@ -84,6 +97,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'Sales Manager',
   })
   @IsString()
+  @IsNotEmpty()
   jobTitle: string;
 
   @ApiProperty({
@@ -92,6 +106,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'Sales',
   })
   @IsString()
+  @IsNotEmpty()
   department: string;
 
   @ApiProperty({
@@ -99,6 +114,8 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: '+233555538672',
   })
   @IsString()
+  @IsNotEmpty()
+  @IsPhoneNumber('GH')
   phoneNumber: string;
 
   @ApiProperty({
@@ -106,6 +123,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'johndoe@freshfarm.com',
   })
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @ApiProperty({
@@ -113,6 +131,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: '123 Market Street, Springfield',
   })
   @IsString()
+  @IsNotEmpty()
   physicalAddress: string;
 
   @ApiPropertyOptional({
@@ -122,6 +141,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   mailingAddress?: string;
 
   @ApiPropertyOptional({
@@ -130,6 +150,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   emergencyContactName?: string;
 
   @ApiPropertyOptional({
@@ -138,6 +159,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   emergencyContactTitle?: string;
 
   @ApiPropertyOptional({
@@ -146,6 +168,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   emergencyContactNumber?: string;
 
   // Payment Type
@@ -162,6 +185,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'USD',
   })
   @IsString()
+  @IsNotEmpty()
   currency: string;
 
   @ApiProperty({
@@ -170,6 +194,7 @@ export class CreateSupplierDto extends GenericResponseDto {
     example: 'Net 30 Days',
   })
   @IsString()
+  @IsNotEmpty()
   paymentTerms: string;
 
   // Bank Details (if payment type is bank)
@@ -179,6 +204,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   bankName?: string;
 
   @ApiPropertyOptional({
@@ -187,6 +213,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   accountType?: string;
 
   @ApiPropertyOptional({
@@ -195,6 +222,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @EmptyToUndefined()
   accountNumber?: string;
 
   // Mobile Money Details (if payment type is mobile money)
@@ -205,6 +233,7 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsEnum(ProviderType)
+  @EmptyToUndefined()
   provider?: ProviderType;
 
   @ApiPropertyOptional({
@@ -213,6 +242,8 @@ export class CreateSupplierDto extends GenericResponseDto {
   })
   @IsOptional()
   @IsString()
+  @IsPhoneNumber('GH')
+  @EmptyToUndefined()
   mobileMoneyPhoneNumber?: string;
 
   @ApiResponseProperty({
