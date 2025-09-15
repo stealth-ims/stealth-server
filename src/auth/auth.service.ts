@@ -123,7 +123,7 @@ export class AuthService {
 
   private async fetchUserByEmail(email: string) {
     const user = await this.userRepository.findOne({
-      where: { email },
+      where: { email: { [Op.iLike]: email } },
       attributes: ['id', 'fullName', 'email', 'role', 'status', 'username'],
     });
 
