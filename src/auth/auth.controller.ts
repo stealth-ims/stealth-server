@@ -64,6 +64,7 @@ import { CreateLoginSessionDto } from './dto/login-session.dto';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { AdminSignUpDto } from '../user/dto/signup.dto';
 import { Request } from 'express';
+import { CacheKey } from '@nestjs/cache-manager';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -208,6 +209,7 @@ export class AuthController {
   })
   @ApiBearerAuth('access-token')
   @Authorize()
+  @CacheKey(null)
   @Get('user')
   async getUser(@GetUser('sub', ParseUUIDPipe) id: string) {
     try {
