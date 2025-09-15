@@ -65,6 +65,7 @@ import { CreateLoginSessionDto } from './dto/login-session.dto';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { AdminSignUpDto } from '../user/dto/signup.dto';
 import { Request } from 'express';
+import { CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -209,8 +210,9 @@ export class AuthController {
   })
   @ApiBearerAuth('access-token')
   @Authorize()
+  @CacheTTL(0.000001)
   @Get('user')
-  async getUser(@GetUser('sub', ParseUUIDPipe) id: string, @Res() res: any) {
+  async getUser(@GetUser('sub', ParseUUIDPipe) id: string) {
     try {
       const response = await this.authService.retrieveUser(id);
       const output = new ApiSuccessResponseDto<User>(
@@ -218,8 +220,8 @@ export class AuthController {
         HttpStatus.OK,
         'user retrieved successfully',
       );
-      res.status(HttpStatus.OK).json(output);
-      return;
+      // res.status(HttpStatus.OK).json(output);
+      return output;
     } catch (error) {
       throwError(this.logger, error);
     }
