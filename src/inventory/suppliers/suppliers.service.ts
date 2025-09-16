@@ -81,7 +81,7 @@ export class SuppliersService {
     };
 
     if (query.search) {
-      whereOptions.name = { [Op.iLike]: `%${query.search}%` };
+      whereOptions.name = { [Op.iLike]: `${query.search}%` };
     }
 
     if (query.status) {
