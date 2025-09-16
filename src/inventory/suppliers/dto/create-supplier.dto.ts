@@ -48,66 +48,67 @@ export class CreateSupplierDto extends GenericResponseDto {
   @EmptyToUndefined()
   brandTradeName?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'Indicates what kind of supplier this is, such as manufacturer, distributor, or wholesaler.',
     example: 'Wholesaler',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  supplierType: string;
+  supplierType?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'The minimum quantity of items the supplier is willing to supply per order.',
     example: 100,
   })
+  @IsOptional()
   @IsNumber()
-  minimumOrderQuantity: number;
+  minimumOrderQuantity?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'The number of days between placing an order and receiving it.',
     example: '7 days',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  leadTime: string;
+  leadTime?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'The preferred method of delivery the supplier uses, such as courier, freight, or self-delivery.',
     example: 'Courier',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  deliveryMethod: string;
+  deliveryMethod?: string;
 
   // Contact Details
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The main point of contact at the supplier.',
     example: 'John Doe',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  primaryContactName: string;
+  primaryContactName?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The position or title of the primary contact at the company.',
     example: 'Sales Manager',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  jobTitle: string;
+  jobTitle?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'The department within the supplier’s organization the primary contact belongs to.',
     example: 'Sales',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  department: string;
+  department?: string;
 
   @ApiProperty({
     description: 'The primary phone number of the contact person.',
@@ -118,21 +119,21 @@ export class CreateSupplierDto extends GenericResponseDto {
   @IsPhoneNumber('GH')
   phoneNumber: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The contact person’s email address.',
     example: 'johndoe@freshfarm.com',
   })
+  @IsOptional()
   @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  email?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The physical location of the supplier.',
     example: '123 Market Street, Springfield',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  physicalAddress: string;
+  physicalAddress?: string;
 
   @ApiPropertyOptional({
     description:
@@ -172,30 +173,31 @@ export class CreateSupplierDto extends GenericResponseDto {
   emergencyContactNumber?: string;
 
   // Payment Type
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The provider through which payments is made',
     example: 'Bank',
     enum: PaymentType,
   })
+  @IsOptional()
   @IsEnum(PaymentType)
-  paymentType: PaymentType;
+  paymentType?: PaymentType;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The currency in which payments to the supplier will be made.',
     example: 'USD',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  currency: string;
+  currency?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'The terms agreed upon for payment (e.g., 30 days net, payment on delivery).',
     example: 'Net 30 Days',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  paymentTerms: string;
+  paymentTerms?: string;
 
   // Bank Details (if payment type is bank)
   @ApiPropertyOptional({
@@ -249,10 +251,10 @@ export class CreateSupplierDto extends GenericResponseDto {
   @ApiResponseProperty({
     example: 'Active',
   })
-  status: StatusType;
+  status?: StatusType;
 
   @ApiResponseProperty({
     example: 'Accra',
   })
-  city: string;
+  city?: string;
 }
