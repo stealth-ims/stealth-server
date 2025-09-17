@@ -21,6 +21,8 @@ import { BullModule } from '@nestjs/bullmq';
       database: process.env.DB_NAME,
       ssl: process.env.NODE_ENV === 'development' ? false : true,
       dialectOptions: {
+        statement_timeout: 20000,
+        application_name: 'nestjs-app',
         ssl:
           process.env.NODE_ENV === 'development'
             ? false
@@ -31,6 +33,13 @@ import { BullModule } from '@nestjs/bullmq';
       },
       autoLoadModels: false,
       synchronize: false,
+      pool: {
+        max: 20,
+        min: 2,
+        acquire: 30000,
+        idle: 10000,
+        evict: 1000,
+      },
       logging: false,
       models: [...IndexModels],
     }),
