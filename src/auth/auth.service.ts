@@ -65,12 +65,12 @@ export class AuthService {
 
   async register(dto: AdminSignUpDto, _req: Request) {
     dto.facility.email = dto.email;
-    const facility = await this.facilityService.create(dto.facility);
+    const newFacility = await this.facilityService.create(dto.facility);
     const hashPassword = await bcrypt.hash(dto.password, this.SALT_OR_ROUNDS);
     const { facility: _facility, ...createDto } = dto;
     const user = await this.userRepository.create({
       ...createDto,
-      facilityId: facility.id,
+      facilityId: newFacility.id,
       role: 'Central Admin',
       permissions: [
         'items:READ_WRITE_DELETE',
@@ -87,8 +87,10 @@ export class AuthService {
       password: hashPassword,
       status: AccountState.ACTIVE,
     });
+    newFacility.createdById = user.id;
+    await newFacility.save();
 
-    await facility.update({ createdById: user.id });
+    // await newFacility.update({ createdById: user.id });
 
     const token = await this.generateTokens(user, null);
     // await this.sendVerificationEmail(user.email, req);
@@ -97,7 +99,7 @@ export class AuthService {
     );
     this.eventEmitter.emit('items.seed', {
       userId: user.id,
-      facilityId: facility.id,
+      facilityId: newFacility.id,
     });
     // items.seed;
     return new LoginTokenDto(user, token, expiresAt);
