@@ -77,7 +77,13 @@ export class ItemService {
    */
   async create(createItemDto: CreateItemDto): Promise<OneItem> {
     const existingItem = await this.itemRepo.findOne({
-      where: { name: createItemDto.name, facilityId: createItemDto.facilityId },
+      where: {
+        [Op.or]: [
+          { name: { [Op.iLike]: createItemDto.name } },
+          { code: { [Op.iLike]: createItemDto.code } },
+        ],
+        facilityId: createItemDto.facilityId,
+      },
     });
     if (existingItem) {
       throw new BadRequestException(
