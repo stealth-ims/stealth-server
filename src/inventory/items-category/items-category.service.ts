@@ -230,12 +230,12 @@ export class ItemCategoryService {
       return creatingItem;
     });
 
-    await Item.bulkCreate(finalItems, { individualHooks: true });
     await Supplier.create({
       name: 'Regional Medical Store',
       facilityId: payload.facilityId,
       createdById: payload.userId,
     });
+    await Item.bulkCreate(finalItems);
 
     this.logger.debug('Data seeded successfully for facility: ', {
       facilityId: payload.facilityId,
