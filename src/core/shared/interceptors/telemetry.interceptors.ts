@@ -13,6 +13,8 @@ export class TelemetryInterceptor implements NestInterceptor {
     next: CallHandler<any>,
   ): Observable<any> | Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
+    const response = context.switchToHttp().getResponse();
+
     const { method, route, url, headers, body } = request;
     const isDevelopment = process.env.NODE_ENV == 'development';
     // const isProduction = process.env.NODE_ENV == 'production';
@@ -27,12 +29,13 @@ export class TelemetryInterceptor implements NestInterceptor {
         body,
       });
     }
-    const now = Date.now();
+    const beforeRequest = Date.now();
 
     return next.handle().pipe(
       tap(() =>
-        this.logger.debug('Request duration', {
-          duration: `${Date.now() - now} ms`,
+        this.logger.debug('Request completed', {
+          duration: `${Date.now() - beforeRequest} ms`,
+          statusCode: response.statusCode,
         }),
       ),
     );
