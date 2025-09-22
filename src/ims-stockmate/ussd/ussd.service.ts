@@ -408,7 +408,7 @@ export class StockmateUssdService {
               createdById: dto.userId,
               name,
             },
-            { skipAudits: true } as CreateOptions,
+            { skipAudit: true } as CreateOptions,
           );
           return `CON Sell to ${newPatient.name}?\n1. Yes\n2. No`;
         }
