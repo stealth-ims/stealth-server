@@ -11,7 +11,7 @@ import {
   UpdateItemCategoryDto,
 } from './dto';
 import { ApiSuccessResponseNoData } from 'src/core/shared/responses/success.response';
-import { CreateOptions, FindAndCountOptions, Op } from 'sequelize';
+import { FindAndCountOptions, Op } from 'sequelize';
 import { Item } from '../items/models/item.model';
 import { generateFilter } from '../../core/shared/factory';
 import { IUserPayload } from '../../auth/interface/payload.interface';
@@ -230,14 +230,11 @@ export class ItemCategoryService {
       return creatingItem;
     });
 
-    await Supplier.create(
-      {
-        name: 'Regional Medical Store',
-        facilityId: payload.facilityId,
-        createdById: payload.userId,
-      },
-      { skipAudit: true } as CreateOptions,
-    );
+    await Supplier.create({
+      name: 'Regional Medical Store',
+      facilityId: payload.facilityId,
+      createdById: payload.userId,
+    });
     await Item.bulkCreate(finalItems);
 
     this.logger.debug('Data seeded successfully for facility: ', {
