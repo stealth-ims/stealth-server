@@ -71,7 +71,7 @@ export class NotificationsGateway
   ): { topic: string; message: string } {
     client.join(topic);
 
-    this.logger.log('I am subscribed to topic: ' + topic);
+    this.logger.debug('I am subscribed to topic: ' + topic);
 
     return {
       topic: topic,
