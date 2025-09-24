@@ -402,10 +402,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.userRepository.update(
-      { ...{ fullName, phoneNumber } },
-      { where: { id: userId } },
-    );
+    await user.update({ ...{ fullName, phoneNumber } });
     return;
   }
 
