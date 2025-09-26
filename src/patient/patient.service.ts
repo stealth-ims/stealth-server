@@ -124,6 +124,7 @@ export class PatientService {
         query.search && {
           [Op.or]: [
             { cardIdentificationNumber: { [Op.iLike]: `%${query.search}%` } },
+            { name: { [Op.iLike]: `%${query.search}%` } },
           ],
         },
       ],
