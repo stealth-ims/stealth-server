@@ -28,7 +28,7 @@ export class CustomCacheInterceptor extends CacheInterceptor {
     const url = httpAdapter.getRequestUrl(request);
     const fullUrl = `${protocol}://${host}${url}`;
 
-    const token = request.user.sub;
+    const token = request.user ? request.user.sub : 'no-auth';
 
     return this.buildCacheKeyFrom(fullUrl, token || 'no-auth');
   }
