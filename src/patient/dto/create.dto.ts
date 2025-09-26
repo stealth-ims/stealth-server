@@ -1,10 +1,11 @@
 import {
   ApiProperty,
+  ApiPropertyOptional,
   ApiResponseProperty,
   IntersectionType,
 } from '@nestjs/swagger';
 import { GenericResponseDto } from '../../core/shared/dto/base.dto';
-import { IsNotEmpty, MaxDate } from 'class-validator';
+import { IsNotEmpty, IsOptional, MaxDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { format } from 'date-fns';
 
@@ -18,10 +19,17 @@ export class CreatePatientDto {
 
   @ApiProperty({
     example: 'gh-56387082875',
-    description: 'Identification number on nhis or ghana card',
+    description: 'Primary Identification number of patient',
   })
   @IsNotEmpty()
   cardIdentificationNumber: string;
+
+  @ApiPropertyOptional({
+    example: '45876378475',
+    description: 'Secondary Identification number of patient',
+  })
+  @IsOptional()
+  secondaryIdentificationNumber: string;
 
   @ApiProperty({
     example: format(new Date(), 'yyyy-MM-dd'),

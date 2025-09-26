@@ -32,6 +32,11 @@ export class Patient extends BaseModel<Patient> {
   @Column
   cardIdentificationNumber: string;
 
+  @AllowNull
+  @Unique
+  @Column
+  secondaryIdentificationNumber: string;
+
   @Column(DataType.DATE)
   dateOfBirth: Date;
 

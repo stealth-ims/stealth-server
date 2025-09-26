@@ -21,6 +21,13 @@ module.exports = {
         field: 'card_identification_number',
       },
 
+      secondaryIdentificationNumber: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true,
+        field: 'secondary_identification_number',
+      },
+
       dateOfBirth: {
         type: Sequelize.DATE,
         allowNull: false,

@@ -108,6 +108,7 @@ export class PatientService {
       { deletedById: deletedBy },
       { where: { id } },
     );
+
     const deletedPatient = await this.patientRepository.destroy({
       where: { id },
       userId: deletedBy,
@@ -124,6 +125,11 @@ export class PatientService {
         query.search && {
           [Op.or]: [
             { cardIdentificationNumber: { [Op.iLike]: `%${query.search}%` } },
+            {
+              secondaryIdentificationNumber: {
+                [Op.iLike]: `%${query.search}%`,
+              },
+            },
             { name: { [Op.iLike]: `%${query.search}%` } },
           ],
         },
@@ -132,7 +138,12 @@ export class PatientService {
     return {
       where: whereOptions,
       order: [['updatedAt', 'DESC']],
-      attributes: ['id', 'name', 'cardIdentificationNumber'],
+      attributes: [
+        'id',
+        'name',
+        'cardIdentificationNumber',
+        'secondaryIdentificationNumber',
+      ],
     };
   }
 }
