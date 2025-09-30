@@ -42,6 +42,7 @@ import {
 import { ItemService } from './items.service';
 import { GetNoPaginateDto } from '../../core/shared/dto/get-no_paginate.dto';
 import { ItemExportsService } from './exports.service';
+import { CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Items')
 @Controller('items')
@@ -102,6 +103,7 @@ export class ItemController {
     isArray: true,
     message: 'Items retrieved successfully',
   })
+  @CacheTTL(0.00001)
   @Permission(Features.ITEMS, PermissionLevel.READ)
   @Get()
   async findAll(

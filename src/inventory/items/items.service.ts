@@ -158,14 +158,19 @@ export class ItemService {
   async findAll(query: ItemPaginationDto) {
     const filter = await this.applyFilter(query);
     const items = await this.itemRepo.findAndCountAll(filter);
-    this.logger.log(`Retrieved ${items.count} items`);
-    items.rows.sort((a, b) => b.totalStock - a.totalStock);
+    const count = await this.itemRepo.count({
+      where: filter.where,
+      distinct: true,
+      col: 'id',
+    });
+    this.logger.log(`Retrieved ${count} items`);
+    // items.rows.sort((a, b) => b.totalStock - a.totalStock);
 
     return new PaginatedDataResponseDto(
       items.rows,
       query.page || 1,
       query.pageSize || 10,
-      items.count,
+      count,
     );
   }
 
@@ -478,7 +483,10 @@ export class ItemService {
         ...queryFilter.searchFilter,
       },
       ...queryFilter.pageFilter,
-      order: [['name', 'ASC']],
+      order: [
+        [query.orderBy || 'name', query.orderDirection || 'ASC'],
+        [Sequelize.literal('"totalStock"'), 'DESC'],
+      ],
       attributes: [
         'id',
         'name',
@@ -491,10 +499,20 @@ export class ItemService {
         'status',
         'createdAt',
         'updatedAt',
-        'totalStock',
+        [Sequelize.fn('SUM', Sequelize.col('batches.quantity')), 'totalStock'],
         'code',
       ],
-      include: [{ model: ItemCategory, attributes: ['id', 'name'] }],
+      include: [
+        {
+          model: Batch,
+          as: 'batches',
+          attributes: [],
+          duplicating: false,
+          required: false,
+        },
+        { model: ItemCategory, attributes: ['id', 'name'] },
+      ],
+      group: ['Item.id', 'category.id'],
       distinct: true,
       departmentId: query.departmentId,
     };
