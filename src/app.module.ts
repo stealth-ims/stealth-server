@@ -40,7 +40,7 @@ import { BullModule } from '@nestjs/bullmq';
         idle: 10000,
         evict: 1000,
       },
-      logging: false,
+      logging: console.log,
       models: [...IndexModels],
     }),
 
