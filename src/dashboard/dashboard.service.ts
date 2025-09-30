@@ -70,7 +70,7 @@ inventory as (
   FROM items i
   LEFT JOIN batches b
       ON b.item_id = i.id
-      ${user.department ? `AND i.department_id = '${user.department}'` : 'AND i.department_id IS NULL'}
+      ${user.department ? `AND i.department_id = '${user.department}'` : ''}
   WHERE ${user.facility ? `i.facility_id = '${user.facility}'` : ''}
 	GROUP BY i.id, i.cost_price
 ),

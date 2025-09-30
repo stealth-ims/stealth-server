@@ -39,6 +39,7 @@ import { firstValueFrom } from 'rxjs';
 import { Request } from 'express';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SmsService } from '../notification/sms/sms.service';
+import { Department } from 'src/admin/department/models/department.model';
 
 @Injectable()
 export class AuthService {
@@ -216,7 +217,10 @@ export class AuthService {
 
   async retrieveUser(userId: string) {
     const user = await this.userRepository.findByPk(userId, {
-      include: [{ model: Facility, attributes: ['id', 'name'] }],
+      include: [
+        { model: Facility, attributes: ['id', 'name'] },
+        { model: Department, attributes: ['id', 'name'] },
+      ],
       attributes: [
         'id',
         'createdAt',

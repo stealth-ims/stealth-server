@@ -21,6 +21,11 @@ export class GetUserDto extends OmitType(CreateUserDto, [
     type: GetNoPaginateDto,
   })
   facility: GetNoPaginateDto;
+
+  @ApiResponseProperty({
+    type: GetNoPaginateDto,
+  })
+  department: GetNoPaginateDto;
 }
 
 export class GetSettingsDto extends IntersectionType(
