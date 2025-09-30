@@ -213,7 +213,7 @@ export class NotificationService {
         throw new NotFoundException('Department not found');
       }
 
-      const deptPart = `:${user.department}:`;
+      const deptPart = `:${user.department}`;
       topic = `${user.facility}${deptPart}`;
 
       await this.notificationsGateway.sendNotificationToTopic(
