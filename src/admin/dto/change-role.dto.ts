@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export enum PermissionsTypes {
   // Items
@@ -54,6 +54,14 @@ export enum PermissionsTypes {
 }
 
 export class ChangeRoleDto {
+  @ApiPropertyOptional({
+    example: 'ef7f6868-ffb1-4de1-8ac1-5208f11b09be',
+    description: 'The ID of the department to assign the user to',
+  })
+  @IsOptional()
+  @IsUUID(4)
+  departmentId: string;
+
   @ApiPropertyOptional({
     example: 'Healthcare Worker',
     description: 'changing user role to something else',

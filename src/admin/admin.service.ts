@@ -137,14 +137,12 @@ export class AdminService {
     adminId: string,
   ) {
     const personnel = await this.userRepository.findByPk(personnelId);
+
     if (!personnel) {
       throw new NotFoundException('personnel not found');
     }
 
-    personnel.role = dto.role;
-    personnel.permissions = dto.permissions;
-    personnel.updatedById = adminId;
-    await personnel.save();
+    await personnel.update({ updatedById: adminId, ...dto });
 
     if (personnel.email) {
       this.sendChangeRoleConfirmationMail(
