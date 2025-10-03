@@ -148,7 +148,7 @@ export class SalesHelperService {
 
       let cappedPrice = this.calculateCappedPrice(item.sellingPrice, markup);
       // cappedPrice = Math.max(cappedPrice, 0);
-      cappedPrice = 0;
+      cappedPrice = item.sellingPrice; // changed to 0 for original structure
       finalTotal += cappedPrice * item.quantity;
     }
 
