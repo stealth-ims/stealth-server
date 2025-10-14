@@ -1,11 +1,24 @@
-import { Controller, Get, HttpStatus, Logger, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Logger,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { UserService } from './user.service';
 import { throwError } from '../core/shared/responses/error.response';
 import { GetUser } from '../auth/decorator';
 import { ApiSuccessResponseDto } from '../core/shared/responses/success.response';
-import { FindUserDto, GetUsersNoPaginateDto } from './dto';
+import {
+  CreateSuperAdminDto,
+  FindUserDto,
+  GetSuperAdminDto,
+  GetUsersNoPaginateDto,
+} from './dto';
 import { IUserPayload } from '../auth/interface/payload.interface';
 
 @ApiTags('Users')
@@ -31,6 +44,24 @@ export class UsersController {
         response,
         HttpStatus.OK,
         'Users fetched successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @CustomApiResponse(['created'], {
+    type: GetSuperAdminDto,
+    message: 'Super Admin User created successfully',
+  })
+  @Post('super-admin')
+  async createSuperAdminUser(@Body() dto: CreateSuperAdminDto) {
+    try {
+      const response = await this.userService.createSuperAdmin(dto);
+      return new ApiSuccessResponseDto(
+        response,
+        HttpStatus.OK,
+        'Super Admin user created successfully',
       );
     } catch (error) {
       throwError(this.logger, error);

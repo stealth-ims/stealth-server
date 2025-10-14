@@ -37,7 +37,7 @@ module.exports = {
         },
         field: 'user_id',
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        onDelete: 'CASCADE',
       },
     });
   },

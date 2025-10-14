@@ -4,9 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from '../auth/models/user.model';
+import { AccountState, User } from '../auth/models/user.model';
 import { Facility } from '../admin/facility/models/facility.model';
-import { CreateSettingsDto, FindUserDto } from './dto';
+import { CreateSettingsDto, CreateSuperAdminDto, FindUserDto } from './dto';
 import { Settings } from './models/setting.model';
 import { buildQuery } from '../core/shared/factory/query-builder.factory';
 import { QueryOptionsDto } from '../core/shared/dto/query-options.dto';
@@ -23,6 +23,7 @@ import { MailService } from '../notification/mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 import { IUserPayload } from '../auth/interface/payload.interface';
 import { UpdateExpiryIntervalDto } from '../admin/facility/dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -63,6 +64,37 @@ export class UserService {
     });
 
     return users;
+  }
+
+  async createSuperAdmin(dto: CreateSuperAdminDto) {
+    const hashPassword = await bcrypt.hash(dto.password, 10);
+    const user = await this.userRepository.create({
+      ...dto,
+      role: 'Super Admin',
+      permissions: [
+        'items:READ_WRITE_DELETE',
+        'item_categories:READ_WRITE_DELETE',
+        'stock_adjustment:READ_WRITE_DELETE',
+        'item_orders:READ_WRITE_DELETE',
+        'reports:READ_WRITE_DELETE',
+        'suppliers:READ_WRITE_DELETE',
+        'sales:READ_WRITE_DELETE',
+        'department_requests:READ_WRITE_DELETE',
+        'departments:READ_WRITE_DELETE',
+        'users:READ_WRITE_DELETE',
+      ],
+      password: hashPassword,
+      status: AccountState.ACTIVE,
+    });
+
+    return {
+      id: user.id,
+      fullName: user.fullName,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.status,
+    };
   }
 
   async findOne(userId: string) {

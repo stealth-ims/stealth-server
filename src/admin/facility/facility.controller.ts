@@ -26,6 +26,7 @@ import { CustomApiResponse } from '../../core/shared/docs/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUser, Public, Roles } from '../../auth/decorator';
 import { Role } from '../../auth/interface/roles.enum';
+import { GetNoPaginateDto } from 'src/core/shared/dto/get-no_paginate.dto';
 
 @ApiTags('Facility')
 @Public()
@@ -70,6 +71,25 @@ export class FacilityController {
           query.pageSize,
           count,
         ),
+        HttpStatus.OK,
+        'Facilities retrieved successfully',
+      );
+    } catch (error) {
+      throwError(this.logger, error);
+    }
+  }
+
+  @Get('no-paginate')
+  @CustomApiResponse(['success'], {
+    type: GetNoPaginateDto,
+    isArray: true,
+    message: 'Facilities retrieved successfully',
+  })
+  async getFacilitiesNoPaginate() {
+    try {
+      const response = await this.facilityService.findAllNoPaginate();
+      return new ApiSuccessResponseDto(
+        response,
         HttpStatus.OK,
         'Facilities retrieved successfully',
       );

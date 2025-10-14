@@ -61,6 +61,26 @@ export class FacilityService {
   }
 
   /**
+   * Retrieves all facilities without pagination.
+   *
+   * @returns A promise that resolves to an array of FacilityResponse objects.
+   * @throws {InternalServerErrorException} if an error occurs while retrieving the categories.
+   */
+  async findAllNoPaginate() {
+    this.logger.log(`Retrieving facilities`);
+
+    const filter: object = {
+      attributes: ['id', 'name'],
+      order: [['name', 'ASC']],
+      distinct: true,
+    };
+
+    const facilities = await this.facilityRepo.findAll(filter);
+
+    return facilities;
+  }
+
+  /**
    * Finds a facility by its ID.
    *
    * @param id - The ID of the facility to find.

@@ -41,6 +41,16 @@ export class FindAuditLogQueryDto extends IntersectionType(
   userDepartmentId?: string;
 }
 
+export class FindAuditLogSuperAdminQueryDto extends OmitType(
+  FindAuditLogQueryDto,
+  ['facilityId', 'userDepartmentId'],
+) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  facilityId?: string;
+}
+
 export class ExportAuditsQueryDto extends IntersectionType(
   ExportQueryDto,
   OmitType(FindAuditLogQueryDto, ['page', 'pageSize']),
@@ -56,6 +66,8 @@ export class AuditLogsResponseDto extends PickType(AuditLogDto, [
   'recordId',
   'departmentId',
   'department',
+  'facilityId',
+  'facility',
   'createdAt',
   'updatedAt',
 ]) {}

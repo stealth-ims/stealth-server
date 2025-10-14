@@ -81,6 +81,11 @@ export class AuditLogDto extends GenericResponseDto {
   @ApiResponseProperty({ example: 'f1a2b3c4-d5e6-7890-abcd-1234567890ef' })
   facilityId?: string;
 
+  @ApiResponseProperty({
+    type: GetNoPaginateDto,
+  })
+  facility: GetNoPaginateDto;
+
   @ApiResponseProperty({ example: 'd1e2f3a4-b5c6-7890-abcd-0987654321fe' })
   departmentId?: string;
 

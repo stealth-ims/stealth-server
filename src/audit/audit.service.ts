@@ -45,9 +45,11 @@ export class AuditsService {
       'Sale',
     ];
     const whereOptions: WhereOptions<AuditLog> = {
-      facilityId: query.facilityId,
       tableName: dataTables,
     };
+    if (query.facilityId) {
+      whereOptions.facilityId = query.facilityId;
+    }
     if (query.userDepartmentId) {
       whereOptions.departmentId = query.userDepartmentId;
     }
@@ -83,13 +85,12 @@ export class AuditsService {
       attributes: [
         'id',
         'userId',
-        'user',
+        'facilityId',
         'action',
         'tableName',
         'description',
         'recordId',
         'departmentId',
-        'department',
         'createdAt',
         'updatedAt',
       ],
