@@ -162,7 +162,9 @@ export class SalesService {
   async create(dto: CreateSaleDto, user: IUserPayload): Promise<Sale> {
     const transaction = await this.sequelize.transaction();
     try {
-      await this.salesHelperService.attachPatientIfExists(dto);
+      if (!dto.patientId && dto.patientCardId) {
+        await this.salesHelperService.attachPatientIfExists(dto);
+      }
 
       const batchSellingPrices: BatchSellingPrice[] = [];
       const saleItems = await this.salesHelperService.processSaleItems(

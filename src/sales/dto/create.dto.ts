@@ -42,12 +42,12 @@ export class CreateSaleItemsDto {
 
 export class CreateSaleDto {
   @ApiPropertyOptional({
-    example: 'gh-56387082875',
-    description: 'The card identification number of the selected patient',
+    example: '0723e7a1-ec12-4cdb-b4d5-6169dba540c6',
+    description: "The Patient's unique identifier in database",
   })
   @IsOptional()
   @PatientExists()
-  patientCardId: string;
+  patientId?: string;
 
   @ApiProperty({
     example: ['CASH'],
@@ -92,9 +92,9 @@ export class CreateSaleDto {
   notes?: string;
 
   @ApiResponseProperty({
-    example: '0723e7a1-ec12-4cdb-b4d5-6169dba540c6',
+    example: 'gh-56387082875',
   })
-  patientId?: string;
+  patientCardId?: string;
 
   @ApiResponseProperty({
     example: 'S-1234',

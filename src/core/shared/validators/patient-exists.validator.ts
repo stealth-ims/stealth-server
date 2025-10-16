@@ -17,7 +17,7 @@ export class PatientExistsRule implements ValidatorConstraintInterface {
       if (!value) {
         return true;
       }
-      await this.patientService.findByCardId(value, false);
+      await this.patientService.findOne(value, false);
     } catch (_e) {
       return false;
     }
