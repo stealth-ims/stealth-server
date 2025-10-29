@@ -465,10 +465,28 @@ export class ItemService {
     }
     let searchOptions = {};
     if (query.search) {
+      const search = query.search;
       searchOptions = {
         [Op.or]: [
-          { name: { [Op.iLike]: `${query.search}%` } },
-          { brandName: { [Op.iLike]: `${query.search}%` } },
+          { name: { [Op.iLike]: `%${search}%` } },
+          { brandName: { [Op.iLike]: `%${search}%` } },
+          { dosageForm: { [Op.iLike]: `%${search}%` } },
+          { strength: { [Op.iLike]: `%${search}%` } },
+          Sequelize.where(
+            Sequelize.fn(
+              'concat_ws',
+              ' ',
+              Sequelize.fn('coalesce', Sequelize.col('Item.name'), ''),
+              Sequelize.literal(
+                `CASE WHEN "brand_name" IS NOT NULL AND "brand_name" <> '' THEN '(' || "brand_name" || ')' ELSE '' END`,
+              ),
+              Sequelize.fn('coalesce', Sequelize.col('dosage_form'), ''),
+              Sequelize.fn('coalesce', Sequelize.col('strength'), ''),
+            ),
+            {
+              [Op.iLike]: `%${search}%`,
+            },
+          ),
         ],
       };
     }

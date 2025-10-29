@@ -14,7 +14,7 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Sale } from './models/sales.model';
 import { PaginatedDataResponseDto } from 'src/core/shared/responses/success.response';
-import { DestroyOptions, FindAndCountOptions } from 'sequelize';
+import { DestroyOptions, FindAndCountOptions, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { BatchService } from '../inventory/items/batches/batch.service';
 import { Batch, Item, Markup } from '../inventory/items/models';
@@ -42,12 +42,35 @@ export class SalesService {
   ) {}
 
   async fetchItems(query: FindItemDto, user: IUserPayload) {
-    const itemWhereConditions: Record<string, Record<any, any>> = {};
+    let itemWhereConditions: WhereOptions = {};
 
     itemWhereConditions.facilityId = { [Op.eq]: user.facility };
     if (query.search) {
-      itemWhereConditions.name = {
-        [Op.iLike]: `%${query.search}%`,
+      const search = query.search;
+
+      itemWhereConditions = {
+        ...itemWhereConditions,
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { brandName: { [Op.iLike]: `%${search}%` } },
+          { dosageForm: { [Op.iLike]: `%${search}%` } },
+          { strength: { [Op.iLike]: `%${search}%` } },
+          Sequelize.where(
+            Sequelize.fn(
+              'concat_ws',
+              ' ',
+              Sequelize.fn('coalesce', Sequelize.col('name'), ''),
+              Sequelize.literal(
+                `CASE WHEN "brand_name" IS NOT NULL AND "brand_name" <> '' THEN '(' || "brand_name" || ')' ELSE '' END`,
+              ),
+              Sequelize.fn('coalesce', Sequelize.col('dosage_form'), ''),
+              Sequelize.fn('coalesce', Sequelize.col('strength'), ''),
+            ),
+            {
+              [Op.iLike]: `%${search}%`,
+            },
+          ),
+        ],
       };
     }
 
