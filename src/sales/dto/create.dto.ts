@@ -19,6 +19,10 @@ import {
 import { GenericResponseDto } from 'src/core/shared/dto/base.dto';
 import { PaymentStatus, SalePaymentType } from '../models/sales.model';
 import { BatchExists, PatientExists } from '../../core/shared/validators';
+import { Transform } from 'class-transformer';
+
+const EmptyToUndefined = () =>
+  Transform(({ value }) => (value === '' ? undefined : value));
 
 export class CreateSaleItemsDto {
   @ApiProperty({
@@ -46,6 +50,7 @@ export class CreateSaleDto {
     description: "The Patient's unique identifier in database",
   })
   @IsOptional()
+  @EmptyToUndefined()
   @PatientExists()
   patientId?: string;
 
