@@ -102,7 +102,7 @@ export class ExportsService {
     doc
       .font('Helvetica-Bold')
       .fontSize(34)
-      .text(`${query.location} USAGE STATS`, {
+      .text(`${query.location} REGION USAGE STATS`, {
         align: 'center',
       });
 
