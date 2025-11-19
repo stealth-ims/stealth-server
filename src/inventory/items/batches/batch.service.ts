@@ -447,6 +447,8 @@ export class BatchService {
 
     batch.quantity += qty;
     batch.updatedById = userId;
+    batch.deletedById = null;
+    batch.deletedAt = null;
     await batch.save();
     this.eventEmitter.emit('quantity.increased', {
       itemId: itemId,
