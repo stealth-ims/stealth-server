@@ -53,7 +53,7 @@ export function generateExportQuery(
     LEFT JOIN sale_carts sc ON sc.sale_id = s.id
     WHERE
       s.facility_id = '${user.facility}'
-      ${user.department ? `AND s.department_id = '${user.department}'` : 'AND s.department_id IS NULL'}
+      ${user.department ? `AND s.department_id = '${user.department}'` : ''}
       ${filters ? `AND ${filters}` : ''}
       ${queryFilters.searchFilter ? `AND ${queryFilters.searchFilter}` : ''}
 
