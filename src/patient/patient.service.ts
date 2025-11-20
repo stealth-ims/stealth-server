@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Patient } from './models/patient.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreatePatientDto, FindPatientDto, UpdatePatientDto } from './dto';
@@ -29,6 +33,27 @@ export class PatientService {
     sales: { model: Sale, attributes: ['id', 'saleNumber', 'status'] },
   };
   async create(dto: CreatePatientDto, user: IUserPayload) {
+    const samePatient = await this.patientRepository.findOne({
+      where: {
+        [Op.or]: [
+          {
+            cardIdentificationNumber: {
+              [Op.iLike]: dto.cardIdentificationNumber,
+            },
+          },
+          {
+            secondaryIdentificationNumber: {
+              [Op.iLike]: dto.secondaryIdentificationNumber,
+            },
+          },
+        ],
+      },
+      attributes: ['id'],
+    });
+    if (samePatient) {
+      throw new ConflictException('Patient already exists');
+    }
+
     const patient = await this.patientRepository.create({
       ...dto,
       createdById: user.sub,
