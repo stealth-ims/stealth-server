@@ -27,6 +27,13 @@ module.exports = {
         field: 'secondary_identification_number',
       },
 
+      queueUniqueId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        unique: true,
+        field: 'queue_unique_id',
+      },
+
       dateOfBirth: {
         type: Sequelize.DATE,
         allowNull: false,

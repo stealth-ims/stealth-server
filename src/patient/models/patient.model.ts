@@ -39,6 +39,10 @@ export class Patient extends BaseModel<Patient> {
   @Column
   secondaryIdentificationNumber: string;
 
+  @AllowNull
+  @Column
+  queueUniqueId: string;
+
   @Column(DataType.DATE)
   dateOfBirth: Date;
 

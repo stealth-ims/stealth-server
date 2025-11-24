@@ -92,7 +92,8 @@ export class PatientService {
     if (populate) {
       includeOption.include = [Sale];
     }
-    const patient = await this.patientRepository.findByPk(id, {
+    const patient = await this.patientRepository.findOne({
+      where: { [Op.or]: [{ id }, { queueUniqueId: id }] },
       include: [
         ...includeOption.include,
         {

@@ -5,7 +5,7 @@ import {
   IntersectionType,
 } from '@nestjs/swagger';
 import { GenericResponseDto } from '../../core/shared/dto/base.dto';
-import { IsNotEmpty, IsOptional, MaxDate } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID, MaxDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { format } from 'date-fns';
 
@@ -23,6 +23,14 @@ export class CreatePatientDto {
   })
   @IsOptional()
   cardIdentificationNumber: string;
+
+  @ApiPropertyOptional({
+    example: 'f59b8418-ace4-4488-bf74-441ba47aa150',
+    description: "The patient's queue unique id",
+  })
+  @IsOptional()
+  @IsUUID(4)
+  queueUniqueId: string;
 
   @ApiPropertyOptional({
     example: '45876378475',

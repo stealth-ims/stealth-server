@@ -12,12 +12,13 @@ import { PatientService } from '../../../patient/patient.service';
 @Injectable()
 export class PatientExistsRule implements ValidatorConstraintInterface {
   constructor(private patientService: PatientService) {}
-  async validate(value?: string) {
+  async validate(value: any, args?: ValidationArguments) {
     try {
       if (!value) {
         return true;
       }
-      await this.patientService.findOne(value, false);
+      const patient = await this.patientService.findOne(value, false);
+      (args.object as any)[args.property] = patient.id;
     } catch (_e) {
       return false;
     }
