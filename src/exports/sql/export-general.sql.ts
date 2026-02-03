@@ -1,4 +1,4 @@
-import { subMonths } from 'date-fns';
+import { startOfMonth } from 'date-fns';
 import { IMSLocations, PerformanceExportSchema } from '../dto';
 
 export function generateGeneralDataQuery(location: IMSLocations) {
@@ -80,11 +80,12 @@ export function generateSaleAndStockingActivityDataQuery(
 
 export function generateSystemUsageDataQuery(location: IMSLocations) {
   const today = new Date();
-  const month = subMonths(today, 1);
-  // const month = startOfMonth(today);
+  // const month = subMonths(today, 1);
+  const month = startOfMonth(today);
+
   return `
     WITH facility_ids AS (
-      SELECT id
+      SELECT id, name
       FROM facilities
       WHERE name IN (
         ${PerformanceExportSchema.locations[location].facilities.join(', ')}
@@ -107,15 +108,18 @@ export function generateSystemUsageDataQuery(location: IMSLocations) {
           'FM999990.00'
       ) || '%' AS "percentageUsage"
       
-    FROM audit_logs a
-    LEFT JOIN departments d ON a.department_id = d.id
-    LEFT JOIN facilities f ON a.facility_id = f.id
-    WHERE
-      a.facility_id IN (SELECT id FROM facility_ids)
-      ${location !== IMSLocations.SAVANNAH ? 'AND d.name IS NOT NULL' : ''}
-      AND a.created_at > '${month.toISOString()}'
-      AND a.table_name NOT IN ('SaleItem', 'Patient')
-    GROUP BY a.facility_id, d.name, f.name;
+
+    FROM facility_ids f
+    LEFT JOIN audit_logs a
+      ON a.facility_id = f.id
+     AND a.created_at > '${month.toISOString()}'
+     AND a.table_name NOT IN ('SaleItem', 'Patient')
+    LEFT JOIN departments d
+      ON a.department_id = d.id
+     ${location !== IMSLocations.SAVANNAH ? 'AND d.name IS NOT NULL' : ''}
+
+    GROUP BY f.id, f.name, d.name;
+
 `;
 }
 

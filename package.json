@@ -6,7 +6,7 @@
   "private": true,
   "license": "MIT License",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "build": "nest build",
