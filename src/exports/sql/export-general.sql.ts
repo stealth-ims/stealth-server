@@ -29,6 +29,9 @@ export function generateGeneralDataQuery(location: IMSLocations) {
 export function generateSaleAndStockingActivityDataQuery(
   location: IMSLocations,
 ) {
+  // const today = new Date('2025-10-01');
+  // const month = startOfMonth(today);
+  // const end = endOfMonth(addMonths(today, 2));
   return `
     WITH facility_ids AS (
       SELECT id
@@ -67,6 +70,7 @@ export function generateSaleAndStockingActivityDataQuery(
       ${location !== IMSLocations.SAVANNAH ? 'AND d.name IS NOT NULL' : ''}
     GROUP BY a.facility_id, d.name, f.name;
 `;
+  // AND a.created_at BETWEEN '${month.toISOString()}' AND '${end.toISOString()}'
 }
 
 // COUNT(CASE WHEN a.description = 'Created Item' THEN 1 END) AS "itemsAdded",
@@ -82,6 +86,7 @@ export function generateSystemUsageDataQuery(location: IMSLocations) {
   const today = new Date();
   // const month = subMonths(today, 1);
   const month = startOfMonth(today);
+  // const end = endOfMonth(addMonths(today, 2));
 
   return `
     WITH facility_ids AS (
@@ -112,7 +117,7 @@ export function generateSystemUsageDataQuery(location: IMSLocations) {
     FROM facility_ids f
     LEFT JOIN audit_logs a
       ON a.facility_id = f.id
-     AND a.created_at > '${month.toISOString()}'
+			AND a.created_at > '${month.toISOString()}'
      AND a.table_name NOT IN ('SaleItem', 'Patient')
     LEFT JOIN departments d
       ON a.department_id = d.id
@@ -121,9 +126,13 @@ export function generateSystemUsageDataQuery(location: IMSLocations) {
     GROUP BY f.id, f.name, d.name;
 
 `;
+  // AND a.created_at BETWEEN '${month.toISOString()}' AND '${end.toISOString()}'
 }
 
 export function generateTotalQuantityDataQuery(location: string) {
+  // const today = new Date('2025-10-01');
+  // const month = startOfMonth(today);
+  // const end = endOfMonth(addMonths(today, 2));
   return `
     WITH facility_ids AS (
       SELECT id
@@ -145,4 +154,5 @@ export function generateTotalQuantityDataQuery(location: string) {
     WHERE b.facility_id IN (SELECT id FROM facility_ids)
     GROUP BY b.facility_id, d.name, f.name;
 `;
+  // AND b.created_at BETWEEN '${month.toISOString()}' AND '${end.toISOString()}'
 }
