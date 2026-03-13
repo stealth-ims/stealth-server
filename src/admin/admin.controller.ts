@@ -139,6 +139,22 @@ export class AdminController {
     );
   }
 
+  @CustomApiResponse(['successNull', 'notfound'], {
+    message: 'User password changed successfully',
+  })
+  @Patch('users/:id/reset-password')
+  async resetPassword(
+    @Param('id', ParseUUIDPipe) personnelId: string,
+    @Body() dto: AdminChangePasswordDto,
+  ) {
+    dto.userId = personnelId;
+    await this.adminService.resetUserPassword(dto);
+    return new ApiSuccessResponseNoData(
+      HttpStatus.OK,
+      'user password changed successfully',
+    );
+  }
+
   @CustomApiResponse(['successNull', 'authorize', 'notfound'], {
     type: GetAdminUserDto,
     message: 'User deactivated successfully',

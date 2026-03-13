@@ -155,7 +155,7 @@ export class AdminService {
     return;
   }
 
-  async resetUserPassword(dto: AdminChangePasswordDto, adminId: string) {
+  async resetUserPassword(dto: AdminChangePasswordDto, adminId?: string) {
     const personnel = await this.userRepository.findByPk(dto.userId);
     if (!personnel) {
       throw new NotFoundException('User not found');
@@ -165,7 +165,9 @@ export class AdminService {
       this.SALT_OR_ROUNDS,
     );
     personnel.password = hashPassword;
-    personnel.updatedById = adminId;
+    if (adminId) {
+      personnel.updatedById = adminId;
+    }
     await personnel.save();
   }
 

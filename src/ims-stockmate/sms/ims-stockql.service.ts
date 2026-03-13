@@ -232,7 +232,7 @@ export class ImsStockQlService {
           quantity: Number(match[2]),
         });
       }
-      if ((match = regex.exec(input)) !== null) {
+      if (result.length > 0) {
         salesAction.saleItems = result;
       }
       return;

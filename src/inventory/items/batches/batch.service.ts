@@ -370,7 +370,7 @@ export class BatchService {
   }
 
   async findOne(id: string, isPopulated: boolean = false): Promise<Batch> {
-    let options = {};
+    let options: Record<string, any>;
     if (isPopulated) {
       options = {
         attributes: ['id', 'createdAt', 'validity', 'batchNumber', 'quantity'],

@@ -153,9 +153,9 @@ export class SalesHelperService {
       item.nhisCovered = true;
       count += 1;
 
-      let cappedPrice = this.calculateCappedPrice(item.sellingPrice, markup);
+      // let cappedPrice = this.calculateCappedPrice(item.sellingPrice, markup);
       // cappedPrice = Math.max(cappedPrice, 0);
-      cappedPrice = item.sellingPrice; // changed to 0 for original structure
+      const cappedPrice = item.sellingPrice; // changed to 0 for original structure
       finalTotal += cappedPrice * item.quantity;
     }
 
