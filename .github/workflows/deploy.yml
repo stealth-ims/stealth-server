@@ -45,8 +45,8 @@ jobs:
             # Pull the specific version generated in the previous job
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/stealth-server:${{ needs.build-and-push.outputs.short_sha }}
 
-            docker stop my-container || true
-            docker rm my-container || true
+            docker stop server-container || true
+            docker rm server-container || true
 
             # Run the container using the SHA tag
-            docker run -d --name my-container -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/stealth-server:${{ needs.build-and-push.outputs.short_sha }}
+            docker run -d --env-file ~/stealth-ims/creds/.env.production.server --name server-container -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/stealth-server:${{ needs.build-and-push.outputs.short_sha }}
