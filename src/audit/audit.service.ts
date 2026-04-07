@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { AuditLog } from './models/audit.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateAuditDto, FindAuditLogQueryDto, UpdateAuditDto } from './dto';
@@ -8,9 +8,13 @@ import { User } from '../auth/models/user.model';
 import { Facility } from '../admin/facility/models/facility.model';
 import { Department } from '../admin/department/models/department.model';
 import { Op } from 'sequelize';
+import { Cron } from '@nestjs/schedule';
+import { startOfMonth, subMonths } from 'date-fns';
 
 @Injectable()
 export class AuditsService {
+  private readonly logger = new Logger(AuditsService.name);
+
   constructor(
     @InjectModel(AuditLog)
     private readonly auditLogRepository: typeof AuditLog,
@@ -21,6 +25,17 @@ export class AuditsService {
     @InjectModel(User)
     private readonly userRepository: typeof User,
   ) {}
+
+  @Cron('0 0 2 1 * *')
+  async purgeOldAuditLogs(): Promise<void> {
+    const cutoff = startOfMonth(subMonths(new Date(), 1));
+    const deleted = await this.auditLogRepository.destroy({
+      where: { createdAt: { [Op.lt]: cutoff } },
+    });
+    this.logger.log(
+      `Purged ${deleted} audit log(s) from before ${cutoff.toISOString()}`,
+    );
+  }
 
   async create(payload: CreateAuditDto): Promise<void> {
     await this.auditLogRepository.create(payload);
@@ -139,13 +154,17 @@ export class AuditsService {
     if (audit.facilityId) {
       audit.facility = await this.facilityRepository.findByPk(
         audit.facilityId,
-        { attributes: ['id', 'name'] },
+        {
+          attributes: ['id', 'name'],
+        },
       );
     }
     if (audit.departmentId) {
       audit.department = await this.departmentRepository.findByPk(
         audit.departmentId,
-        { attributes: ['id', 'name'] },
+        {
+          attributes: ['id', 'name'],
+        },
       );
     }
     return audit;

@@ -65,6 +65,7 @@ import { CustomApiResponse } from '../core/shared/docs/decorators';
 import { AdminSignUpDto } from '../user/dto/signup.dto';
 import { Request } from 'express';
 import { CacheTTL } from '@nestjs/cache-manager';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -125,6 +126,7 @@ export class AuthController {
     description: 'Profile Picture',
     type: ImageUploadDto,
   })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
@@ -180,6 +182,7 @@ export class AuthController {
     type: ApiErrorResponse,
     description: 'Validation error occured',
   })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async signIn(@Body() dto: LoginDto) {
