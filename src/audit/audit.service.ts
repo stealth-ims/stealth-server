@@ -32,7 +32,7 @@ export class AuditsService {
     const deleted = await this.auditLogRepository.destroy({
       where: { createdAt: { [Op.lt]: cutoff } },
     });
-    this.logger.log(
+    this.logger.debug(
       `Purged ${deleted} audit log(s) from before ${cutoff.toISOString()}`,
     );
   }
