@@ -26,7 +26,7 @@ export class AuditsService {
     private readonly userRepository: typeof User,
   ) {}
 
-  @Cron('0 0 2 1 * *', { disabled: process.env.NODE_ENV === 'production' })
+  @Cron('0 0 2 1 * *', { disabled: process.env.NODE_ENV !== 'production' })
   async purgeOldAuditLogs(): Promise<void> {
     const cutoff = startOfMonth(subMonths(new Date(), 2));
     const deleted = await this.auditLogRepository.destroy({
