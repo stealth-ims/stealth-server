@@ -45,7 +45,6 @@ module.exports = {
       },
       phoneNumber: {
         type: Sequelize.STRING,
-        allowNull: false,
         field: 'phone_number',
       },
       email: {

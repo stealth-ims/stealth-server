@@ -58,6 +58,7 @@ export class Supplier extends BaseModel<Supplier> {
   @Column
   department: string;
 
+  @AllowNull
   @Column
   phoneNumber: string;
 
